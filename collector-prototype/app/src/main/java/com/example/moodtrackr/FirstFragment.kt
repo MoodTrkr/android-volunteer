@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 
+//import com.example.moodtrackr.AppUsageExtractor
+
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
@@ -34,6 +36,8 @@ class FirstFragment : Fragment() {
 
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+//            val extractor = AppUsageExtractor()
+//            extractor.instantReturn()
         }
     }
 
