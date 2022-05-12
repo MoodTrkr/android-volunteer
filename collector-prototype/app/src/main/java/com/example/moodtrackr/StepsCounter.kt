@@ -35,7 +35,7 @@ class StepsCounter(activity: FragmentActivity) : Fragment(), SensorEventListener
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        Log.d("test", event!!.values[0].toString())
+        Log.d("DEBUG", event!!.values[0].toString())
     }
 
 }
