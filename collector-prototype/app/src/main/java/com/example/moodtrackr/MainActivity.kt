@@ -42,14 +42,11 @@ class MainActivity : AppCompatActivity() {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
-//            requestMultiplePermissions.launch(
-//                arrayOf(
-//                    Manifest.permission.READ_EXTERNAL_STORAGE,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-////                    Manifest.permission.PACKAGE_USAGE_STATS,
-//                    Manifest.permission.INTERNET
-//                )
-//            )
+            requestMultiplePermissions.launch(
+                arrayOf(
+                    Manifest.permission.READ_CALL_LOG
+                )
+            )
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }

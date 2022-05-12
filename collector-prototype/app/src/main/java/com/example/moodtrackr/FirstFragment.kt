@@ -39,11 +39,17 @@ class FirstFragment : Fragment() {
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            val button: Button = view.findViewById(R.id.button1) as Button
             Log.e("DEBUG", "test_before")
-            val extractor = AppUsageExtractor(activity)
-            val extracted = extractor.instantReturn()
+            val usageExtractor = AppUsageExtractor(activity)
+            val usageQuery = usageExtractor.instantReturn()
 //            button.text = "d"
             Log.e("DEBUG", "test_after")
-            Log.e("DEBUG", extracted.toString())
+            Log.e("DEBUG", usageQuery.toString())
+
+            val callLogsExtractor = CallLogsStatsExtractor(activity)
+            val callLogsOutput = callLogsExtractor.instantReturn()
+            for (line in callLogsOutput) {
+                Log.e("DEBUG", line)
+            }
         }
     }
 
