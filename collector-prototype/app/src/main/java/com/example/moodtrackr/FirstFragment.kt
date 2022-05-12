@@ -1,12 +1,13 @@
 package com.example.moodtrackr
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.example.moodtrackr.databinding.FragmentFirstBinding
+
 
 //import com.example.moodtrackr.AppUsageExtractor
 
@@ -35,9 +36,14 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-//            val extractor = AppUsageExtractor()
-//            extractor.instantReturn()
+//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+//            val button: Button = view.findViewById(R.id.button1) as Button
+            Log.e("DEBUG", "test_before")
+            val extractor = AppUsageExtractor(activity)
+            val extracted = extractor.instantReturn()
+//            button.text = "d"
+            Log.e("DEBUG", "test_after")
+            Log.e("DEBUG", extracted.toString())
         }
     }
 
