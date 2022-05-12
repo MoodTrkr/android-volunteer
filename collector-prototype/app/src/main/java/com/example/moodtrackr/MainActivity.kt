@@ -1,5 +1,6 @@
 package com.example.moodtrackr
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -40,15 +41,12 @@ class MainActivity : AppCompatActivity() {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
-//            requestMultiplePermissions.launch(
-//                arrayOf(
-//                    Manifest.permission.READ_EXTERNAL_STORAGE,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-////                    Manifest.permission.PACKAGE_USAGE_STATS,
-//                    Manifest.permission.INTERNET
-//                )
-//            )
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            requestMultiplePermissions.launch(
+                arrayOf(
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                )
+            )
+//            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
         if (savedInstanceState == null) {
             // 2
