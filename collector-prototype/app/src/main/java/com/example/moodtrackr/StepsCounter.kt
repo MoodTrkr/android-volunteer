@@ -27,7 +27,7 @@ class StepsCounter(activity: FragmentActivity) : Fragment(), SensorEventListener
         val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
             ?: throw Exception("Got no step sensor")
 
-        var startCount = 0
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
