@@ -1,11 +1,9 @@
 package com.example.moodtrackr
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -51,6 +49,13 @@ class MainActivity : AppCompatActivity() {
 //                )
 //            )
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+        }
+        if (savedInstanceState == null) {
+            // 2
+            supportFragmentManager
+                .beginTransaction()
+                .add(0, StepsCounter(this), "dogList")
+                .commit()
         }
     }
 
