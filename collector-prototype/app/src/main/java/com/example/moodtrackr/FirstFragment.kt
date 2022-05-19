@@ -50,6 +50,10 @@ class FirstFragment : Fragment() {
             for (line in callLogsOutput) {
                 Log.e("DEBUG", line)
             }
+
+            val networkExtractor = OfflineExtractor(activity)
+            //val networkQuery = networkExtractor.instantReturn()
+            //Log.e("DEBUG", networkQuery.toString())
         }
     }
 

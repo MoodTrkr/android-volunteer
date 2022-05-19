@@ -44,10 +44,11 @@ class MainActivity : AppCompatActivity() {
 
             requestMultiplePermissions.launch(
                 arrayOf(
-                    Manifest.permission.READ_CALL_LOG
+                    Manifest.permission.READ_CALL_LOG,
+                    Manifest.permission.ACCESS_NETWORK_STATE
                 )
             )
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
 
