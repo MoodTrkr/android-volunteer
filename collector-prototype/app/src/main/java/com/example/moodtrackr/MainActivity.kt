@@ -34,6 +34,10 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
+        val intent = Intent(this, DataCollectorService::class.java)
+//            requireActivity().applicationContext.startForegroundService(intent)
+        startService(intent)
+
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
