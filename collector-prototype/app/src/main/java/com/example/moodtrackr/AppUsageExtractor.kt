@@ -14,7 +14,7 @@ class AppUsageExtractor(context: FragmentActivity?) {
     private var context: Context? = null
 
     init {
-        val context = context!!.applicationContext
+        this.context = context!!.applicationContext
         setUSM(context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager)
     }
 

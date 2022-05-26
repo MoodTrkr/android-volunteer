@@ -42,12 +42,7 @@ class MainActivity : AppCompatActivity() {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
-            requestMultiplePermissions.launch(
-                arrayOf(
-                    Manifest.permission.READ_CALL_LOG,
-                    Manifest.permission.ACCESS_NETWORK_STATE
-                )
-            )
+            val permsManager: PermissionsManager = PermissionsManager(this)
             //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }

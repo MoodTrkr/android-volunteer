@@ -17,10 +17,10 @@ class CallLogsStatsExtractor(context: FragmentActivity?) {
     private var baseContext: Context? = null
 
     init {
-        val appContext = context!!.applicationContext
-        val baseContext = context!!.baseContext
+        this.appContext = context!!.applicationContext
+        this.baseContext = context!!.baseContext
         val cr: ContentResolver = baseContext!!.contentResolver
-        val callLogsCursor: Cursor? = cr.query(CallLog.Calls.CONTENT_URI, null, "1", null, CallLog.Calls.DATE)
+        this.callLogsCursor = cr.query(CallLog.Calls.CONTENT_URI, null, "1", null, CallLog.Calls.DATE)
 
         setCallLogsCursor(callLogsCursor!!)
     }
