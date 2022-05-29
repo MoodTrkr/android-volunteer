@@ -37,12 +37,13 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        val permsManager: PermissionsManager = PermissionsManager(this)
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
-            val permsManager: PermissionsManager = PermissionsManager(this)
+            permsManager.checkAllPermissions()
             //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }

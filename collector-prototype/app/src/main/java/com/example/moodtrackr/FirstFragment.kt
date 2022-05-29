@@ -1,5 +1,6 @@
 package com.example.moodtrackr
 
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,6 +35,7 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val permsManager: PermissionsManager = PermissionsManager(this)
 
         binding.buttonFirst.setOnClickListener {
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
@@ -53,6 +55,13 @@ class FirstFragment : Fragment() {
 
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()
+
+            val geoExtractor = GeoDataExtractor(activity, permsManager)
+            val loc = geoExtractor.getLoc()
+//            geoExtractor.getLoc()                                               //this is async, so we'll print here instead of returning anything
+//            val locStr: String = "Latitude: " + loc.latitude.toString() + ", Longitude: " + loc.longitude.toString() + ", Accuracy: " + loc.accuracy.toString()
+//            Log.e("DEBUG", loc.toString())
+
             //Log.e("DEBUG", networkQuery.toString())
         }
     }

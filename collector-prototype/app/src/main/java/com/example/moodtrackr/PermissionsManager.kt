@@ -28,6 +28,7 @@ class PermissionsManager() {
     )
 
     constructor(fragment: Fragment) : this() {
+        Log.e("DEBUG", "Initialized on Fragment")
         this.appContext = fragment.requireActivity().applicationContext
         this.baseContext = fragment.requireActivity().baseContext
         this.requestMultiplePermissions = fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -38,6 +39,7 @@ class PermissionsManager() {
     }
 
     constructor(activity: FragmentActivity) : this() {
+        Log.e("DEBUG", "Initialized on Activity")
         this.appContext = activity.applicationContext
         this.baseContext = activity.baseContext
         this.requestMultiplePermissions = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -56,6 +58,7 @@ class PermissionsManager() {
     }
 
     fun checkAllPermissions() {
+        Log.e("DEBUG", "Checking all Permissions!")
         var notProvidedPermissions: Array<String> = emptyArray()
         mandatoryPermissions.forEach { permission ->
             if (ActivityCompat.checkSelfPermission(
@@ -67,6 +70,7 @@ class PermissionsManager() {
     }
 
     fun checkLocPermissions() {
+        Log.e("DEBUG", "Check Loc Permissions!")
         if (ActivityCompat.checkSelfPermission(
                 appContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
