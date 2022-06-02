@@ -63,6 +63,10 @@ class FirstFragment : Fragment() {
 //            Log.e("DEBUG", loc.toString())
 
             //Log.e("DEBUG", networkQuery.toString())
+
+            val geoFenceTracker = null
+
+
         }
     }
 
