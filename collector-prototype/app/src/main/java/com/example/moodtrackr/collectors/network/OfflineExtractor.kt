@@ -1,11 +1,8 @@
-package com.example.moodtrackr
+package com.example.moodtrackr.collectors.network
 
-import android.app.usage.UsageEvents
 import android.content.Context
 import android.net.*
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import java.util.*
 
 
 class OfflineExtractor(activity: FragmentActivity?) {

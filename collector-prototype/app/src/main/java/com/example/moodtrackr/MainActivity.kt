@@ -1,11 +1,7 @@
 package com.example.moodtrackr
 
-import android.Manifest
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.moodtrackr.databinding.ActivityMainBinding
+import com.example.moodtrackr.utilities.PermissionsManager
 
 class MainActivity : AppCompatActivity() {
 

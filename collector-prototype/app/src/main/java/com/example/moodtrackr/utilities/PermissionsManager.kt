@@ -1,18 +1,14 @@
-package com.example.moodtrackr
+package com.example.moodtrackr.utilities
 
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Location
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import java.security.Permissions
-import java.util.*
-import kotlin.collections.ArrayList
 
 
 class PermissionsManager() {

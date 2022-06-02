@@ -1,16 +1,20 @@
 package com.example.moodtrackr
 
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.moodtrackr.collectors.AppUsageExtractor
+import com.example.moodtrackr.collectors.CallLogsStatsExtractor
+import com.example.moodtrackr.collectors.geo.GeoDataExtractor
+import com.example.moodtrackr.collectors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
+import com.example.moodtrackr.utilities.PermissionsManager
 
 
-//import com.example.moodtrackr.AppUsageExtractor
+//import com.example.moodtrackr.extractors.AppUsageExtractor
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.

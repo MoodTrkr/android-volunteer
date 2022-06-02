@@ -1,4 +1,4 @@
-package com.example.moodtrackr
+package com.example.moodtrackr.collectors.network
 
 import android.app.usage.UsageEvents
 import android.content.Context
