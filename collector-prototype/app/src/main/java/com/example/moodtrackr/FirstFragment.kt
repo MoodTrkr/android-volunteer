@@ -11,6 +11,7 @@ import com.example.moodtrackr.extractors.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
+import com.example.moodtrackr.extractors.StepsCountExtractor
 import com.example.moodtrackr.utilities.PermissionsManager
 
 
@@ -42,6 +43,12 @@ class FirstFragment : Fragment() {
         val permsManager: PermissionsManager = PermissionsManager(this)
 
         binding.buttonFirst.setOnClickListener {
+            if (savedInstanceState == null) {
+                parentFragmentManager
+                    .beginTransaction()
+                    .add(0, StepsCountExtractor(requireActivity()), "dogList")
+                    .commit()
+            }
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            val button: Button = view.findViewById(R.id.button1) as Button
             Log.e("DEBUG", "test_before")
@@ -62,13 +69,6 @@ class FirstFragment : Fragment() {
 
             val geoExtractor = GeoDataExtractor(activity, permsManager)
             val loc = geoExtractor.getLoc()
-//            geoExtractor.getLoc()                                               //this is async, so we'll print here instead of returning anything
-//            val locStr: String = "Latitude: " + loc.latitude.toString() + ", Longitude: " + loc.longitude.toString() + ", Accuracy: " + loc.accuracy.toString()
-//            Log.e("DEBUG", loc.toString())
-
-            //Log.e("DEBUG", networkQuery.toString())
-
-            val geoFenceTracker = null
 
 
         }

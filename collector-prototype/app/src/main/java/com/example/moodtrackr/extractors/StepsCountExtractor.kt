@@ -1,0 +1,43 @@
+package com.example.moodtrackr.extractors
+
+import android.hardware.Sensor
+import android.hardware.SensorManager
+import android.hardware.SensorEventListener
+import android.content.Context
+import android.hardware.SensorEvent
+import androidx.fragment.app.FragmentActivity
+import android.util.Log
+import androidx.fragment.app.Fragment
+
+
+class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener {
+    private lateinit var activity: FragmentActivity
+    private lateinit var ctx : Context
+
+    init {
+        this.activity = activity
+        this.ctx = activity.applicationContext
+        if (ctx == null) {
+            Log.d("StepsCounter", "Context Failed")
+            throw Exception("Context Failed")
+        }
+        val sensorManager : SensorManager? = ctx.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        if (sensorManager == null) {
+            Log.d("StepsCounter", "Sensor Manager Failed")
+            throw Exception("Sensor Manager Failed")
+        }
+        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+            ?: throw Exception("Got no step sensor")
+
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        var x = 0
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        Log.d("DEBUG", event!!.values[0].toString())
+    }
+
+}
