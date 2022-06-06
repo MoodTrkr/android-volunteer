@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.moodtrackr.collectors.AppUsageExtractor
-import com.example.moodtrackr.collectors.CallLogsStatsExtractor
-import com.example.moodtrackr.collectors.geo.GeoDataExtractor
-import com.example.moodtrackr.collectors.network.OfflineExtractor
+import com.example.moodtrackr.extractors.AppUsageExtractor
+import com.example.moodtrackr.extractors.CallLogsStatsExtractor
+import com.example.moodtrackr.extractors.geo.GeoDataExtractor
+import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.utilities.PermissionsManager
 

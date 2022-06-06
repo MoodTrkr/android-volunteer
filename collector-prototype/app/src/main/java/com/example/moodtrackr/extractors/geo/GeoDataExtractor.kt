@@ -1,4 +1,4 @@
-package com.example.moodtrackr.collectors.geo
+package com.example.moodtrackr.extractors.geo
 
 import android.content.Context
 import android.location.Location

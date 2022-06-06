@@ -1,4 +1,4 @@
-package com.example.moodtrackr.collectors.network
+package com.example.moodtrackr.extractors.network
 
 import android.content.Context
 import android.net.*

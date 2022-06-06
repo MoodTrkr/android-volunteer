@@ -1,4 +1,4 @@
-package com.example.moodtrackr.collectors
+package com.example.moodtrackr.extractors
 
 import android.content.ContentResolver
 import android.content.Context
