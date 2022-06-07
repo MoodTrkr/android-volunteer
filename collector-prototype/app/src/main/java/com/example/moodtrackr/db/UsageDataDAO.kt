@@ -7,10 +7,10 @@ import androidx.room.Query
 @Dao
 interface UsageDataDAO {
 
-//    @Query("SELECT * FROM unlockRecord WHERE time >= :start AND time <= :end")
-//    fun getAllInTimeRange(start: Long, end: Long): List<UnlockRecord>
-//
-//    @Insert
-//    fun insertAll(vararg unlockRecord: UnlockRecord)
+    @Query("SELECT u.usage_val FROM usageRecords u WHERE u.date >= :start AND u.date <= :end")
+    fun getAllInTimeRange(start: Long, end: Long): List<UsageRecord>
+
+    @Insert
+    fun insertAll(vararg usageRecord: UsageRecord)
 
 }

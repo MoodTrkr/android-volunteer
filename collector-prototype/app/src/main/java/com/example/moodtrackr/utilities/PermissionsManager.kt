@@ -21,7 +21,8 @@ class PermissionsManager() {
         Manifest.permission.ACCESS_BACKGROUND_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACTIVITY_RECOGNITION
+        Manifest.permission.ACTIVITY_RECOGNITION,
+        Manifest.permission.FOREGROUND_SERVICE
     )
 
     constructor(fragment: Fragment) : this() {

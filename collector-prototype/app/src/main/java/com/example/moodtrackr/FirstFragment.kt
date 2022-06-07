@@ -12,7 +12,9 @@ import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.StepsCountExtractor
+import com.example.moodtrackr.extractors.UnlockCollector
 import com.example.moodtrackr.utilities.PermissionsManager
+import kotlin.concurrent.thread
 
 
 //import com.example.moodtrackr.extractors.AppUsageExtractor
@@ -49,6 +51,12 @@ class FirstFragment : Fragment() {
                     .add(0, StepsCountExtractor(requireActivity()), "dogList")
                     .commit()
             }
+
+            thread(start = true) {
+                val unlockCollector = UnlockCollector(activity)
+                Log.e("DEBUG", unlockCollector.getUnlockCount24h().toString())
+            }
+
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            val button: Button = view.findViewById(R.id.button1) as Button
             Log.e("DEBUG", "test_before")

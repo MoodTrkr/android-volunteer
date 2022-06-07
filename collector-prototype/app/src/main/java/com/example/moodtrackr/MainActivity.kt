@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.moodtrackr.databinding.ActivityMainBinding
+import com.example.moodtrackr.extractors.unlocks.DataCollectorService
 import com.example.moodtrackr.utilities.PermissionsManager
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +31,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+
+        val intent = Intent(this, DataCollectorService::class.java)
+//            requireActivity().applicationContext.startForegroundService(intent)
+        startService(intent)
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
