@@ -18,14 +18,19 @@ class AppUsageExtractor(context: FragmentActivity?) {
         this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
 
-    fun instantReturn(): MutableMap<String, UsageStats>? {
+    fun instantReturn(): MutableMap<String, Long> {
         val endTime = System.currentTimeMillis()
         val startTime = endTime - 1000*3600*24
         Log.e("DEBUG", startTime.toString())
         Log.e("DEBUG", endTime.toString())
 
 //        return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
-        return usm.queryAndAggregateUsageStats(startTime, endTime)
+        var stats = mutableMapOf<String, Long>()
+        var queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
+        queryResults = queryResults.filter { (key, value) -> value.totalTimeInForeground>0}
+
+        queryResults.forEach{(key, value) -> stats[key] = value.totalTimeInForeground }
+        return stats
     }
 
     fun screenOnTimeQuery(): Long {

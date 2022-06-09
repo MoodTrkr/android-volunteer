@@ -19,4 +19,8 @@ class CollectionUtil(context: FragmentActivity?) {
         this.appContext = context!!.applicationContext
         this.baseContext = context!!.baseContext
     }
+
+    fun dailyCollection() {
+
+    }
 }
