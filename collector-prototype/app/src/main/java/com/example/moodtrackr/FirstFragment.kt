@@ -78,6 +78,8 @@ class FirstFragment : Fragment() {
             val geoExtractor = GeoDataExtractor(activity, permsManager)
             val loc = geoExtractor.getLoc()
 
+            val screenOnTime: Long = usageExtractor.screenOnTimeQuery()
+            Log.e("DEBUG", "Screen Time: $screenOnTime")
 
         }
     }

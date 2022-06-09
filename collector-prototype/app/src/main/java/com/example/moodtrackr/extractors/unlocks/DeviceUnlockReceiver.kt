@@ -20,7 +20,7 @@ class DeviceUnlockReceiver: BroadcastReceiver() {
 
         ).build()
 
-        val time = UsageRecord(Date(), "unlock", "1")
+        val time = UsageRecord(Date().toString(), "unlock", "1")
         Log.e("DEBUG", "Zeus")
         // Use an injected singleton db context for real implementation.
 

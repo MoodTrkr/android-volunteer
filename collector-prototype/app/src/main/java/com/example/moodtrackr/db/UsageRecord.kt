@@ -8,7 +8,7 @@ import java.util.*
 
 @Entity(tableName = "usageRecords")
 data class UsageRecord constructor(
-    @ColumnInfo(name = "date") var date: Date,
+    @PrimaryKey @ColumnInfo(name = "date") var date: String,
     @ColumnInfo(name = "usage_var") var variable: String,
     @ColumnInfo(name = "usage_val") var value: String
 )

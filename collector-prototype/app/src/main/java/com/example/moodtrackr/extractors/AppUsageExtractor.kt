@@ -1,39 +1,43 @@
 package com.example.moodtrackr.extractors
 
 import android.app.usage.UsageEvents
+import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class AppUsageExtractor(context: FragmentActivity?) {
-    private var usm: UsageStatsManager? = null
-    private var context: Context? = null
+    private lateinit var usm: UsageStatsManager
+    private lateinit var context: Context
 
     init {
         this.context = context!!.applicationContext
-        setUSM(context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager)
+        this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
 
-    private fun getUSM(): UsageStatsManager {
-        return usm!!
-    }
-
-    private fun setUSM(inUsm: UsageStatsManager) {
-        usm = inUsm
-    }
-
-    fun instantReturn(): UsageEvents? {
-        val calendar = Calendar.getInstance()
+    fun instantReturn(): MutableMap<String, UsageStats>? {
         val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000*3600*24*3
+        val startTime = endTime - 1000*3600*24
         Log.e("DEBUG", startTime.toString())
         Log.e("DEBUG", endTime.toString())
 
-//        Log.e("DEBUG", isUserUnlocked(context!!).toString())
-//        var unlocked = (context!!.getSystemService(Context.USER_SERVICE) as UserManager).isUserUnlocked()
-//        Log.e("DEBUG", unlocked.toString())
-        return usm!!.queryEvents(startTime, endTime)
+//        return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
+        return usm.queryAndAggregateUsageStats(startTime, endTime)
+    }
+
+    fun screenOnTimeQuery(): Long {
+        val endTime = System.currentTimeMillis()
+        val startTime = endTime - 1000*3600*24
+        Log.e("DEBUG", startTime.toString())
+        Log.e("DEBUG", endTime.toString())
+
+        var screenTime: Long = 0
+        val queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
+        queryResults.forEach{(key, value) -> screenTime += value.totalTimeInForeground }
+        return TimeUnit.MILLISECONDS.toMinutes(screenTime)
+
     }
 }

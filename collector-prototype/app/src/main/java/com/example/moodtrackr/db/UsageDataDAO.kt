@@ -8,7 +8,7 @@ import androidx.room.Query
 interface UsageDataDAO {
 
     @Query("SELECT u.usage_val FROM usageRecords u WHERE u.date >= :start AND u.date <= :end")
-    fun getAllInTimeRange(start: Long, end: Long): List<UsageRecord>
+    fun getAllInTimeRange(start: Long, end: Long): List<String>
 
     @Insert
     fun insertAll(vararg usageRecord: UsageRecord)
