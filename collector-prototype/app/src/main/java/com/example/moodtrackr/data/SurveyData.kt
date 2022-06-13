@@ -6,6 +6,5 @@ import java.util.*
 
 data class SurveyData(
     val time: Date,
-    val callLogs: MTCallStats,
-    val screenTime: Long
+    val questions: Map<Int, Int>
     )
