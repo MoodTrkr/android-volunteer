@@ -9,4 +9,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.util.*
 
-data class HourlyCollection(val time: Date, val steps: Long, val unlocks: Long)
+data class HourlyCollection(
+    val time: Date,
+    val steps: Long,
+    val unlocks: Long
+    )
