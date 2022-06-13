@@ -1,13 +1,9 @@
 package com.example.moodtrackr.collectors
 
-import android.app.usage.UsageEvents
-import android.app.usage.UsageStatsManager
 import android.content.Context
-import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import com.example.moodtrackr.extractors.AppUsageExtractor
-import com.example.moodtrackr.extractors.CallLogsStatsExtractor
-import java.util.*
+import com.example.moodtrackr.extractors.usage.AppUsageExtractor
+import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 
 class CollectionUtil(context: FragmentActivity?) {
     private lateinit var usageExtractor: AppUsageExtractor

@@ -6,7 +6,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.room.Room
 import com.example.moodtrackr.db.AppDatabase
-import com.example.moodtrackr.db.UsageRecord
+import com.example.moodtrackr.db.realtime.RTUsageRecord
+import com.example.moodtrackr.db.records.UsageRecord
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -20,12 +21,12 @@ class DeviceUnlockReceiver: BroadcastReceiver() {
 
         ).build()
 
-        val time = UsageRecord(Date().toString(), "unlock", "1")
+        val time = RTUsageRecord(Date().toString(), "unlock", "1")
         Log.e("DEBUG", "Zeus")
         // Use an injected singleton db context for real implementation.
 
         thread(start = true) {
-            db.usageDataDAO().insertAll(time)
+            db.rtUsageDataDAO().insertAll(time)
         }
 
 

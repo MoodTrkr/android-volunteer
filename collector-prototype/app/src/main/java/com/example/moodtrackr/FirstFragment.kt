@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.moodtrackr.extractors.AppUsageExtractor
-import com.example.moodtrackr.extractors.CallLogsStatsExtractor
+import com.example.moodtrackr.extractors.usage.AppUsageExtractor
+import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
@@ -17,7 +17,7 @@ import com.example.moodtrackr.utilities.PermissionsManager
 import kotlin.concurrent.thread
 
 
-//import com.example.moodtrackr.extractors.AppUsageExtractor
+//import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -68,9 +68,7 @@ class FirstFragment : Fragment() {
 
             val callLogsExtractor = CallLogsStatsExtractor(activity)
             val callLogsOutput = callLogsExtractor.instantReturn()
-            for (line in callLogsOutput) {
-                Log.e("DEBUG", line)
-            }
+            callLogsOutput.forEach{(key, value) -> Log.e("DEBUG", "($key, $value)") }
 
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()

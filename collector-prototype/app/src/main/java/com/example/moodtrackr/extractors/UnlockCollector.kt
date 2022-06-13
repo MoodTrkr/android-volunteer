@@ -19,8 +19,8 @@ class UnlockCollector (context: FragmentActivity?){
     }
 
     fun getUnlockCount24h(): Int {
-        val usageRecordDAO = db.usageDataDAO()
+        val usageRecordDAO = db.rtUsageDataDAO()
 
-        return usageRecordDAO.getAllInTimeRange(System.currentTimeMillis()-86400000, System.currentTimeMillis()).count()
+        return usageRecordDAO.getAllUnlocksInTimeRange(System.currentTimeMillis()-86400000, System.currentTimeMillis()).count()
     }
 }

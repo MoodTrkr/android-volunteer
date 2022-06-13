@@ -1,12 +1,9 @@
-package com.example.moodtrackr.extractors
+package com.example.moodtrackr.extractors.usage
 
-import android.app.usage.UsageEvents
-import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class AppUsageExtractor(context: FragmentActivity?) {

@@ -1,4 +1,4 @@
-package com.example.moodtrackr.db
+package com.example.moodtrackr.db.records
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,6 +9,5 @@ import java.util.*
 @Entity(tableName = "usageRecords")
 data class UsageRecord constructor(
     @PrimaryKey @ColumnInfo(name = "date") var date: String,
-    @ColumnInfo(name = "usage_var") var variable: String,
-    @ColumnInfo(name = "usage_val") var value: String
+    @ColumnInfo(name = "usage_data") var variable: String
 )
