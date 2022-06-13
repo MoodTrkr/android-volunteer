@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 import java.util.*
 
-
 class MTUsageData() {
     @PrimaryKey @ColumnInfo(name = "date") lateinit var date: Date
     @ColumnInfo(name = "complete") var complete: Boolean = false
