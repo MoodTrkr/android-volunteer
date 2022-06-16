@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 import org.json.JSONObject
 import java.util.*
 
-@Entity(tableName = "usageRecords")
+//@Entity(tableName = "usageRecords")
+@Deprecated("Do not use")
 data class UsageRecord constructor(
     @PrimaryKey @ColumnInfo(name = "date") var date: String,
     @ColumnInfo(name = "usage_data") var variable: String

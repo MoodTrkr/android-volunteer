@@ -6,21 +6,22 @@ import androidx.room.Query
 import androidx.room.Update
 import java.sql.Date
 
-@Dao
+//@Dao
+@Deprecated("Do not use")
 interface UsageDataDAO {
 
-    @Query("SELECT u.usage_data FROM usageRecords u WHERE u.date >= :start AND u.date <= :end")
+//    @Query("SELECT u.usage_data FROM usageRecords u WHERE u.date >= :start AND u.date <= :end")
     fun getByTimeRange(start: Long, end: Long): List<String>
 
-    @Query("SELECT strftime('%d', :date) FROM usageRecords")
+//    @Query("SELECT strftime('%d', :date) FROM usageRecords")
     fun getByDate(date: Date): List<String>
 
-    @Query("SELECT * FROM usageRecords")
+//    @Query("SELECT * FROM usageRecords")
     fun getAll(date: Date): List<String>
 
-    @Insert
+//    @Insert
     fun insert(usageRecord: UsageRecord)
 
-    @Update
+//    @Update
     fun updateByDay(vararg usageRecord: UsageRecord)
 }

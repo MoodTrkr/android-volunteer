@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 import org.json.JSONObject
 import java.util.*
 
-@Entity(tableName = "RTUsageRecords")
+@Entity(tableName = "rt_usage_records")
 data class RTUsageRecord constructor(
-    @PrimaryKey @ColumnInfo(name = "date") var date: String,
-    @ColumnInfo(name = "usage_var") var usageVar: String,
-    @ColumnInfo(name = "usage_val") var usageVal: String
+    @PrimaryKey @ColumnInfo(name = "rt_date") var date: Date = Date(),
+    @ColumnInfo(name = "rt_usage_var") var usageVar: String = "",
+    @ColumnInfo(name = "rt_usage_val") var usageVal: String = ""
 )

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.moodtrackr.collectors.CollectionUtil
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
@@ -79,6 +80,9 @@ class FirstFragment : Fragment() {
             val screenOnTime: Long = usageExtractor.screenOnTimeQuery()
             Log.e("DEBUG", "Screen Time: $screenOnTime")
 
+            val collectionUtil: CollectionUtil = CollectionUtil(activity)
+            collectionUtil.dbInit()
+            Log.e("DEBUG", collectionUtil.getAll().toString())
         }
     }
 

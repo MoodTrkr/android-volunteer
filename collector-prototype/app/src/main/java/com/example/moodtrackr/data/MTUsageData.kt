@@ -2,20 +2,26 @@ package com.example.moodtrackr.data
 
 import android.text.format.DateUtils
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.moodtrackr.extractors.calls.data.MTCallStats
+import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import java.util.*
 
-class MTUsageData() {
-    @PrimaryKey @ColumnInfo(name = "date") lateinit var date: Date
-    @ColumnInfo(name = "complete") var complete: Boolean = false
-    @ColumnInfo(name = "hourly") lateinit var hourlyCollBook: HourlyCollectionBook
-    lateinit var dailyCollection: DailyCollection
-    lateinit var surveyData: SurveyData
-
+@Entity(tableName = "usage_records")
+data class MTUsageData(
+    @PrimaryKey @ColumnInfo(name = "date") var date: Date = Date(),
+    @ColumnInfo(name = "complete") var complete: Boolean = false,
+    @Embedded(prefix = "hourly_") var hourlyCollBook: HourlyCollectionBook = HourlyCollectionBook(),
+    @Embedded(prefix = "daily_") var dailyCollection: DailyCollection = DailyCollection(),
+    @Embedded(prefix = "survey_") var surveyData: SurveyData = SurveyData()
+)
+{
+    constructor() : this(Date(), false, HourlyCollectionBook(), DailyCollection(), SurveyData())
     constructor(complete: Boolean, date: Date, hourlyCollBook: HourlyCollectionBook, dailyCollection: DailyCollection, surveyData: SurveyData) : this() {
         this.complete = complete
         this.date = truncateDate(date)
-        this.complete = false
         this.hourlyCollBook = hourlyCollBook
         this.dailyCollection = dailyCollection
         this.surveyData = surveyData
@@ -45,9 +51,5 @@ class MTUsageData() {
         cal[Calendar.SECOND] = 0
         cal[Calendar.MILLISECOND] = 0
         return cal.time
-    }
-
-    fun dbInsert() {
-
     }
 }

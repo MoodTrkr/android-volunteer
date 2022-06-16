@@ -9,10 +9,10 @@ import java.sql.Date
 @Dao
 interface RTUsageDataDAO {
 
-    @Query("SELECT u.usage_val FROM rtUsageRecords u WHERE u.date >= :start AND u.date <= :end")
+    @Query("SELECT u.rt_usage_val FROM rt_usage_records u WHERE u.rt_date >= :start AND u.rt_date <= :end")
     fun getAllInTimeRange(start: Long, end: Long): List<String>
 
-    @Query("SELECT u.usage_val FROM rtUsageRecords u WHERE u.date >= :start AND u.date <= :end AND u.usage_var LIKE 'unlock' ")
+    @Query("SELECT u.rt_usage_val FROM rt_usage_records u WHERE u.rt_date >= :start AND u.rt_date <= :end AND u.rt_usage_var LIKE 'unlock' ")
     fun getAllUnlocksInTimeRange(start: Long, end: Long): List<String>
 
     @Insert

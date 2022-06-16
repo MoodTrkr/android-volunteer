@@ -21,7 +21,7 @@ class DeviceUnlockReceiver: BroadcastReceiver() {
 
         ).build()
 
-        val time = RTUsageRecord(Date().toString(), "unlock", "1")
+        val time = RTUsageRecord(Date(), "unlock", "1")
         Log.e("DEBUG", "Zeus")
         // Use an injected singleton db context for real implementation.
 
