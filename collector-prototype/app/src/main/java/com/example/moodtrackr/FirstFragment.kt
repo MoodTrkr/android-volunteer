@@ -62,7 +62,7 @@ class FirstFragment : Fragment() {
 //            val button: Button = view.findViewById(R.id.button1) as Button
             Log.e("DEBUG", "test_before")
             val usageExtractor = AppUsageExtractor(activity)
-            val usageQuery = usageExtractor.instantReturn()
+            val usageQuery = usageExtractor.usageStatsQuery()
 //            button.text = "d"
             Log.e("DEBUG", "test_after")
             Log.e("DEBUG", usageQuery.toString())

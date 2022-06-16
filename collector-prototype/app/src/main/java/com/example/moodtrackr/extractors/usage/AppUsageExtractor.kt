@@ -1,9 +1,11 @@
 package com.example.moodtrackr.extractors.usage
 
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class AppUsageExtractor(context: FragmentActivity?) {
@@ -15,7 +17,25 @@ class AppUsageExtractor(context: FragmentActivity?) {
         this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
 
-    fun instantReturn(): MutableMap<String, Long> {
+    fun usageEventsQuery(): MutableMap<Long, Pair<String, Int>> {
+        val endTime = System.currentTimeMillis()
+        val startTime = endTime - 1000*3600*24
+        Log.e("DEBUG", startTime.toString())
+        Log.e("DEBUG", endTime.toString())
+
+        val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)
+        var event: UsageEvents.Event? = null
+        var filteredEvents = mutableMapOf<Long, Pair<String, Int>>()
+        while (queryResults.hasNextEvent()) {
+            queryResults.getNextEvent(event)
+            if (event!!.eventType == UsageEvents.Event.ACTIVITY_PAUSED || event!!.eventType == UsageEvents.Event.ACTIVITY_RESUMED || event!!.eventType == UsageEvents.Event.ACTIVITY_STOPPED) {
+                filteredEvents[event!!.timeStamp] = Pair(event!!.packageName, event!!.eventType)
+            }
+        }
+        return filteredEvents
+    }
+
+    fun usageStatsQuery(): MutableMap<String, Long> {
         val endTime = System.currentTimeMillis()
         val startTime = endTime - 1000*3600*24
         Log.e("DEBUG", startTime.toString())
