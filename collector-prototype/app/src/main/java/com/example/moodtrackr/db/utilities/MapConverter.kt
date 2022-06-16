@@ -68,4 +68,16 @@ class MapConverter {
         val gson = Gson()
         return gson.toJson(map)
     }
+
+    @TypeConverter
+    fun UsageLogsMapFromString(value: String): MutableMap<Long, Pair<String, Int>> {
+        val mapType: Type = object : TypeToken<MutableMap<Long, Pair<String, Int>>>() {}.type
+        return Gson().fromJson(value, mapType)
+    }
+
+    @TypeConverter
+    fun fromUsageLogsMapMap(map: MutableMap<Long, Pair<String, Int>>): String {
+        val gson = Gson()
+        return gson.toJson(map)
+    }
 }

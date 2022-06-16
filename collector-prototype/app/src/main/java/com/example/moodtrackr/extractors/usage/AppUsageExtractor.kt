@@ -24,7 +24,7 @@ class AppUsageExtractor(context: FragmentActivity?) {
         Log.e("DEBUG", endTime.toString())
 
         val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)
-        var event: UsageEvents.Event? = null
+        var event: UsageEvents.Event? = UsageEvents.Event()
         var filteredEvents = mutableMapOf<Long, Pair<String, Int>>()
         while (queryResults.hasNextEvent()) {
             queryResults.getNextEvent(event)
