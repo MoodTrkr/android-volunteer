@@ -17,12 +17,7 @@ class AppUsageExtractor(context: FragmentActivity?) {
         this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
 
-    fun usageEventsQuery(): MutableMap<Long, Pair<String, Int>> {
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000*3600*24
-        Log.e("DEBUG", startTime.toString())
-        Log.e("DEBUG", endTime.toString())
-
+    fun usageEventsQuery(startTime: Long, endTime: Long): MutableMap<Long, Pair<String, Int>> {
         val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)
         var event: UsageEvents.Event? = UsageEvents.Event()
         var filteredEvents = mutableMapOf<Long, Pair<String, Int>>()
@@ -35,12 +30,7 @@ class AppUsageExtractor(context: FragmentActivity?) {
         return filteredEvents
     }
 
-    fun usageStatsQuery(): MutableMap<String, Long> {
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000*3600*24
-        Log.e("DEBUG", startTime.toString())
-        Log.e("DEBUG", endTime.toString())
-
+    fun usageStatsQuery(startTime: Long, endTime: Long): MutableMap<String, Long> {
 //        return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
         var stats = mutableMapOf<String, Long>()
         var queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
@@ -50,12 +40,7 @@ class AppUsageExtractor(context: FragmentActivity?) {
         return stats
     }
 
-    fun screenOnTimeQuery(): Long {
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 1000*3600*24
-        Log.e("DEBUG", startTime.toString())
-        Log.e("DEBUG", endTime.toString())
-
+    fun screenOnTimeQuery(startTime: Long, endTime: Long): Long {
         var screenTime: Long = 0
         val queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
         queryResults.forEach{(key, value) -> screenTime += value.totalTimeInForeground }

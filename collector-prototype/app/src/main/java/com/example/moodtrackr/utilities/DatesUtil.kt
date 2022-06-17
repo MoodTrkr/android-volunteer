@@ -1,13 +1,7 @@
 package com.example.moodtrackr.utilities
 
-import android.content.Context
-import androidx.fragment.app.FragmentActivity
-import androidx.room.Room
-import com.example.moodtrackr.db.AppDatabase
-import com.example.moodtrackr.db.realtime.RTUsageDataDAO
-import com.example.moodtrackr.db.records.UsageRecordsDAO
+import com.example.moodtrackr.R
 import java.util.*
-import kotlin.concurrent.thread
 
 class DatesUtil() {
     companion object {
@@ -65,6 +59,21 @@ class DatesUtil() {
             cal[Calendar.SECOND] = 0
             cal[Calendar.MILLISECOND] = 0
             return cal.time
+        }
+
+        fun todayQueryWrapper(f: (startTime: Long, endTime: Long) -> Any): Any {
+            val bounds: Pair<Long, Long> = getDayBounds(getToday())
+            return f(bounds.first, bounds.second)
+        }
+
+        fun yesterdayQueryWrapper(f: (startTime: Long, endTime: Long) -> Any): Any {
+            val bounds: Pair<Long, Long> = getDayBounds(getYesterday())
+            return f(bounds.first, bounds.second)
+        }
+
+        fun boundsInsertionWrapper(date: Date, f: (startTime: Long, endTime: Long) -> Any): Any {
+            val bounds: Pair<Long, Long> = getDayBounds(date)
+            return f(bounds.first, bounds.second)
         }
     }
 }
