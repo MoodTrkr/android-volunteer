@@ -83,7 +83,7 @@ class FirstFragment : Fragment() {
             Log.e("DEBUG", "Screen Time: $screenOnTime")
 
             val collectionUtil: CollectionUtil = CollectionUtil(activity)
-            collectionUtil.dbInit()
+            //collectionUtil.dbInit()
             Log.e("DEBUG", collectionUtil.getAll().toString())
         }
     }
