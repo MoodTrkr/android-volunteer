@@ -8,10 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
+import com.example.moodtrackr.survey.SurveyFragment
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.extractors.unlocks.DataCollectorService
 import com.example.moodtrackr.utilities.DatabaseManager
@@ -30,18 +32,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // inject fragment if it has not been added to the activity
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add<SurveyFragment>(R.id.fragment_container_view)
+            }
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
 
         val intent = Intent(this, DataCollectorService::class.java)
 //            requireActivity().applicationContext.startForegroundService(intent)
         startService(intent)
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
         val permsManager: PermissionsManager = PermissionsManager(this)
         val dbManager = DatabaseManager(this)
 

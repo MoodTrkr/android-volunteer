@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener {
     private lateinit var ctx : Context
     private var stepsDBLastUpdate: Long = 0
+    val type: String = "persistent"
 
     init {
         this.ctx = activity.applicationContext
