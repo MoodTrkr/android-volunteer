@@ -12,7 +12,7 @@ import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 
 @Database(entities = [MTUsageData::class, RTUsageRecord::class], version = 2)
-@TypeConverters(DateConverter::class, MapConverter::class)
+@TypeConverters(DateConverter::class, MapConverter::class, StringConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun usageRecordsDAO(): UsageRecordsDAO
     abstract fun rtUsageDataDAO(): RTUsageDataDAO
