@@ -8,14 +8,17 @@ import android.hardware.SensorEvent
 import androidx.fragment.app.FragmentActivity
 import android.util.Log
 import androidx.fragment.app.Fragment
+import com.example.moodtrackr.db.realtime.RTUsageRecord
+import com.example.moodtrackr.utilities.DatabaseManager
+import com.example.moodtrackr.utilities.DatesUtil
+import kotlinx.coroutines.runBlocking
 
 
 class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener {
-    private lateinit var activity: FragmentActivity
     private lateinit var ctx : Context
+    private var stepsDBLastUpdate: Long = 0
 
     init {
-        this.activity = activity
         this.ctx = activity.applicationContext
         if (ctx == null) {
             Log.d("StepsCounter", "Context Failed")
@@ -37,7 +40,44 @@ class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventL
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        steps = event!!.values[0].toLong()
         Log.d("DEBUG", event!!.values[0].toString())
     }
 
+    private fun updateSequence() {
+        if ( steps - stepsDBLastUpdate  > 100 ) {
+            updateDB( steps )
+        }
+    }
+
+    private fun updateDB(steps: Long) {
+        runBlocking {
+            var stepsDB = DatabaseManager.rtUsageRecordsDAO.getStepsObjOnDay(
+                DatesUtil.getTodayTruncated().time
+            )
+            stepsDB = checkSequence(stepsDB)
+            stepsDB.usageVal = steps.toString()
+            DatabaseManager.rtUsageRecordsDAO.update( stepsDB )
+            stepsDBLastUpdate = steps
+        }
+    }
+
+    private fun checkSequence(stepsDB: RTUsageRecord?): RTUsageRecord {
+        var stepsDBNew : RTUsageRecord? = stepsDB
+        runBlocking {
+            if (stepsDB === null) {
+                var stepsDBNew : RTUsageRecord = RTUsageRecord(
+                    DatesUtil.getTodayTruncated(),
+                    "steps",
+                    "0"
+                )
+                DatabaseManager.rtUsageRecordsDAO.insertAll( stepsDBNew )
+            }
+        }
+        return stepsDBNew!!
+    }
+
+    companion object {
+        var steps: Long = 0
+    }
 }
