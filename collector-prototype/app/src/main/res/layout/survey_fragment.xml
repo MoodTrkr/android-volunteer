@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionTwo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionThree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionFour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionFive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+        <Button
+            android:textAllCaps="false"
+            android:id="@+id/optionSix"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="300dp" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
