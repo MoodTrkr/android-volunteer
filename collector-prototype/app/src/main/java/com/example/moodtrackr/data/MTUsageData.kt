@@ -13,7 +13,7 @@ import java.util.*
 data class MTUsageData(
     @PrimaryKey @ColumnInfo(name = "date") var date: Date = Date(),
     @ColumnInfo(name = "complete") var complete: Boolean = false,
-    @Embedded(prefix = "hourly_") var hourlyCollBook: HourlyCollectionBook = HourlyCollectionBook(),
+    @Embedded(prefix = "periodic_") var hourlyCollBook: HourlyCollectionBook = HourlyCollectionBook(),
     @Embedded(prefix = "daily_") var dailyCollection: DailyCollection = DailyCollection(),
     @Embedded(prefix = "survey_") var surveyData: SurveyData = SurveyData()
 )
