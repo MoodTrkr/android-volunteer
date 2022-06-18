@@ -10,13 +10,15 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 
 
-class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener {
-    private lateinit var activity: FragmentActivity
-    private lateinit var ctx : Context
+class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener, Extractor {
+
+    override val type: String = "persistent"
+    companion object {
+        var STEP_COUNT:Int = 0
+    }
 
     init {
-        this.activity = activity
-        this.ctx = activity.applicationContext
+        val ctx = activity.applicationContext
         if (ctx == null) {
             Log.d("StepsCounter", "Context Failed")
             throw Exception("Context Failed")
@@ -38,6 +40,11 @@ class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventL
 
     override fun onSensorChanged(event: SensorEvent?) {
         Log.d("DEBUG", event!!.values[0].toString())
+        STEP_COUNT = event!!.values[0].toInt()
+    }
+
+    fun getData():Int {
+        return STEP_COUNT
     }
 
 }
