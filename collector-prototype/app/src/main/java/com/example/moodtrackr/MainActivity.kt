@@ -1,11 +1,8 @@
 package com.example.moodtrackr
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,6 +12,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.moodtrackr.databinding.ActivityMainBinding
+import com.example.moodtrackr.extractors.unlocks.DataCollectorService
+import com.example.moodtrackr.utilities.PermissionsManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,23 +33,21 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
+        val intent = Intent(this, DataCollectorService::class.java)
+//            requireActivity().applicationContext.startForegroundService(intent)
+        startService(intent)
+
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        val permsManager: PermissionsManager = PermissionsManager(this)
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
-//            requestMultiplePermissions.launch(
-//                arrayOf(
-//                    Manifest.permission.READ_EXTERNAL_STORAGE,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-////                    Manifest.permission.PACKAGE_USAGE_STATS,
-//                    Manifest.permission.INTERNET
-//                )
-//            )
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            permsManager.checkAllPermissions()
+            //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
 
