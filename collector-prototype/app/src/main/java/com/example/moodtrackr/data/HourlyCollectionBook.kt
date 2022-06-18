@@ -18,8 +18,8 @@ data class HourlyCollectionBook(
 {
     constructor() : this(mutableMapOf<Int, HourlyCollection>())
     operator fun get(idx: Int): HourlyCollection? { return this.book[idx] }
-    operator fun set(idx: Int, value: HourlyCollection) { if (idx<24) this.book[idx] = value }
+    operator fun set(idx: Int, value: HourlyCollection) { if (idx<144) this.book[idx] = value }
     fun size(): Int { return this.book.keys.size }
-    fun isFull(): Boolean { return this.book.keys.size == 24 }
+    fun isFull(): Boolean { return this.book.keys.size == 144 }
 }
 
