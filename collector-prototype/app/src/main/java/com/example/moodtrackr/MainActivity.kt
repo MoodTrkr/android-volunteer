@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
 
         val permsManager: PermissionsManager = PermissionsManager(this)
-        val dbManager = DatabaseManager(this)
+        val dbManager = DatabaseManager.getInstance(this.applicationContext)
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines

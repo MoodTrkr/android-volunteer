@@ -16,12 +16,12 @@ import kotlinx.coroutines.runBlocking
 
 
 class StepsCountExtractor(context: Context) : Fragment(), SensorEventListener {
-    private lateinit var context : Context
+    private lateinit var ctx : Context
     private var stepsDBLastUpdate: Long = 0
 
     constructor(activity: FragmentActivity): this(activity.applicationContext)
     init {
-        this.context = context
+        this.ctx = context
         if (context == null) {
             Log.d("StepsCounter", "Context Failed")
             throw Exception("Context Failed")

@@ -17,7 +17,7 @@ class AppUsageExtractor(context: Context) {
         this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
 
-    constructor(activity: FragmentActivity) : this(activity.baseContext)
+    constructor(activity: FragmentActivity?) : this(activity!!.baseContext)
 
     fun usageEventsQuery(startTime: Long, endTime: Long): MutableMap<Long, Pair<String, Int>> {
         val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)

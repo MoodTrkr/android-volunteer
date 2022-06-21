@@ -1,31 +1,33 @@
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.work.CoroutineWorker
-import androidx.work.ForegroundInfo
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.core.content.ContextCompat
+import androidx.work.*
 import com.example.moodtrackr.R
 import com.example.moodtrackr.extractors.StepsCountExtractor
-import com.example.moodtrackr.extractors.unlocks.DeviceUnlockReceiver
+import com.example.moodtrackr.extractors.unlocks.DataCollectorService
+
 
 class PersistentWorker(context: Context, parameters: WorkerParameters) :
-    CoroutineWorker(context, parameters) {
+    Worker(context, parameters) {
     private var context: Context = context
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as
                 NotificationManager
 
-    override suspend fun doWork(): Result {
-        // Mark the Worker as important
-        val progress = "Starting Download"
-        setForeground(createForegroundInfo(progress))
-        setupExtractors()
+    override fun doWork(): Result {
+        Log.e("DEBUG", "doWork called for: " + this.id)
+        Log.e("DEBUG", "Service Running: " + DataCollectorService.running)
+        if (!DataCollectorService.running) {
+            Log.d("DEBUG", "starting service from doWork")
+            val intent = Intent(context, DataCollectorService::class.java)
+            ContextCompat.startForegroundService(context, intent)
+        }
         return Result.success()
     }
 

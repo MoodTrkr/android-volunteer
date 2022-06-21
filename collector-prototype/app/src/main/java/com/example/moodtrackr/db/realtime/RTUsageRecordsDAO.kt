@@ -7,7 +7,7 @@ import androidx.room.Update
 import java.sql.Date
 
 @Dao
-interface RTUsageDataDAO {
+interface RTUsageRecordsDAO {
 
     @Query("SELECT u.rt_usage_val FROM rt_usage_records u WHERE u.rt_date >= :start AND u.rt_date <= :end")
     suspend fun getAllInTimeRange(start: Long, end: Long): List<String>?

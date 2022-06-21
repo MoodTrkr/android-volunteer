@@ -9,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.*
 import com.example.moodtrackr.R
+import com.example.moodtrackr.db.AppDatabase
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.StepsCountExtractor
 import com.example.moodtrackr.extractors.unlocks.DeviceUnlockReceiver
@@ -16,18 +17,15 @@ import com.example.moodtrackr.utilities.DatabaseManager
 import com.example.moodtrackr.utilities.DatesUtil
 import kotlinx.coroutines.runBlocking
 
-class StepsWorker(context: Context, parameters: WorkerParameters) :
+class UnlocksWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
     private var context: Context = context
-    private val notificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as
-                NotificationManager
 
     override suspend fun doWork(): Result {
         Log.e("DEBUG", "Test")
         runBlocking {
             val time = DatesUtil.getTodayTruncated().time
-            var unlocks: RTUsageRecord? = DatabaseManager.rtUsageRecordsDAO.getUnlockObjOnDay(time)
+            var unlocks: RTUsageRecord? = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getUnlockObjOnDay(time)
             unlocks = checkSequence(unlocks)
             updateDBUnchecked(unlocks!!.usageVal.toLong()+1)
         }
@@ -36,11 +34,11 @@ class StepsWorker(context: Context, parameters: WorkerParameters) :
 
     private fun updateDBUnchecked(unlocks: Long) {
         runBlocking {
-            var unlocksDB = DatabaseManager.rtUsageRecordsDAO.getUnlockObjOnDay(
+            var unlocksDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getUnlockObjOnDay(
                 DatesUtil.getTodayTruncated().time
             )
             unlocksDB!!.usageVal = unlocks.toString()
-            DatabaseManager.rtUsageRecordsDAO.update( unlocksDB )
+            DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( unlocksDB )
         }
     }
 
@@ -53,7 +51,7 @@ class StepsWorker(context: Context, parameters: WorkerParameters) :
                     "unlocks",
                     "0"
                 )
-                DatabaseManager.rtUsageRecordsDAO.insertAll(unlocksDBNew)
+                DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(unlocksDBNew)
             }
             else {
                 unlocksDBNew = unlocksDB
