@@ -1,8 +1,12 @@
 package com.example.moodtrackr.collectors
 
+import PersistentWorker
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import androidx.room.Room
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.AppDatabase
 import com.example.moodtrackr.db.realtime.RTUsageDataDAO
@@ -14,18 +18,20 @@ import com.example.moodtrackr.utilities.DatesUtil
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
-class CollectionUtil(context: FragmentActivity?) {
+class CollectionUtil(context: Context) {
     private var usageExtractor: AppUsageExtractor
     private var callLogsExtractor: CallLogsStatsExtractor
     private var appContext: Context
     private var baseContext: Context
 
     init {
-        this.appContext = context!!.applicationContext
-        this.baseContext = context.baseContext
+        this.baseContext = context
+        this.appContext = context.applicationContext
         this.usageExtractor = AppUsageExtractor(context)
         this.callLogsExtractor = CallLogsStatsExtractor(context)
     }
+
+    constructor(activity: FragmentActivity) : this(activity.applicationContext)
 
     fun dailyCollection() {
 
@@ -38,6 +44,18 @@ class CollectionUtil(context: FragmentActivity?) {
 
     fun getAll(): List<MTUsageData> {
         return runBlocking { usageRecordsDAO.getAll() }
+    }
+
+    fun queuePersistent() {
+        WorkManager
+            .getInstance(appContext)
+            .enqueue(buildPeristent())
+    }
+
+    private fun buildPeristent(): WorkRequest {
+        return OneTimeWorkRequestBuilder<PersistentWorker>()
+                // Additional configuration
+                .build()
     }
 
     companion object {
@@ -54,7 +72,7 @@ class CollectionUtil(context: FragmentActivity?) {
                 pair = Pair(
                     rtUsageRecordsDAO.getStepsOnDay(day.time),
                     rtUsageRecordsDAO.getUnlocksOnDay(day.time)
-                )
+                ) as Pair<Long, Long>
             }
             return pair
         }

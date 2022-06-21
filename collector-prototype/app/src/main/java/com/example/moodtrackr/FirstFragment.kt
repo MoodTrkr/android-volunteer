@@ -56,10 +56,8 @@ class FirstFragment : Fragment() {
                     .commit()
             }
 
-            thread(start = true) {
-                val unlockCollector = UnlockCollector(activity)
-                Log.e("DEBUG", unlockCollector.getUnlockCount24h().toString())
-            }
+            val unlockCollector = UnlockCollector(activity)
+            Log.e("DEBUG", unlockCollector.getUnlockCount24h().toString())
 
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            val button: Button = view.findViewById(R.id.button1) as Button
@@ -88,6 +86,8 @@ class FirstFragment : Fragment() {
             val collectionUtil: CollectionUtil = CollectionUtil(activity)
             //collectionUtil.dbInit()
             Log.e("DEBUG", collectionUtil.getAll().toString())
+
+            CollectionUtil(activity).queuePersistent()
         }
     }
 

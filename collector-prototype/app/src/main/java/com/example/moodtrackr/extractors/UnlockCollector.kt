@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import androidx.room.Room
 import com.example.moodtrackr.db.AppDatabase
+import kotlinx.coroutines.runBlocking
 
 class UnlockCollector (context: FragmentActivity?){
 
@@ -21,6 +22,7 @@ class UnlockCollector (context: FragmentActivity?){
     fun getUnlockCount24h(): Int {
         val usageRecordDAO = db.rtUsageDataDAO()
 
-        return usageRecordDAO.getAllUnlocksInTimeRange(System.currentTimeMillis()-86400000, System.currentTimeMillis()).count()
+//        return runBlocking { usageRecordDAO.getAllUnlocksInTimeRange(System.currentTimeMillis()-86400000, System.currentTimeMillis()).count() }
+        return 0
     }
 }

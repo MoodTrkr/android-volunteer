@@ -14,7 +14,7 @@ import com.example.moodtrackr.R
 import com.example.moodtrackr.extractors.StepsCountExtractor
 import com.example.moodtrackr.extractors.unlocks.DeviceUnlockReceiver
 
-class PersistentWorker(context: Context, parameters: WorkerParameters) :
+class PeriodicWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
     private var context: Context = context
     private val notificationManager =

@@ -14,18 +14,19 @@ import com.example.moodtrackr.utilities.DatesUtil
 import kotlinx.coroutines.runBlocking
 
 
-class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventListener {
-    private lateinit var ctx : Context
-    private var stepsDBLastUpdate: Long = 0
-    val type: String = "persistent"
 
+class StepsCountExtractor(context: Context) : Fragment(), SensorEventListener {
+    private lateinit var context : Context
+    private var stepsDBLastUpdate: Long = 0
+
+    constructor(activity: FragmentActivity): this(activity.applicationContext)
     init {
-        this.ctx = activity.applicationContext
-        if (ctx == null) {
+        this.context = context
+        if (context == null) {
             Log.d("StepsCounter", "Context Failed")
             throw Exception("Context Failed")
         }
-        val sensorManager : SensorManager? = ctx.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensorManager : SensorManager? = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         if (sensorManager == null) {
             Log.d("StepsCounter", "Sensor Manager Failed")
             throw Exception("Sensor Manager Failed")
@@ -67,12 +68,12 @@ class StepsCountExtractor(activity: FragmentActivity) : Fragment(), SensorEventL
         var stepsDBNew : RTUsageRecord? = stepsDB
         runBlocking {
             if (stepsDB === null) {
-                var stepsDBNew : RTUsageRecord = RTUsageRecord(
+                stepsDBNew = RTUsageRecord(
                     DatesUtil.getTodayTruncated(),
                     "steps",
                     "0"
                 )
-                DatabaseManager.rtUsageRecordsDAO.insertAll( stepsDBNew )
+                DatabaseManager.rtUsageRecordsDAO.insertAll(stepsDBNew!!)
             }
         }
         return stepsDBNew!!
