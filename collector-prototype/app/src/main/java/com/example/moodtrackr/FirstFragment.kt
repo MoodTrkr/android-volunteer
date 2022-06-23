@@ -6,18 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.moodtrackr.extractors.AppUsageExtractor
-import com.example.moodtrackr.extractors.CallLogsStatsExtractor
+import com.example.moodtrackr.collectors.CollectionUtil
+import com.example.moodtrackr.extractors.usage.AppUsageExtractor
+import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.StepsCountExtractor
 import com.example.moodtrackr.extractors.UnlockCollector
+import com.example.moodtrackr.extractors.calls.data.MTCallStats
+import com.example.moodtrackr.utilities.DatesUtil
 import com.example.moodtrackr.utilities.PermissionsManager
+import java.util.*
 import kotlin.concurrent.thread
 
 
-//import com.example.moodtrackr.extractors.AppUsageExtractor
+//import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -61,16 +65,16 @@ class FirstFragment : Fragment() {
 //            val button: Button = view.findViewById(R.id.button1) as Button
             Log.e("DEBUG", "test_before")
             val usageExtractor = AppUsageExtractor(activity)
-            val usageQuery = usageExtractor.instantReturn()
-//            button.text = "d"
+            val usageStatsQuery = DatesUtil.yesterdayQueryWrapper( usageExtractor::usageStatsQuery ) as MutableMap<String, Long>
+            val usageEventsQuery = DatesUtil.yesterdayQueryWrapper( usageExtractor::usageEventsQuery ) as MutableMap<Long, Pair<String, Int>>
+
             Log.e("DEBUG", "test_after")
-            Log.e("DEBUG", usageQuery.toString())
+            Log.e("DEBUG", usageStatsQuery.toString())
+            Log.e("DEBUG", usageEventsQuery.toString())
 
             val callLogsExtractor = CallLogsStatsExtractor(activity)
-            val callLogsOutput = callLogsExtractor.instantReturn()
-            for (line in callLogsOutput) {
-                Log.e("DEBUG", line)
-            }
+            val callLogsOutput: MTCallStats = DatesUtil.yesterdayQueryWrapper( callLogsExtractor::queryLogs ) as MTCallStats
+            callLogsOutput.calls.forEach{(key, value) -> Log.e("DEBUG", "($key, $value)") }
 
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()
@@ -78,9 +82,12 @@ class FirstFragment : Fragment() {
             val geoExtractor = GeoDataExtractor(activity, permsManager)
             val loc = geoExtractor.getLoc()
 
-            val screenOnTime: Long = usageExtractor.screenOnTimeQuery()
+            val screenOnTime: Long = DatesUtil.yesterdayQueryWrapper( usageExtractor::screenOnTimeQuery ) as Long
             Log.e("DEBUG", "Screen Time: $screenOnTime")
 
+            val collectionUtil: CollectionUtil = CollectionUtil(activity)
+            //collectionUtil.dbInit()
+            Log.e("DEBUG", collectionUtil.getAll().toString())
         }
     }
 

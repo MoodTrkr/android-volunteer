@@ -2,6 +2,7 @@ package com.example.moodtrackr
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -15,6 +16,7 @@ import androidx.fragment.app.commit
 import com.example.moodtrackr.survey.SurveyFragment
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.extractors.unlocks.DataCollectorService
+import com.example.moodtrackr.utilities.DatabaseManager
 import com.example.moodtrackr.utilities.PermissionsManager
 
 class MainActivity : AppCompatActivity() {
@@ -47,13 +49,14 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
 
         val permsManager: PermissionsManager = PermissionsManager(this)
+        val dbManager = DatabaseManager(this)
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
             permsManager.checkAllPermissions()
-            //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
 
