@@ -1,3 +1,5 @@
+package com.example.moodtrackr.collectors.workers
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -10,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.work.*
 import com.example.moodtrackr.R
 import com.example.moodtrackr.extractors.StepsCountExtractor
-import com.example.moodtrackr.extractors.unlocks.DataCollectorService
+import com.example.moodtrackr.collectors.service.DataCollectorService
 
 
 class PersistentWorker(context: Context, parameters: WorkerParameters) :

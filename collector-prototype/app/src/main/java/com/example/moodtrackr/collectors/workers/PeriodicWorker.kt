@@ -1,18 +1,17 @@
+package com.example.moodtrackr.collectors.workers
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.moodtrackr.R
 import com.example.moodtrackr.extractors.StepsCountExtractor
-import com.example.moodtrackr.extractors.unlocks.DeviceUnlockReceiver
 
 class PeriodicWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {

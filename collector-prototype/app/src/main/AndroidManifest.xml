@@ -22,7 +22,7 @@
         android:theme="@style/Theme.MoodTrackr">
 
         <service
-            android:name=".extractors.unlocks.DataCollectorService"
+            android:name=".collectors.service.DataCollectorService"
             android:enabled="true"
             android:exported="true" />
         <service
@@ -39,7 +39,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".extractors.unlocks.DeviceUnlockReceiver"
+        <receiver android:name=".extractors.unlocks.UnlockReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.USER_PRESENT"/>

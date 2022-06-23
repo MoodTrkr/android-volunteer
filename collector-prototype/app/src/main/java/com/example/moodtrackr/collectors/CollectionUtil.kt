@@ -1,10 +1,12 @@
 package com.example.moodtrackr.collectors
 
-import PersistentWorker
+import com.example.moodtrackr.collectors.workers.PersistentWorker
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import androidx.work.*
+import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.data.MTUsageData
+import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.db.realtime.RTUsageRecordsDAO
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
@@ -53,7 +55,7 @@ class CollectionUtil(context: Context) {
     }
 
     private fun buildPeristent(): PeriodicWorkRequest {
-//        return OneTimeWorkRequestBuilder<PersistentWorker>()
+//        return OneTimeWorkRequestBuilder<com.example.moodtrackr.collectors.workers.PersistentWorker>()
 //                // Additional configuration
 //                .build()
         return PeriodicWorkRequestBuilder<PersistentWorker>(
@@ -66,17 +68,16 @@ class CollectionUtil(context: Context) {
         private var usageRecordsDAO: UsageRecordsDAO = DatabaseManager.usageRecordsDAO
         private var rtUsageRecordsDAO: RTUsageRecordsDAO = DatabaseManager.rtUsageRecordsDAO
 
-        fun periodicCollectToday(): Pair<Long, Long> {
-            return periodicCollect(DatesUtil.getTodayTruncated())
+        fun periodicCollectToday(context: Context): Pair<Long?, Long?> {
+            return periodicCollect(context, DatesUtil.getTodayTruncated())
         }
 
-        fun periodicCollect(day: Date): Pair<Long, Long> {
-            var pair: Pair<Long, Long>
+        fun periodicCollect(context: Context, day: Date): Pair<Long?, Long?> {
+            val record: RTUsageRecord
+            var pair: Pair<Long?, Long?> = Pair(null, null)
             runBlocking {
-                pair = Pair(
-                    rtUsageRecordsDAO.getStepsOnDay(day.time),
-                    rtUsageRecordsDAO.getUnlocksOnDay(day.time)
-                ) as Pair<Long, Long>
+                record = DBHelperRT.getObjSafe(context, day)
+                pair = Pair(record.unlocks, record.steps)
             }
             return pair
         }

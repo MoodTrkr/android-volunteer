@@ -1,6 +1,6 @@
 package com.example.moodtrackr.extractors.unlocks
 
-import UnlocksWorker
+import com.example.moodtrackr.collectors.workers.UnlocksWorker
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,7 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 
 
-class DeviceUnlockReceiver: BroadcastReceiver() {
+class UnlockReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.e("DEBUG", "Lock/Unlocked")
         val manager = WorkManager.getInstance(context)

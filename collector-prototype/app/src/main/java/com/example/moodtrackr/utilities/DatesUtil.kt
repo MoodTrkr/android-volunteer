@@ -26,6 +26,11 @@ class DatesUtil() {
             return getYesterday(cal.time)
         }
 
+        fun getYesterdayTruncated(): Date {
+            var cal: Calendar = Calendar.getInstance()
+            return truncateDate(getYesterday(cal.time))
+        }
+
         fun getTomorrow(day: Date): Date {
             var cal: Calendar = Calendar.getInstance()
             cal.time = day
