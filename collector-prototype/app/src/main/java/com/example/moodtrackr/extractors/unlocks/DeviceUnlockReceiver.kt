@@ -24,7 +24,7 @@ class DeviceUnlockReceiver: BroadcastReceiver() {
         ).build()
 
 //        val time = RTUsageRecord(DatesUtil.getToday(), "unlock", "1")
-        val time = DatesUtil.getToday().time
+        val time = DatesUtil.getTodayTruncated().time
         runBlocking {
             var unlocks: RTUsageRecord = db.rtUsageDataDAO().getUnlockObjOnDay(time)
             unlocks.usageVal+=1
