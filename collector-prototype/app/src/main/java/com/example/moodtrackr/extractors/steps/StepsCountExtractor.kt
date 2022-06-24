@@ -1,4 +1,4 @@
-package com.example.moodtrackr.extractors
+package com.example.moodtrackr.extractors.steps
 
 import android.hardware.Sensor
 import android.hardware.SensorManager
@@ -7,10 +7,11 @@ import android.content.Context
 import android.hardware.SensorEvent
 import androidx.fragment.app.FragmentActivity
 import android.util.Log
+import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.db.realtime.RTUsageRecord
-import com.example.moodtrackr.utilities.DatabaseManager
-import com.example.moodtrackr.utilities.DatesUtil
+import com.example.moodtrackr.util.DatabaseManager
+import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.runBlocking
 
 
@@ -32,10 +33,9 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             Log.d("StepsCounter", "Sensor Manager Failed")
             throw Exception("Sensor Manager Failed")
         }
-//        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-//            ?: throw Exception("Got no step sensor")
-//
-//        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+
+        steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
+        registerListener()
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -43,8 +43,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        steps = event!!.values[0].toLong()
-        Log.d("DEBUG", event!!.values[0].toString())
+        steps += 1
         updateSequence()
     }
 
@@ -71,6 +70,8 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
         var stepsDBNew : RTUsageRecord
         runBlocking {
             if (stepsDB === null) {
+                clean()
+                registerListener()
                 stepsDBNew = RTUsageRecord(
                     DatesUtil.getTodayTruncated(),
                     0,
@@ -83,6 +84,17 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             }
         }
         return stepsDBNew
+    }
+
+    fun registerListener() {
+        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+            ?: throw Exception("Got no step sensor")
+
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
+    fun clean() {
+        sensorManager.unregisterListener(this)
     }
 
     companion object {

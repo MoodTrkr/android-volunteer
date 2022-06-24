@@ -11,7 +11,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.work.*
 import com.example.moodtrackr.R
-import com.example.moodtrackr.extractors.StepsCountExtractor
+import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.collectors.service.DataCollectorService
 
 

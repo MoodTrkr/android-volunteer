@@ -1,4 +1,4 @@
-package com.example.moodtrackr.utilities
+package com.example.moodtrackr.util
 
 import android.content.Context
 import androidx.room.Room

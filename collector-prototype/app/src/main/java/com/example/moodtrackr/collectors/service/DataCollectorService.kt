@@ -14,9 +14,9 @@ import androidx.core.app.NotificationCompat
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.db.realtime.RTUsageRecord
-import com.example.moodtrackr.extractors.StepsCountExtractor
+import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.extractors.unlocks.UnlockReceiver
-import com.example.moodtrackr.utilities.DatesUtil
+import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.runBlocking
 
 class DataCollectorService : Service() {
@@ -30,12 +30,7 @@ class DataCollectorService : Service() {
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
-        stepsCounter = StepsCountExtractor(this)
-
-        val sensor: Sensor? = stepsCounter.sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-            ?: throw Exception("Got no step sensor")
-
-        stepsCounter.sensorManager.registerListener(stepsCounter, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+        this.stepsCounter = StepsCountExtractor(this)
 
         runBlocking {
             val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
@@ -97,6 +92,7 @@ class DataCollectorService : Service() {
 
     override fun onDestroy() {
         running = false
+        this.stepsCounter.clean()
         stopForeground(true)
     }
 

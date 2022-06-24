@@ -5,7 +5,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.moodtrackr.collectors.util.CollectionUtil
 
-class PeriodicWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
+class DailyWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
     private var context: Context = context.applicationContext
 
     override fun doWork(): Result {
