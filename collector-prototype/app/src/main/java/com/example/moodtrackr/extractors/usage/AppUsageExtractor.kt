@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class AppUsageExtractor(context: FragmentActivity?) {
+class AppUsageExtractor(context: Context) {
     private lateinit var usm: UsageStatsManager
     private lateinit var context: Context
 
@@ -16,6 +16,8 @@ class AppUsageExtractor(context: FragmentActivity?) {
         this.context = context!!.applicationContext
         this.usm = context!!.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
     }
+
+    constructor(activity: FragmentActivity?) : this(activity!!.baseContext)
 
     fun usageEventsQuery(startTime: Long, endTime: Long): MutableMap<Long, Pair<String, Int>> {
         val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)

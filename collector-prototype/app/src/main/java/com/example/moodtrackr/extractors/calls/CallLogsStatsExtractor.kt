@@ -10,33 +10,26 @@ import com.example.moodtrackr.extractors.calls.data.MTCallStats
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class CallLogsStatsExtractor(context: FragmentActivity?) {
-    private var callLogsCursor: Cursor? = null
-    private var appContext: Context? = null
-    private var baseContext: Context? = null
+class CallLogsStatsExtractor(baseContext: Context) {
+    private lateinit var callLogsCursor: Cursor
+    private lateinit var appContext: Context
+    private lateinit var baseContext: Context
 
     init {
-        this.appContext = context!!.applicationContext
-        this.baseContext = context!!.baseContext
+        this.baseContext = baseContext!!
+        this.appContext = baseContext.applicationContext
         val cr: ContentResolver = baseContext!!.contentResolver
         this.callLogsCursor = cr.query(CallLog.Calls.CONTENT_URI, null, "1", null,
-            CallLog.Calls.DATE)
-
-        setCallLogsCursor(callLogsCursor!!)
+            CallLog.Calls.DATE)!!
     }
 
-    private fun getCallLogsCursor(): Cursor {
-        return callLogsCursor!!
-    }
+    constructor(activity: FragmentActivity?): this(activity!!.baseContext)
 
-    private fun setCallLogsCursor(inCallLogsCursor: Cursor) {
-        callLogsCursor = inCallLogsCursor
-    }
 
     private fun isCallWithinTimeRange(startTime: Long, endTime: Long): Boolean {
         val entryTime: Long = (callLogsCursor!!.getLong(callLogsCursor!!.
         getColumnIndexOrThrow(CallLog.Calls.DATE)))
-        return entryTime > startTime && entryTime < endTime
+        return entryTime in (startTime + 1) until endTime
     }
 
     fun queryLogs(startTime: Long, endTime: Long): MTCallStats {

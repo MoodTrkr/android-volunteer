@@ -15,7 +15,7 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.example.moodtrackr.survey.SurveyFragment
 import com.example.moodtrackr.databinding.ActivityMainBinding
-import com.example.moodtrackr.extractors.unlocks.DataCollectorService
+import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.utilities.DatabaseManager
 import com.example.moodtrackr.utilities.PermissionsManager
 
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<SurveyFragment>(R.id.fragment_container_view)
+                add<FirstFragment>(R.id.fragment_container_view)
             }
         }
 
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         startService(intent)
 
         val permsManager: PermissionsManager = PermissionsManager(this)
-        val dbManager = DatabaseManager(this)
+        val dbManager = DatabaseManager.getInstance(this.applicationContext)
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
