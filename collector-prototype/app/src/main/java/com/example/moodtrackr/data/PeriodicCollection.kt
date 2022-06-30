@@ -2,7 +2,7 @@ package com.example.moodtrackr.data
 
 import java.util.*
 
-data class HourlyCollection(
+data class PeriodicCollection(
     val time: Date,
     val steps: Long,
     val unlocks: Long

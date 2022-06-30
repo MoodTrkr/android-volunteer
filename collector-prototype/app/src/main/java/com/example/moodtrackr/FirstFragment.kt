@@ -17,8 +17,10 @@ import com.example.moodtrackr.extractors.UnlockCollector
 import com.example.moodtrackr.extractors.calls.data.MTCallStats
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
+import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
+import kotlinx.coroutines.runBlocking
 
 
 //import com.example.moodtrackr.extractors.usage.AppUsageExtractor
@@ -86,6 +88,10 @@ class FirstFragment : Fragment() {
             val collectionUtil: CollectionUtil = CollectionUtil(activity)
             //collectionUtil.dbInit()
             Log.e("DEBUG", collectionUtil.getAll().toString())
+            runBlocking {
+                Log.e("DEBUG", "RT_DB")
+                Log.e("DEBUG", DatabaseManager.getInstance(requireContext().applicationContext).rtUsageRecordsDAO.getAll().toString())
+            }
 
             WorkersUtil.queuePersistent(requireActivity().applicationContext)
             WorkersUtil.queuePeriodic(requireActivity().applicationContext)

@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.data.DailyCollection
-import com.example.moodtrackr.data.HourlyCollection
+import com.example.moodtrackr.data.PeriodicCollection
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
@@ -40,9 +40,9 @@ class CollectionUtil(context: Context) {
             runBlocking {
                 val rtRecord: RTUsageRecord = DBHelperRT.getObjSafe(context, dayTruncated)
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
-                if (!record.hourlyCollBook.isFull()) {
-                    record.hourlyCollBook.insert(
-                        HourlyCollection(Date(), rtRecord.unlocks, rtRecord.steps)
+                if (!record.periodicCollBook.isFull()) {
+                    record.periodicCollBook.insert(
+                        PeriodicCollection(Date(), rtRecord.steps, rtRecord.unlocks)
                     )
                     DBHelper.updateDB(context, record)
                 }

@@ -48,7 +48,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     private fun updateSequence() {
-        if ( steps - stepsDBLastUpdate  > 100 ) {
+        if ( steps - stepsDBLastUpdate  > 20 ) {
             updateDB( steps )
         }
     }

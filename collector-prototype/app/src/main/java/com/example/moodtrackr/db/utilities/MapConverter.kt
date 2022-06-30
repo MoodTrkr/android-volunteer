@@ -1,7 +1,7 @@
 package com.example.moodtrackr.db.utilities
 
 import androidx.room.TypeConverter
-import com.example.moodtrackr.data.HourlyCollection
+import com.example.moodtrackr.data.PeriodicCollection
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
@@ -58,13 +58,13 @@ class MapConverter {
     }
 
     @TypeConverter
-    fun IntHourlyCollFromString(value: String): MutableMap<Int, HourlyCollection> {
-        val mapType: Type = object : TypeToken<MutableMap<Int, HourlyCollection>>() {}.type
+    fun IntHourlyCollFromString(value: String): MutableMap<Int, PeriodicCollection> {
+        val mapType: Type = object : TypeToken<MutableMap<Int, PeriodicCollection>>() {}.type
         return Gson().fromJson(value, mapType)
     }
 
     @TypeConverter
-    fun fromIntHourlyCollMap(map: MutableMap<Int, HourlyCollection>): String {
+    fun fromIntHourlyCollMap(map: MutableMap<Int, PeriodicCollection>): String {
         val gson = Gson()
         return gson.toJson(map)
     }
