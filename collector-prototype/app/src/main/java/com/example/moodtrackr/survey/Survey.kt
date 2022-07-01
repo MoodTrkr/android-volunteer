@@ -1,5 +1,9 @@
 package com.example.moodtrackr.survey
+import com.example.moodtrackr.data.SurveyData
+import com.example.moodtrackr.utilities.DatesUtil
+import java.sql.Date
 import java.time.LocalDate
+import java.time.ZoneOffset
 
 class Survey (
     var currentQuestionNumber:Int = 0,
@@ -35,5 +39,21 @@ class Survey (
 ){
     fun getCurrentQuestion():Question{
         return questions[currentQuestionNumber]
+    }
+
+    fun getSurveyData(): SurveyData{
+        val answers = mutableMapOf<Int, Int>()
+        val surveyVersion = 0
+        var index = 0;
+        while(index < this.questions.size){
+            if(this.questions[index].answer == null){
+                break
+            }
+            answers[index] = this.questions[index].answer!!.id
+            index++
+        }
+        var convertedDate = Date.from(this.date.atStartOfDay().toInstant(ZoneOffset.UTC));
+        convertedDate = DatesUtil.truncateDate(convertedDate);
+        return SurveyData(convertedDate,answers,surveyVersion)
     }
 }

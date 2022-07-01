@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<FirstFragment>(R.id.fragment_container_view)
+                add<SurveyFragment>(R.id.fragment_container_view)
             }
         }
 

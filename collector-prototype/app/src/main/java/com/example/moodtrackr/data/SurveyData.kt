@@ -4,9 +4,9 @@ import java.util.*
 
 data class SurveyData(
     val time: Date,
+    val questions: MutableMap<Int, Int>,
     val version: Int,
-    val questions: MutableMap<Int, Int>
     )
 {
-    constructor(): this(Date(), 0, mutableMapOf<Int, Int>())
+    constructor(): this(Date(), mutableMapOf<Int, Int>(),0)
 }
