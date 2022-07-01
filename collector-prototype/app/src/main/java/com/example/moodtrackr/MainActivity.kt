@@ -15,6 +15,7 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.service.DataCollectorService
+import com.example.moodtrackr.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<FirstFragment>(R.id.fragment_container_view)
+                add<SurveyFragment>(R.id.fragment_container_view)
             }
         }
 

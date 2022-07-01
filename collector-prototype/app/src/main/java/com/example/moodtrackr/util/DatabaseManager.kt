@@ -22,7 +22,8 @@ class DatabaseManager() {
             db = Room.databaseBuilder(
                 context,
                 AppDatabase::class.java, "app-database"
-            ).build()
+            ).fallbackToDestructiveMigration()
+            .build()
             usageRecordsDAO = db!!.usageRecordsDAO
             rtUsageRecordsDAO = db!!.rtUsageRecordsDAO
             return db
