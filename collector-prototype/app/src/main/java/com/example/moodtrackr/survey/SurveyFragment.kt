@@ -1,7 +1,5 @@
 package com.example.moodtrackr.survey
 import android.os.Bundle
-import android.util.Log
-import android.util.Log.DEBUG
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +8,13 @@ import com.example.moodtrackr.R
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.SurveyFragmentBinding
 import com.example.moodtrackr.db.records.UsageRecordsDAO
-import com.example.moodtrackr.utilities.DatabaseManager
-import com.example.moodtrackr.utilities.DatesUtil
+import com.example.moodtrackr.util.DatabaseManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
-    private lateinit var survey:Survey;
+    private lateinit var surveyDO:SurveyDO;
     private var _binding: SurveyFragmentBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -33,11 +30,11 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         _binding = SurveyFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        survey = Survey();
-        val currentQuestion = survey.getCurrentQuestion();
+        surveyDO = SurveyDO();
+        val currentQuestion = surveyDO.getCurrentQuestion();
         usageRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).usageRecordsDAO;
         runBlocking {
-            usageRecord = usageRecordsDao.getObjOnDay(survey.getSurveyData().time!!)
+            usageRecord = usageRecordsDao.getObjOnDay(surveyDO.getSurveyData().time!!)
         }
         //To DO
         // Make The complete screen show up if the survey for yesterday is complete.
@@ -50,7 +47,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             setQuestion();
 
             binding.back.setOnClickListener {
-                survey.currentQuestionNumber -= 1;
+                surveyDO.currentQuestionNumber -= 1;
                 setQuestion();
             };
             binding.optionOne.setOnClickListener { v ->
@@ -82,10 +79,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     }
 
     private fun setQuestion(){
-        if(survey.currentQuestionNumber == survey.questions.size){
+        if(surveyDO.currentQuestionNumber == surveyDO.questionDOS.size){
             // survey is finished
             showSurveyComplete();
-            var surveyData =  survey.getSurveyData();
+            var surveyData =  surveyDO.getSurveyData();
 
             runBlocking {
                 launch{
@@ -109,17 +106,17 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             binding.meme.visibility = View.INVISIBLE;
             binding.options.visibility = View.VISIBLE;
             binding.back.visibility = View.VISIBLE;
-            val currentQuestion = survey.getCurrentQuestion();
-            binding.optionOne.text = currentQuestion.options[0].text;
-            binding.optionTwo.text = currentQuestion.options[1].text;
-            binding.optionThree.text = currentQuestion.options[2].text;
-            binding.optionFour.text = currentQuestion.options[3].text;
-            binding.optionFive.text = currentQuestion.options[4].text;
-            binding.optionSix.text = currentQuestion.options[5].text;
+            val currentQuestion = surveyDO.getCurrentQuestion();
+            binding.optionOne.text = currentQuestion.optionDOS[0].text;
+            binding.optionTwo.text = currentQuestion.optionDOS[1].text;
+            binding.optionThree.text = currentQuestion.optionDOS[2].text;
+            binding.optionFour.text = currentQuestion.optionDOS[3].text;
+            binding.optionFive.text = currentQuestion.optionDOS[4].text;
+            binding.optionSix.text = currentQuestion.optionDOS[5].text;
 
             binding.prompt.text = currentQuestion.prompt;
 
-            if(survey.currentQuestionNumber == 0){
+            if(surveyDO.currentQuestionNumber == 0){
                 binding.back.visibility = View.INVISIBLE;
             }
         }
@@ -133,10 +130,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     }
 
     private fun handleOptionClick(v:View ) {
-        survey.getCurrentQuestion().answer =
-        survey.getCurrentQuestion().options[v.getTag( R.string.buttonIdForTag) as Int]; // Tag 0 is the id of the option
+        surveyDO.getCurrentQuestion().answer =
+        surveyDO.getCurrentQuestion().optionDOS[v.getTag( R.string.buttonIdForTag) as Int]; // Tag 0 is the id of the option
 
-        survey.currentQuestionNumber += 1;
+        surveyDO.currentQuestionNumber += 1;
         setQuestion();
     }
 

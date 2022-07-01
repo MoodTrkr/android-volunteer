@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.example.moodtrackr.db.AppDatabase
 import kotlinx.coroutines.runBlocking
 
+@Deprecated("Not in use. Not implemented either")
 class UnlockCollector (context: FragmentActivity?){
 
     private var appContext: Context

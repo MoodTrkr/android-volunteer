@@ -5,6 +5,8 @@ import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
+import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
+import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -19,7 +21,7 @@ class AppUsageExtractor(context: Context) {
 
     constructor(activity: FragmentActivity?) : this(activity!!.baseContext)
 
-    fun usageEventsQuery(startTime: Long, endTime: Long): MutableMap<Long, Pair<String, Int>> {
+    fun usageEventsQuery(startTime: Long, endTime: Long): MTAppUsageLogs {
         val queryResults: UsageEvents = usm.queryEvents(startTime, endTime)
         var event: UsageEvents.Event? = UsageEvents.Event()
         var filteredEvents = mutableMapOf<Long, Pair<String, Int>>()
@@ -29,17 +31,17 @@ class AppUsageExtractor(context: Context) {
                 filteredEvents[event!!.timeStamp] = Pair(event!!.packageName, event!!.eventType)
             }
         }
-        return filteredEvents
+        return MTAppUsageLogs(filteredEvents)
     }
 
-    fun usageStatsQuery(startTime: Long, endTime: Long): MutableMap<String, Long> {
+    fun usageStatsQuery(startTime: Long, endTime: Long): MTAppUsageStats {
 //        return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, startTime, endTime)
         var stats = mutableMapOf<String, Long>()
         var queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
         queryResults = queryResults.filter { (key, value) -> value.totalTimeInForeground>0}
 
         queryResults.forEach{(key, value) -> stats[key] = value.totalTimeInForeground }
-        return stats
+        return MTAppUsageStats(stats)
     }
 
     fun screenOnTimeQuery(startTime: Long, endTime: Long): Long {
@@ -47,6 +49,5 @@ class AppUsageExtractor(context: Context) {
         val queryResults = usm.queryAndAggregateUsageStats(startTime, endTime)
         queryResults.forEach{(key, value) -> screenTime += value.totalTimeInForeground }
         return TimeUnit.MILLISECONDS.toMinutes(screenTime)
-
     }
 }

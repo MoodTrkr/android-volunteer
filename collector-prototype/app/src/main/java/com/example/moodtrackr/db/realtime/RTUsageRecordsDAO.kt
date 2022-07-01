@@ -18,7 +18,6 @@ interface RTUsageRecordsDAO {
     @Query("SELECT * FROM rt_usage_records u")
     suspend fun getAll(): RTUsageRecord?
 
-
     @Insert
     suspend fun insertAll(vararg usageRecord: RTUsageRecord)
 

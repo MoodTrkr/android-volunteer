@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.work.*
 import com.example.moodtrackr.db.realtime.RTUsageRecord
-import com.example.moodtrackr.utilities.DatabaseManager
-import com.example.moodtrackr.utilities.DatesUtil
+import com.example.moodtrackr.util.DatabaseManager
+import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.runBlocking
 
 class UnlocksWorker(context: Context, parameters: WorkerParameters) :

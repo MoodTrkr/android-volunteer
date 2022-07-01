@@ -1,6 +1,5 @@
-package com.example.moodtrackr.utilities
+package com.example.moodtrackr.util
 
-import com.example.moodtrackr.R
 import java.util.*
 
 class DatesUtil() {

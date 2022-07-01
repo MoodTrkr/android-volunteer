@@ -33,7 +33,7 @@ class CallLogsStatsExtractor(baseContext: Context) {
     }
 
     fun queryLogs(startTime: Long, endTime: Long): MTCallStats {
-        var callLogOutput: MutableMap<Date, Long> = mutableMapOf<Date, Long>()
+        var callLogOutput: MutableMap<Long, Long> = mutableMapOf<Long, Long>()
         callLogsCursor!!.moveToLast()
         while (callLogsCursor != null &&
             isCallWithinTimeRange(startTime, endTime)) {
@@ -43,7 +43,7 @@ class CallLogsStatsExtractor(baseContext: Context) {
             var callDuration: Long =
                 callLogsCursor!!.getLong(callLogsCursor!!.getColumnIndexOrThrow(CallLog.Calls.DURATION))
             callDuration = TimeUnit.MILLISECONDS.toMinutes(callDuration)
-            callLogOutput[callDate] = callDuration
+            callLogOutput[callDate.time] = callDuration
             callLogsCursor!!.moveToPrevious()
         }
         return MTCallStats(callLogOutput)
