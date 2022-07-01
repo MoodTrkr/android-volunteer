@@ -1,4 +1,4 @@
-package com.example.moodtrackr.survey
+package com.example.moodtrackr.userInterface.survey
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
-    private lateinit var surveyDO:SurveyDO;
+    private lateinit var surveyDO: SurveyDO;
     private var _binding: SurveyFragmentBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
