@@ -15,7 +15,7 @@ import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.service.DataCollectorService
-import com.example.moodtrackr.survey.SurveyFragment
+import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 

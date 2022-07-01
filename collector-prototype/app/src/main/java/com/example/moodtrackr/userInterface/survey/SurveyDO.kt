@@ -1,4 +1,4 @@
-package com.example.moodtrackr.survey
+package com.example.moodtrackr.userInterface.survey
 import com.example.moodtrackr.data.SurveyData
 import com.example.moodtrackr.util.DatesUtil
 import java.sql.Date
@@ -37,7 +37,7 @@ class SurveyDO (
         ),
     val date: LocalDate = LocalDate.now().minusDays(1),
 ){
-    fun getCurrentQuestion():QuestionDO{
+    fun getCurrentQuestion(): QuestionDO {
         return questionDOS[currentQuestionNumber]
     }
 
