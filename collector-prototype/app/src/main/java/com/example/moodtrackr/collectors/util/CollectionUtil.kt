@@ -12,6 +12,9 @@ import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -37,7 +40,7 @@ class CollectionUtil(context: Context) {
 
         fun periodicCollect(context: Context, day: Date) {
             val dayTruncated = DatesUtil.truncateDate(day)
-            runBlocking {
+            CoroutineScope(Dispatchers.IO).launch {
                 val rtRecord: RTUsageRecord = DBHelperRT.getObjSafe(context, dayTruncated)
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
                 if (!record.periodicCollBook.isFull()) {
@@ -50,14 +53,15 @@ class CollectionUtil(context: Context) {
         }
 
         fun dailyCollectToday(context: Context) {
-            periodicCollect(context, DatesUtil.getToday())
+            dailyCollect(context, DatesUtil.getToday())
         }
 
         fun dailyCollect(context: Context, day: Date) {
             val dayTruncated = DatesUtil.truncateDate(day)
             val usageExtractor = AppUsageExtractor(context)
             val callLogsExtractor = CallLogsStatsExtractor(context)
-            runBlocking {
+
+            CoroutineScope(Dispatchers.IO).launch {
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
                 val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                 if (!record.dailyCollection.complete) {

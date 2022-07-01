@@ -12,13 +12,15 @@ import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
 
 class StepsCountExtractor(context: Context) : SensorEventListener {
     private lateinit var context : Context
-    private var stepsDBLastUpdate: Long = 0
     lateinit var sensorManager: SensorManager
 
     constructor(activity: FragmentActivity): this(activity.applicationContext)
@@ -34,27 +36,29 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             throw Exception("Sensor Manager Failed")
         }
 
-        steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
+        //steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
+        steps = DataCollectorService.steps
         registerListener()
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        var x = 0
+
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         steps += 1
+        //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
         updateSequence()
     }
 
     private fun updateSequence() {
-        if ( steps - stepsDBLastUpdate  > 20 ) {
+        if ( steps - stepsDBLastUpdate  > 10 ) {
             updateDB( steps )
         }
     }
 
     private fun updateDB(steps: Long) {
-        runBlocking {
+        CoroutineScope(Dispatchers.Default).launch {
             var stepsDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(
                 DatesUtil.getTodayTruncated().time
             )
@@ -89,7 +93,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     fun registerListener() {
         val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
             ?: throw Exception("Got no step sensor")
-
+        Log.e("DEBUG", "Is wake up sensor?: ${sensor!!.isWakeUpSensor}")
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
@@ -99,5 +103,6 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
 
     companion object {
         var steps: Long = 0
+        var stepsDBLastUpdate: Long = 0
     }
 }

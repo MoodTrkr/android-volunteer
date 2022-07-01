@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -17,6 +18,9 @@ import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.extractors.unlocks.UnlockReceiver
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class DataCollectorService : Service() {
@@ -30,13 +34,8 @@ class DataCollectorService : Service() {
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
-        this.stepsCounter = StepsCountExtractor(this)
 
-        runBlocking {
-            val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
-            unlocks = record.unlocks
-            steps = record.steps
-        }
+        getState()
 
         builder = createNotif()
         createChannel()
@@ -45,6 +44,8 @@ class DataCollectorService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
+
+        this.stepsCounter = StepsCountExtractor(this)
         val unlockReceiver = UnlockReceiver()
         registerReceiver(unlockReceiver, filter)
 
@@ -57,7 +58,7 @@ class DataCollectorService : Service() {
         val notification = builder.build()
 
         // If we get killed, after returning from here, restart
-        startForeground(1, notification);
+        startForeground(NOTIF_ID, notification);
         return START_STICKY
     }
 
@@ -69,15 +70,10 @@ class DataCollectorService : Service() {
     private fun createChannel() {
         // Create the NotificationChannel
         val descriptionText = "Used by Mood Tracker"
-        val importance = NotificationManager.IMPORTANCE_MIN
+        val importance = NotificationManager.IMPORTANCE_HIGH
         val mChannel = NotificationChannel(NOTIF_ID.toString(), TITLE, importance)
         mChannel.description = descriptionText
         notificationManager.createNotificationChannel(mChannel)
-    }
-
-    fun updateUnlocks() {
-        builder.setContentText("Unlocks: $unlocks")
-        notificationManager.notify(NOTIF_ID, builder.build())
     }
 
     private fun createNotif(): NotificationCompat.Builder {
@@ -90,18 +86,41 @@ class DataCollectorService : Service() {
             .setOnlyAlertOnce(true)
     }
 
+    private fun getState() {
+        runBlocking {
+            val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
+            unlocks = record.unlocks
+            steps = record.steps
+        }
+    }
+
+    private fun saveState() {
+        CoroutineScope(Dispatchers.IO).launch {
+            DBHelperRT.updateDB(applicationContext, unlocks, steps)
+        }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        saveState()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        saveState()
+    }
+
     override fun onDestroy() {
         running = false
+        saveState()
         this.stepsCounter.clean()
         stopForeground(true)
     }
 
     companion object {
-        private val TITLE: String = "MDTKR"
-        private val NOTIF_ID: Int = 0
+        val TITLE: String = "MDTKR"
+        val NOTIF_ID: Int = 0
 
+        var steps: Long = 0 //meant to just follow StepsCountExtractor.steps
         var unlocks: Long = 0
-        var steps: Long = 0
         var running: Boolean = false
     }
 }

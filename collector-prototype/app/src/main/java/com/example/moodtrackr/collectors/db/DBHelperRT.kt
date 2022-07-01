@@ -4,6 +4,9 @@ import android.content.Context
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -39,7 +42,7 @@ class DBHelperRT {
 
             record!!.unlocks = unlocks
             record!!.steps = steps
-            runBlocking { DatabaseManager.getInstance(context).rtUsageRecordsDAO.update(record!!) }
+            CoroutineScope(Dispatchers.IO).launch { DatabaseManager.getInstance(context).rtUsageRecordsDAO.update(record!!) }
         }
 
         fun checkSequence(context: Context, record: RTUsageRecord?): RTUsageRecord {

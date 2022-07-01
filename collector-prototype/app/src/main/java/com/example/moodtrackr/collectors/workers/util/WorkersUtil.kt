@@ -6,6 +6,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.moodtrackr.collectors.workers.DailyWorker
+import com.example.moodtrackr.collectors.workers.HourlyWorker
 import com.example.moodtrackr.collectors.workers.PeriodicWorker
 import com.example.moodtrackr.collectors.workers.PersistentWorker
 import java.util.concurrent.TimeUnit
@@ -22,6 +23,12 @@ class WorkersUtil {
             WorkManager
                 .getInstance(context)
                 .enqueueUniquePeriodicWork("MT_PERIODIC_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildPeriodic())
+        }
+
+        fun queueHourly(context: Context) {
+            WorkManager
+                .getInstance(context)
+                .enqueueUniquePeriodicWork("MT_HOURLY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildHourly())
         }
 
         fun queueDaily(context: Context) {
@@ -41,6 +48,13 @@ class WorkersUtil {
             return PeriodicWorkRequestBuilder<PeriodicWorker>(
                 20,
                 TimeUnit.MINUTES)
+                .build()
+        }
+
+        fun buildHourly(): PeriodicWorkRequest {
+            return PeriodicWorkRequestBuilder<HourlyWorker>(
+                1,
+                TimeUnit.HOURS)
                 .build()
         }
 

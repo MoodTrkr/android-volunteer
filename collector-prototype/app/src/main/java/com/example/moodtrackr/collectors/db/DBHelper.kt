@@ -4,6 +4,9 @@ import android.content.Context
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -26,7 +29,7 @@ class DBHelper {
                 record = DatabaseManager.getInstance(context).usageRecordsDAO.getObjOnDay( usageData.date )
             }
             record = checkSequence(context, record, usageData)
-            runBlocking { DatabaseManager.getInstance(context).usageRecordsDAO.update(usageData) }
+            CoroutineScope(Dispatchers.IO).launch { DatabaseManager.getInstance(context).usageRecordsDAO.update(usageData) }
         }
 
         fun checkSequence(context: Context, record: MTUsageData?, usageData: MTUsageData): MTUsageData {
