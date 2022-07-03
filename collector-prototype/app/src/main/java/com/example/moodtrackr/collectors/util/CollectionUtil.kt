@@ -52,6 +52,10 @@ class CollectionUtil(context: Context) {
             }
         }
 
+        fun dailyCollectYesterday(context: Context) {
+            dailyCollect(context, DatesUtil.getYesterdayTruncated())
+        }
+
         fun dailyCollectToday(context: Context) {
             dailyCollect(context, DatesUtil.getToday())
         }

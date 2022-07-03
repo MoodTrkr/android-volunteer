@@ -14,7 +14,8 @@ class PeriodicWorker(context: Context, parameters: WorkerParameters) : Worker(co
         // Mark the Worker as important
         CollectionUtil.periodicCollectToday(context)
 
-        if ( DatesUtil.getTomorrow().time - Date().time < 1200000 ) { CollectionUtil.dailyCollectToday(context) }
+        if ( DatesUtil.getTomorrow().time - Date().time < 1200000 ) { CollectionUtil.dailyCollectYesterday(context) }
+        //if ( DatesUtil.getTomorrow().time - Date().time < 1200000 ) { CollectionUtil.dailyCollectToday(context) }
         return Result.success()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.moodtrackr.collectors.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -27,26 +28,28 @@ class DataCollectorService : Service() {
     private lateinit var builder: NotificationCompat.Builder
     private lateinit var notificationManager: NotificationManager
     private lateinit var stepsCounter: StepsCountExtractor
+    private lateinit var unlockReceiver: UnlockReceiver
     private lateinit var context: Context
+    private lateinit var notification: Notification
 
     override fun onCreate() {
         super.onCreate()
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
+        Log.e("DataCollectorService", "DataCollectorService onCreate Triggered!")
 
-        getState()
-
-        builder = createNotif()
+        builder = createNotif(getState())
         createChannel()
-        running = true
+        notification = builder.build()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
+        Log.e("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
 
         this.stepsCounter = StepsCountExtractor(this)
-        val unlockReceiver = UnlockReceiver()
+        unlockReceiver = UnlockReceiver()
         registerReceiver(unlockReceiver, filter)
 
         if (intent?.action != null && intent.action.equals(
@@ -55,10 +58,9 @@ class DataCollectorService : Service() {
             stopSelf()
         }
 
-        val notification = builder.build()
-
         // If we get killed, after returning from here, restart
         startForeground(NOTIF_ID, notification);
+        running = true
         return START_STICKY
     }
 
@@ -76,22 +78,23 @@ class DataCollectorService : Service() {
         notificationManager.createNotificationChannel(mChannel)
     }
 
-    private fun createNotif(): NotificationCompat.Builder {
+    private fun createNotif(state: Pair<Long, Long>): NotificationCompat.Builder {
+        Log.e("DataCollectorService", "Notification State: $state")
         return NotificationCompat.Builder(this.applicationContext, NOTIF_ID.toString())
             .setContentTitle(TITLE)
             .setTicker(TITLE)
-            .setContentText("Unlocks: $unlocks | Steps: $steps")
+            .setContentText("Unlocks: ${state.first} | Steps: ${state.second}")
             .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
     }
 
-    private fun getState() {
-        runBlocking {
-            val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
-            unlocks = record.unlocks
-            steps = record.steps
-        }
+    private fun getState(): Pair<Long, Long> {
+        val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
+        unlocks = record.unlocks
+        steps = record.steps
+        Log.e("DataCollectorService", "DataCollectorService getState: ${record}")
+        return Pair(unlocks, steps)
     }
 
     private fun saveState() {
@@ -112,6 +115,7 @@ class DataCollectorService : Service() {
         running = false
         saveState()
         this.stepsCounter.clean()
+        unregisterReceiver(unlockReceiver)
         stopForeground(true)
     }
 

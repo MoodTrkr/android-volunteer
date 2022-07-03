@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.util.CollectionUtil
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
@@ -94,12 +95,15 @@ class FirstFragment : Fragment() {
                 Log.e("DEBUG", DatabaseManager.getInstance(requireContext().applicationContext).rtUsageRecordsDAO.getAll().toString())
             }
 
-            NotifUpdateUtil.updateNotif(requireContext().applicationContext)
 
-            WorkersUtil.queuePersistent(requireActivity().applicationContext)
-            WorkersUtil.queuePeriodic(requireActivity().applicationContext)
-            WorkersUtil.queueHourly(requireActivity().applicationContext)
-            //WorkersUtil.queueDaily(requireActivity().applicationContext)
+            NotifUpdateUtil.updateNotif(requireContext().applicationContext)
+//
+//            WorkersUtil.queuePersistent(requireActivity().applicationContext)
+//            WorkersUtil.queuePeriodic(requireActivity().applicationContext)
+//            WorkersUtil.queueHourly(requireActivity().applicationContext)
+//            WorkersUtil.queueDaily(requireActivity().applicationContext)
+            Log.e("DEBUG", "DataCollectorService Vars: ${DataCollectorService.steps}, ${DataCollectorService.unlocks}")
+            Log.e("DEBUG", "DatesUtil: ${DatesUtil.getTodayTruncated()} ${DatesUtil.getTomorrow()}")
         }
     }
 
