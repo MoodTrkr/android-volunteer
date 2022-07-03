@@ -45,12 +45,12 @@
                 <action android:name="android.intent.action.SCREEN_ON"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".collectors.service.RestartReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="REFRESH_THIS" />
-            </intent-filter>
-        </receiver>
+<!--        <receiver android:name=".collectors.service.RestartReceiver"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="REFRESH_THIS" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
     </application>
 
 </manifest>
