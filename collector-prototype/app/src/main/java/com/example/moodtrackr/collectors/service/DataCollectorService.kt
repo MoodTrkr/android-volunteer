@@ -42,6 +42,7 @@ class DataCollectorService : Service() {
         builder = createNotif(getState())
         createChannel()
         notification = builder.build()
+        startForeground(NOTIF_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -59,7 +60,10 @@ class DataCollectorService : Service() {
         }
 
         // If we get killed, after returning from here, restart
-        startForeground(NOTIF_ID, notification);
+        builder = createNotif(getState())
+        createChannel()
+        notification = builder.build()
+        startForeground(NOTIF_ID, notification)
         running = true
         return START_STICKY
     }
@@ -102,11 +106,12 @@ class DataCollectorService : Service() {
         if(this::stepsCounter.isInitialized) this.stepsCounter.clean()
         if(this::unlockReceiver.isInitialized) unregisterReceiver(unlockReceiver)
         stopForeground(true)
+        notificationManager.cancel(NOTIF_ID);
     }
 
     companion object {
         val TITLE: String = "MDTKR"
-        val NOTIF_ID: Int = 0
+        val NOTIF_ID: Int = 1000
 
         var localSteps: Long = 0 //meant to be updated by StepsCountExtractor
         var localUnlocks: Long = 0 //meant to be updated by UnlocksReceiver

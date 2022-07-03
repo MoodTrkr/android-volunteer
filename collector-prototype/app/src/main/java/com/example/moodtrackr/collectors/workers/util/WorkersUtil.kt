@@ -1,10 +1,7 @@
 package com.example.moodtrackr.collectors.workers.util
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.example.moodtrackr.collectors.workers.DailyWorker
 import com.example.moodtrackr.collectors.workers.HourlyWorker
 import com.example.moodtrackr.collectors.workers.PeriodicWorker
@@ -13,11 +10,16 @@ import java.util.concurrent.TimeUnit
 
 class WorkersUtil {
     companion object {
+        fun queueServiceMaintainenceOneTime(context: Context) {
+            WorkManager
+                .getInstance(context)
+                .enqueue(buildServiceMaintainenceOneTime())
+        }
+
         fun queueServiceMaintenance(context: Context) {
             WorkManager
                 .getInstance(context)
                 .enqueueUniquePeriodicWork("MT_SERVICE_MAINTENANCE_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildServiceMaintainence())
-
         }
 
         fun queuePeriodic(context: Context) {
@@ -36,6 +38,11 @@ class WorkersUtil {
             WorkManager
                 .getInstance(context)
                 .enqueueUniquePeriodicWork("MT_DAILY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildDaily())
+        }
+
+        fun buildServiceMaintainenceOneTime(): OneTimeWorkRequest {
+            return OneTimeWorkRequestBuilder<ServiceMaintainenceWorker>()
+                .build()
         }
 
         fun buildServiceMaintainence(): PeriodicWorkRequest {

@@ -2,6 +2,7 @@ package com.example.moodtrackr.util
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.example.moodtrackr.db.AppDatabase
 import com.example.moodtrackr.db.realtime.RTUsageRecordsDAO
 import com.example.moodtrackr.db.records.UsageRecordsDAO
@@ -22,8 +23,11 @@ class DatabaseManager() {
             db = Room.databaseBuilder(
                 context,
                 AppDatabase::class.java, "app-database"
-            ).fallbackToDestructiveMigration()
-            .build()
+            )
+                .fallbackToDestructiveMigration()
+//                .enableMultiInstanceInvalidation()
+//                .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
+                .build()
             usageRecordsDAO = db!!.usageRecordsDAO
             rtUsageRecordsDAO = db!!.rtUsageRecordsDAO
             return db

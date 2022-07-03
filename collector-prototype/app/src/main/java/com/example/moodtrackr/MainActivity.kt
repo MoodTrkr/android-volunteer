@@ -46,11 +46,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val intent = Intent(this, DataCollectorService::class.java)
-        if (!DataCollectorService.running) {
-            //this.applicationContext.startForegroundService(intent)
-            startService(intent)
-        }
+        WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
 
         val permsManager: PermissionsManager = PermissionsManager(this)
         permsManager.checkAllPermissions()

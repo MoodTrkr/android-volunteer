@@ -27,7 +27,7 @@ class ServiceMaintainenceWorker(context: Context, parameters: WorkerParameters) 
         Log.e("DEBUG", "Service Running: " + DataCollectorService.running)
         if (!DataCollectorService.running) {
             Log.d("DEBUG", "starting service from doWork")
-            val intent = Intent(context, DataCollectorService::class.java)
+            val intent = Intent(context.applicationContext, DataCollectorService::class.java)
             ContextCompat.startForegroundService(context, intent)
         }
         return Result.success()
