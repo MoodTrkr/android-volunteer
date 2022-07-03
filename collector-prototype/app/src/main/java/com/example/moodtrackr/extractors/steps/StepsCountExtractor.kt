@@ -7,6 +7,7 @@ import android.content.Context
 import android.hardware.SensorEvent
 import androidx.fragment.app.FragmentActivity
 import android.util.Log
+import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.util.DatabaseManager
@@ -35,8 +36,8 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             throw Exception("Sensor Manager Failed")
         }
 
-        //steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
-        steps = DataCollectorService.steps
+        steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
+//        steps = DataCollectorService.steps
         registerListener()
     }
 
@@ -65,7 +66,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             stepsDB.steps = steps
             DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
             stepsDBLastUpdate = steps
-            DataCollectorService.steps = steps
+            DataCollectorService.localSteps = steps
         }
     }
 

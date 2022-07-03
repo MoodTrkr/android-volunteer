@@ -3,6 +3,7 @@ package com.example.moodtrackr.collectors.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.*
+import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
@@ -18,7 +19,8 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
             val time = DatesUtil.getTodayTruncated().time
             var record: RTUsageRecord? = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(time)
             record = checkSequence(record)
-            updateDBUnchecked(record!!.unlocks+1)
+            updateDBUnchecked(record.unlocks+1)
+            DataCollectorService.localUnlocks = record.unlocks+1
         }
         return Result.success()
     }

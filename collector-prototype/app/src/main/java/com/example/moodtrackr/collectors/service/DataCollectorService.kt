@@ -45,7 +45,7 @@ class DataCollectorService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
+        val filter = IntentFilter(Intent.ACTION_SCREEN_ON) //formerly ACTION_USER_PRESENT
         Log.e("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
 
         this.stepsCounter = StepsCountExtractor(this)
@@ -91,31 +91,16 @@ class DataCollectorService : Service() {
 
     private fun getState(): Pair<Long, Long> {
         val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
-        unlocks = record.unlocks
-        steps = record.steps
+        localUnlocks = record.unlocks
+        localSteps = record.steps
         Log.e("DataCollectorService", "DataCollectorService getState: ${record}")
-        return Pair(unlocks, steps)
-    }
-
-    private fun saveState() {
-        CoroutineScope(Dispatchers.IO).launch {
-            DBHelperRT.updateDB(applicationContext, unlocks, steps)
-        }
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        saveState()
-    }
-
-    override fun onTrimMemory(level: Int) {
-        saveState()
+        return Pair(localUnlocks, localSteps)
     }
 
     override fun onDestroy() {
         running = false
-        saveState()
-        this.stepsCounter.clean()
-        unregisterReceiver(unlockReceiver)
+        if(this::stepsCounter.isInitialized) this.stepsCounter.clean()
+        if(this::unlockReceiver.isInitialized) unregisterReceiver(unlockReceiver)
         stopForeground(true)
     }
 
@@ -123,8 +108,8 @@ class DataCollectorService : Service() {
         val TITLE: String = "MDTKR"
         val NOTIF_ID: Int = 0
 
-        var steps: Long = 0 //meant to just follow StepsCountExtractor.steps
-        var unlocks: Long = 0
+        var localSteps: Long = 0 //meant to be updated by StepsCountExtractor
+        var localUnlocks: Long = 0 //meant to be updated by UnlocksReceiver
         var running: Boolean = false
     }
 }

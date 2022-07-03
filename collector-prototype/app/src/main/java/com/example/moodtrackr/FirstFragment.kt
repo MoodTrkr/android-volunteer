@@ -102,8 +102,7 @@ class FirstFragment : Fragment() {
 //            WorkersUtil.queuePeriodic(requireActivity().applicationContext)
 //            WorkersUtil.queueHourly(requireActivity().applicationContext)
 //            WorkersUtil.queueDaily(requireActivity().applicationContext)
-            Log.e("DEBUG", "DataCollectorService Vars: ${DataCollectorService.steps}, ${DataCollectorService.unlocks}")
-            Log.e("DEBUG", "DatesUtil: ${DatesUtil.getTodayTruncated()} ${DatesUtil.getTomorrow()}")
+            Log.e("DEBUG", "DataCollectorService Vars: ${DataCollectorService.localUnlocks}, ${DataCollectorService.localSteps}")
         }
     }
 
