@@ -22,9 +22,12 @@
         android:theme="@style/Theme.MoodTrackr">
 
         <service
-            android:name=".extractors.unlocks.DataCollectorService"
+            android:name=".collectors.service.DataCollectorService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true"
+            />
+<!--        android:process=":collectorProcess"-->
+<!--        android:isolatedProcess="true"-->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -32,16 +35,22 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".extractors.unlocks.DeviceUnlockReceiver"  android:exported="true">
+        <receiver android:name=".extractors.unlocks.UnlockReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+                <action android:name="android.intent.action.SCREEN_ON"/>
             </intent-filter>
         </receiver>
+<!--        <receiver android:name=".collectors.service.RestartReceiver"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="REFRESH_THIS" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
     </application>
 
 </manifest>

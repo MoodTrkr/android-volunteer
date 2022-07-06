@@ -2,18 +2,23 @@ package com.example.moodtrackr
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
+import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.databinding.ActivityMainBinding
-import com.example.moodtrackr.extractors.unlocks.DataCollectorService
-import com.example.moodtrackr.utilities.PermissionsManager
+import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
+import com.example.moodtrackr.collectors.workers.util.WorkersUtil
+import com.example.moodtrackr.util.DatabaseManager
+import com.example.moodtrackr.util.PermissionsManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,26 +33,39 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // inject fragment if it has not been added to the activity
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                //add<SurveyFragment>(R.id.fragment_container_view)
+                //add<LoginFragment>(R.id.fragment_container_view)
+                add<FirstFragment>(R.id.fragment_container_view)
+            }
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
+        WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
 
-        val intent = Intent(this, DataCollectorService::class.java)
-//            requireActivity().applicationContext.startForegroundService(intent)
-        startService(intent)
-
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
         val permsManager: PermissionsManager = PermissionsManager(this)
+        permsManager.checkAllPermissions()
+
+        val dbManager = DatabaseManager.getInstance(this.applicationContext)
+
+        NotifUpdateUtil.updateNotif(this.applicationContext)
+
+        WorkersUtil.queueServiceMaintenance(this.applicationContext)
+        WorkersUtil.queuePeriodic(this.applicationContext)
+        WorkersUtil.queueHourly(this.applicationContext)
+
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
 
             permsManager.checkAllPermissions()
-            //startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
 

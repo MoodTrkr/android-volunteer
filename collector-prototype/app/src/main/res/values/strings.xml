@@ -9,4 +9,11 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name = "survey_title">Today\'s Survey</string>
+    
+    <string name="buttonIdForTag">0</string>
+    <string name="com_auth0_domain">dev-dh23pufb.us.auth0.com</string>
+    <string name="com_auth0_clientId">HSMJ0SyYwxlfXh9IKhYMTYYekMe62qmU</string>
+    <string name="com_auth0_clientSecret">Z0kLtmA7uy77hE6MCqe4jqdzIXX_i5ph5LDT8Rm8Kwp1QDp8vkkGZ5K26COhd51B</string>
 </resources>
