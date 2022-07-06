@@ -52,6 +52,10 @@ class CollectionUtil(context: Context) {
             }
         }
 
+        fun dailyCollectYesterday(context: Context) {
+            dailyCollect(context, DatesUtil.getYesterday())
+        }
+
         fun dailyCollectToday(context: Context) {
             dailyCollect(context, DatesUtil.getToday())
         }
@@ -63,8 +67,8 @@ class CollectionUtil(context: Context) {
 
             CoroutineScope(Dispatchers.IO).launch {
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
-                val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                 if (!record.dailyCollection.complete) {
+                    val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                     record.dailyCollection = DailyCollection(
                         dayTruncated,
                         usageExtractor.usageStatsQuery(timeBounds.first, timeBounds.second),

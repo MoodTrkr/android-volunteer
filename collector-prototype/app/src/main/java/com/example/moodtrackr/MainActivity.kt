@@ -13,9 +13,10 @@ import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.service.DataCollectorService
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.databinding.ActivityMainBinding
+import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
+import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 
@@ -36,20 +37,28 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add<SurveyFragment>(R.id.fragment_container_view)
+                //add<SurveyFragment>(R.id.fragment_container_view)
+                //add<LoginFragment>(R.id.fragment_container_view)
+                add<FirstFragment>(R.id.fragment_container_view)
             }
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val intent = Intent(this, DataCollectorService::class.java)
-//            requireActivity().applicationContext.startForegroundService(intent)
-        startService(intent)
+        WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
 
         val permsManager: PermissionsManager = PermissionsManager(this)
+        permsManager.checkAllPermissions()
+
         val dbManager = DatabaseManager.getInstance(this.applicationContext)
+
+        NotifUpdateUtil.updateNotif(this.applicationContext)
+
+        WorkersUtil.queueServiceMaintenance(this.applicationContext)
+        WorkersUtil.queuePeriodic(this.applicationContext)
+        WorkersUtil.queueHourly(this.applicationContext)
+
 
         binding.fab.setOnClickListener {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines

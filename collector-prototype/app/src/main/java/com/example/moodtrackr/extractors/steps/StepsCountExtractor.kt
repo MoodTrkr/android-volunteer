@@ -36,8 +36,8 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             throw Exception("Sensor Manager Failed")
         }
 
-        //steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
-        steps = DataCollectorService.steps
+        steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
+//        steps = DataCollectorService.steps
         registerListener()
     }
 
@@ -66,7 +66,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             stepsDB.steps = steps
             DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
             stepsDBLastUpdate = steps
-            DataCollectorService.steps = steps
+            DataCollectorService.localSteps = steps
         }
     }
 

@@ -10,7 +10,7 @@ class DailyWorker(context: Context, parameters: WorkerParameters) : Worker(conte
 
     override fun doWork(): Result {
         // Mark the Worker as important
-        CollectionUtil.dailyCollectToday(context)
+        //CollectionUtil.dailyCollectToday(context)
         return Result.success()
     }
 }
