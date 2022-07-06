@@ -87,4 +87,31 @@ class Auth0Manager(context: Context) {
         })
     }
 
+    fun getCredentials(): String? {
+        // With the access token, call `userInfo` and get the profile from Auth0.
+        var accessToken: String? = null
+        credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
+            override fun onFailure(error: CredentialsManagerException) {
+                // Something went wrong!
+            }
+            override fun onSuccess(result: Credentials) {
+                // We have the user's credentials!
+                accessToken=result.accessToken
+                Log.e("DEBUG", "access token: $accessToken")
+
+                apiClient.userInfo(accessToken!!)
+                    .start(object: Callback<UserProfile, AuthenticationException> {
+                        override fun onFailure(exception: AuthenticationException) {
+                            // Something went wrong!
+                        }
+                        override fun onSuccess(profile: UserProfile) {
+                            // We have the user's profile!
+                            Log.e("DEBUG", "User Profile: ${profile}")
+                        }
+                    })
+            }
+        })
+        return accessToken
+    }
+
 }
