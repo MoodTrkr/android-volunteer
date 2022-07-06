@@ -12,8 +12,12 @@ class HourlyWorker(context: Context, parameters: WorkerParameters) : Worker(cont
     private var context: Context = context.applicationContext
 
     override fun doWork(): Result {
-        // Mark the Worker as important
+        // Update Notification
         NotifUpdateUtil.updateNotif(context.applicationContext)
+
+        //Run daily collection sequence for yesterday
+        CollectionUtil.dailyCollectYesterday(context)
+
         return Result.success()
     }
 }

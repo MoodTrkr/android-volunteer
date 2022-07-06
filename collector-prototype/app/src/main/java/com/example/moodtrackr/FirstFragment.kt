@@ -6,10 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.util.CollectionUtil
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
+import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
@@ -103,6 +105,18 @@ class FirstFragment : Fragment() {
 //            WorkersUtil.queueHourly(requireActivity().applicationContext)
 //            WorkersUtil.queueDaily(requireActivity().applicationContext)
             Log.e("DEBUG", "DataCollectorService Vars: ${DataCollectorService.localUnlocks}, ${DataCollectorService.localSteps}")
+
+
+            var yesterday = DatesUtil.getYesterdayTruncated()
+            Log.e("DEBUG", "Yesterday: $yesterday")
+
+            yesterday = DatesUtil.truncateDate(yesterday)
+            Log.e("DEBUG", "Yesterday Truncated: $yesterday")
+            Log.e("DEBUG", "Yesterday Bounds: ${DatesUtil.getDayBounds(yesterday)}")
+
+//            val record: MTUsageData = DBHelper.getObjSafe(requireContext().applicationContext, yesterday)
+//            Log.e("DEBUG", "Yesterday Obj: $record")
+//            Log.e("DEBUG", "Yesterday Daily Complete: ${record.dailyCollection.complete}")
         }
     }
 
