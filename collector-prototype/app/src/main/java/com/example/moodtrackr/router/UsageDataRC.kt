@@ -3,16 +3,15 @@ package com.example.moodtrackr.router
 import android.content.Context
 import com.example.moodtrackr.R
 import com.example.moodtrackr.data.MTUsageData
-import com.example.moodtrackr.db.AppDatabase
-import com.example.moodtrackr.util.DatabaseManager
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-
-interface RESTClient {
+/**
+ * Usage Data Rest Client
+ */
+interface UsageDataRC {
     /**
      * Find Usage Data by Date. Date data must provided in Long format.
      */
@@ -39,23 +38,23 @@ interface RESTClient {
 
     companion object {
         private const val BASE_PATH = "/api/v1/usage-data"
-        @Volatile private var restClient: RESTClient? = null
+        @Volatile private var restClient: UsageDataRC? = null
 
-        fun getInstance(context: Context) : RESTClient {
-            return RESTClient.restClient ?: synchronized(this) {
-                RESTClient.restClient ?:
+        fun getInstance(context: Context) : UsageDataRC {
+            return UsageDataRC.restClient ?: synchronized(this) {
+                UsageDataRC.restClient ?:
                 buildRestClient(context)!!
-                    .also { RESTClient.restClient = it }
+                    .also { UsageDataRC.restClient = it }
             }
         }
 
-        private fun buildRestClient(context: Context): RESTClient {
+        private fun buildRestClient(context: Context): UsageDataRC {
             val apiUrl = context.resources.getString((R.string.restApiUrl))
             return Retrofit.Builder()
                         .addConverterFactory(GsonConverterFactory.create())
                         .baseUrl(apiUrl)
                         .build()
-                        .create(RESTClient::class.java)
+                        .create(UsageDataRC::class.java)
         }
     }
 }
