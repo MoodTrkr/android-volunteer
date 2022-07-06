@@ -16,4 +16,5 @@
     <string name="com_auth0_domain">dev-dh23pufb.us.auth0.com</string>
     <string name="com_auth0_clientId">HSMJ0SyYwxlfXh9IKhYMTYYekMe62qmU</string>
     <string name="com_auth0_clientSecret">Z0kLtmA7uy77hE6MCqe4jqdzIXX_i5ph5LDT8Rm8Kwp1QDp8vkkGZ5K26COhd51B</string>
+    <string name="restApiUrl">https://api.github.com</string>
 </resources>
