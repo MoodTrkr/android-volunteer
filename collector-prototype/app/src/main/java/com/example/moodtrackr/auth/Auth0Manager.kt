@@ -13,21 +13,23 @@ import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.auth0.android.result.UserProfile
 import com.example.moodtrackr.R
+import kotlinx.coroutines.runBlocking
 
 class Auth0Manager(context: Context) {
     private val context: Context = context //must be activity context (get using requireActivity())
     private val account: Auth0 = Auth0(
         context.resources.getString(R.string.com_auth0_clientId),
-        context.resources.getString(R.string.com_auth0_domain))
+        context.resources.getString(R.string.com_auth0_domain),
+    )
     private val apiClient = AuthenticationAPIClient(account)
     private val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
 
     fun loginWithBrowser() {
         // Setup the WebAuthProvider, using the custom scheme and scope.
-
         WebAuthProvider.login(account)
             .withScheme("demo")
-            .withScope("openid profile email")
+            .withScope("openid profile email offline_access")
+            .withAudience(context.resources.getString(R.string.com_auth0_audience))
             // Launch the authentication passing the callback where the results will be received
             .start(context, object: Callback<Credentials, AuthenticationException> {
                 // Called when there is an authentication failure
@@ -41,6 +43,7 @@ class Auth0Manager(context: Context) {
                     // This can be used to call APIs
                     val accessToken = credentials.accessToken
                     credentialsManager.saveCredentials(credentials)
+                    retrieveAccessToken()
                     Log.e("DEBUG", "access token: $accessToken")
                 }
             })
@@ -80,7 +83,7 @@ class Auth0Manager(context: Context) {
                         }
                         override fun onSuccess(profile: UserProfile) {
                             // We have the user's profile!
-                            Log.e("DEBUG", "User Profile: ${profile}")
+                            Log.e("DEBUG", "User Profile: $profile")
                         }
                     })
             }
@@ -96,9 +99,6 @@ class Auth0Manager(context: Context) {
             }
             override fun onSuccess(result: Credentials) {
                 // We have the user's credentials!
-                accessToken=result.accessToken
-                Log.e("DEBUG", "access token: $accessToken")
-
                 apiClient.userInfo(accessToken!!)
                     .start(object: Callback<UserProfile, AuthenticationException> {
                         override fun onFailure(exception: AuthenticationException) {
@@ -112,6 +112,22 @@ class Auth0Manager(context: Context) {
             }
         })
         return accessToken
+    }
+    fun retrieveAccessToken() {
+        // With the access token, call `userInfo` and get the profile from Auth0.
+        runBlocking {
+            credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
+                override fun onFailure(error: CredentialsManagerException) {
+                    // Something went wrong!
+                }
+                override fun onSuccess(result: Credentials) {
+                    // We have the user's credentials!
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
+                        result.accessToken)
+                    Log.e("DEBUG", "access token: ${result.accessToken}")
+                }
+            })
+        }
     }
 
 }

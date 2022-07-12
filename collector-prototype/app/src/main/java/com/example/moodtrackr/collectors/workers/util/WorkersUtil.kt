@@ -47,8 +47,8 @@ class WorkersUtil {
 
         fun buildServiceMaintainence(): PeriodicWorkRequest {
             return PeriodicWorkRequestBuilder<ServiceMaintainenceWorker>(
-                60,
-                TimeUnit.HOURS)
+                20,
+                TimeUnit.MINUTES)
                 .build()
         }
 
