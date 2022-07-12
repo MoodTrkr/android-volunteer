@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Kotlin2JsCompilerArguments">
+    <option name="sourceMapPrefix" value="mdtkr" />
+  </component>
+  <component name="KotlinCompilerSettings">
+    <option name="copyJsLibraryFiles" value="false" />
+    <option name="outputDirectoryForJsLibraryFiles" value="C:\Users\qasim\code\android-volunteer\collector-prototype\build\ts" />
+  </component>
+</project>

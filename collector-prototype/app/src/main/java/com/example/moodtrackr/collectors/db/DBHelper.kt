@@ -15,7 +15,7 @@ class DBHelper {
         fun getObjSafe(context: Context, day: Date): MTUsageData {
             val record: MTUsageData?
             runBlocking {
-                record = DatabaseManager.getInstance(context).usageRecordsDAO.getObjOnDay(day)
+                record = DatabaseManager.getInstance(context).usageRecordsDAO.getObjOnDay(day.time)
             }
             if (record == null) {
                 return checkSequence(context, record, MTUsageData(day))
