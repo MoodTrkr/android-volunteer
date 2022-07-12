@@ -1,9 +1,6 @@
 package com.example.moodtrackr.db.realtime
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import java.sql.Date
 
 @Dao
@@ -18,9 +15,9 @@ interface RTUsageRecordsDAO {
     @Query("SELECT * FROM rt_usage_records u")
     suspend fun getAll(): RTUsageRecord?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(vararg usageRecord: RTUsageRecord)
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(vararg usageRecord: RTUsageRecord)
 }

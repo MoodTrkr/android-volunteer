@@ -6,25 +6,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.moodtrackr.collectors.db.DBHelper
+import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.util.CollectionUtil
-import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.data.MTUsageData
-import com.example.moodtrackr.extractors.usage.AppUsageExtractor
-import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
-import com.example.moodtrackr.extractors.geo.GeoDataExtractor
-import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.UnlockCollector
+import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.calls.data.MTCallStats
+import com.example.moodtrackr.extractors.geo.GeoDataExtractor
+import com.example.moodtrackr.extractors.network.OfflineExtractor
+import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
+import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.router.util.CompressionUtil
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.runBlocking
+import java.io.File
+import java.io.FileWriter
 
 
 //import com.example.moodtrackr.extractors.usage.AppUsageExtractor
@@ -33,7 +37,7 @@ import kotlinx.coroutines.runBlocking
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class FirstFragment : Fragment() {
-
+    private lateinit var auth0Manager: Auth0Manager
     private var _binding: FragmentFirstBinding? = null
 
     // This property is only valid between onCreateView and
@@ -42,9 +46,10 @@ class FirstFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
 
+        this.auth0Manager = Auth0Manager(requireActivity())
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -97,7 +102,6 @@ class FirstFragment : Fragment() {
                 Log.e("DEBUG", DatabaseManager.getInstance(requireContext().applicationContext).rtUsageRecordsDAO.getAll().toString())
             }
 
-
             NotifUpdateUtil.updateNotif(requireContext().applicationContext)
 //
 //            WorkersUtil.queuePersistent(requireActivity().applicationContext)
@@ -117,6 +121,48 @@ class FirstFragment : Fragment() {
 //            val record: MTUsageData = DBHelper.getObjSafe(requireContext().applicationContext, yesterday)
 //            Log.e("DEBUG", "Yesterday Obj: $record")
 //            Log.e("DEBUG", "Yesterday Daily Complete: ${record.dailyCollection.complete}")
+
+            val myFile = File(requireContext().applicationContext.filesDir, "output.json")
+            if (myFile.exists())                    myFile.delete()
+            if (!myFile.parentFile.exists())        myFile.parentFile.mkdirs()
+            Log.e("DEBUG", myFile.absolutePath)
+            myFile.createNewFile()
+
+            val gson = GsonBuilder().setPrettyPrinting().create()
+            //val writer = Files.newBufferedWriter(myFile.toPath())
+            val writer = FileWriter(myFile)
+            runBlocking {
+                gson.toJson(DatabaseManager.getInstance(requireContext().applicationContext).usageRecordsDAO.getAll(), writer)
+            }
+            writer.flush()
+            writer.close()
+        }
+
+        binding.loginBtnFirstFragment.setOnClickListener { _ -> auth0Manager.loginWithBrowser()}
+        binding.logoutBtnFirstFragment.setOnClickListener { _ -> auth0Manager.logout()}
+        binding.pushUsageObjBtn.setOnClickListener {
+            val restClient = RestClient.getInstance(requireContext().applicationContext)
+            var usage: MTUsageData?
+            runBlocking {
+                usage = DatabaseManager.getInstance(requireContext().applicationContext).usageRecordsDAO.getObjOnDay(
+                    DatesUtil.getYesterdayTruncated().time
+                )
+            }
+            Log.e("DEBUG", "Pushing to Server!")
+            runBlocking {
+                usage?.let { it -> restClient.insertUsageData(
+                    DatesUtil.getYesterdayTruncated().time,
+                    it
+                ) }
+            }
+        }
+        binding.getUsageObjBtn.setOnClickListener {
+            val restClient = RestClient.getInstance(requireContext().applicationContext)
+            Log.e("DEBUG", "Getting from Server!")
+            runBlocking {
+                val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
+                Log.e("DEBUG", "Server Results: $get")
+            }
         }
     }
 
