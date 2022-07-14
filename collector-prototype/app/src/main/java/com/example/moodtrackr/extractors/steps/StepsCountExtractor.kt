@@ -46,14 +46,27 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        steps += 1
+        steps++
         //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
-        updateSequence()
+        stepsTrue = event!!.values[0]
+        accurateUpdateSequence()
     }
 
     private fun updateSequence() {
-        if ( steps - stepsDBLastUpdate  > 10 ) {
+        if ( steps - stepsDBLastUpdate  > 100 ) {
             updateDB( steps )
+            stepsDBLastUpdate = steps
+        }
+    }
+
+    private fun accurateUpdateSequence() {
+        if ( steps - stepsDBLastUpdate  > 100 ) {
+            if (stepsTrueLastUpdate != 0F) {
+                steps = stepsDBLastUpdate + (stepsTrue - stepsTrueLastUpdate).toLong()
+                updateDB( steps )
+            }
+            else updateDB(steps)
+            stepsTrueLastUpdate = stepsTrue
         }
     }
 
@@ -65,7 +78,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             stepsDB = checkSequence(stepsDB)
             stepsDB.steps = steps
             DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
-            stepsDBLastUpdate = steps
+
             DataCollectorService.localSteps = steps
         }
     }
@@ -74,8 +87,6 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
         var stepsDBNew : RTUsageRecord
         runBlocking {
             if (stepsDB === null) {
-                clean()
-                registerListener()
                 stepsDBNew = RTUsageRecord(
                     DatesUtil.getTodayTruncated(),
                     0,
@@ -104,5 +115,8 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     companion object {
         var steps: Long = 0
         var stepsDBLastUpdate: Long = 0
+
+        var stepsTrue: Float = 0F
+        var stepsTrueLastUpdate: Float = 0F
     }
 }
