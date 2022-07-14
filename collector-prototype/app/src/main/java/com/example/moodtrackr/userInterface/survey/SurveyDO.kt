@@ -1,6 +1,5 @@
 package com.example.moodtrackr.userInterface.survey
 import com.example.moodtrackr.data.SurveyData
-import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.util.DatesUtil
 import java.sql.Date
 import java.time.LocalDate
@@ -57,6 +56,6 @@ class SurveyDO (
         }
         var convertedDate = Date.from(this.date.atStartOfDay().toInstant(ZoneOffset.UTC));
         convertedDate = DatesUtil.truncateDate(convertedDate);
-        return SurveyData(convertedDate,surveyVersion,answers,isComplete, MTSleepData())
+        return SurveyData(convertedDate,surveyVersion,answers,isComplete)
     }
 }
