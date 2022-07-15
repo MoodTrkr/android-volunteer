@@ -90,6 +90,10 @@ class Auth0Manager(context: Context) {
         })
     }
 
+    fun refreshCredentials() {
+        refreshCredentials(context, apiClient, credentialsManager)
+    }
+
     fun getCredentials(): String? {
         // With the access token, call `userInfo` and get the profile from Auth0.
         var accessToken: String? = null
@@ -114,20 +118,68 @@ class Auth0Manager(context: Context) {
         return accessToken
     }
     fun retrieveAccessToken() {
-        // With the access token, call `userInfo` and get the profile from Auth0.
-        runBlocking {
-            credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
-                override fun onFailure(error: CredentialsManagerException) {
-                    // Something went wrong!
-                }
-                override fun onSuccess(result: Credentials) {
-                    // We have the user's credentials!
-                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
-                        result.accessToken)
-                    Log.e("DEBUG", "access token: ${result.accessToken}")
-                }
-            })
-        }
+        Companion.retrieveAccessToken(context, credentialsManager)
     }
 
+    companion object {
+        private fun authSetup(context: Context): Triple<Auth0, AuthenticationAPIClient, CredentialsManager> {
+            val account: Auth0 = Auth0(
+                context.resources.getString(R.string.com_auth0_clientId),
+                context.resources.getString(R.string.com_auth0_domain),
+            )
+            val apiClient = AuthenticationAPIClient(account);
+            val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
+            return Triple(account, apiClient, credentialsManager)
+        }
+
+        fun refreshCredentials(context: Context) {
+            val triple = authSetup(context)
+            refreshCredentials(context,
+                triple.second,
+                triple.third
+            )
+        }
+
+        private fun refreshCredentials(context: Context, apiClient: AuthenticationAPIClient,
+                               credentialsManager: CredentialsManager) {
+            val refreshToken = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_refresh))
+            if (refreshToken != null) {
+                val account = Auth0(context)
+                val client = AuthenticationAPIClient(account)
+                client.renewAuth(refreshToken)
+                    .start(object: Callback<Credentials, AuthenticationException> {
+                        override fun onFailure(exception: AuthenticationException) {
+                            // Error
+                        }
+
+                        override fun onSuccess(credentials: Credentials) {
+                            // Use the credentials
+                            credentialsManager.saveCredentials(credentials)
+                            retrieveAccessToken(context, credentialsManager)
+                        }
+                    })
+            }
+        }
+
+        fun retrieveAccessToken(context: Context, credentialsManager: CredentialsManager) {
+            // With the access token, call `userInfo` and get the profile from Auth0.
+            runBlocking {
+                credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
+                    override fun onFailure(error: CredentialsManagerException) {
+                        // Something went wrong!
+                    }
+                    override fun onSuccess(result: Credentials) {
+                        // We have the user's credentials!
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
+                            result.accessToken)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
+                            result.expiresAt.time)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_refresh),
+                            result.refreshToken)
+                    }
+                })
+            }
+        }
+    }
 }

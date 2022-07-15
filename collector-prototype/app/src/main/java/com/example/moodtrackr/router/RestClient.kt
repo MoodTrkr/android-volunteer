@@ -37,7 +37,6 @@ interface RestClient : UsageDataRoutes {
         private fun buildRestClient(context: Context): RestClient {
             val token: String? = SharedPreferencesStorage(context)
                 .retrieveString(context.resources.getString(R.string.token_identifier))
-            Log.e("RestClient", "$token")
 
             val client: OkHttpClient = OkHttpClient.Builder()
 //                .writeTimeout(30, TimeUnit.SECONDS)

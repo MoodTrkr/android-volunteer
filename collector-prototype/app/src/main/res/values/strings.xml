@@ -19,4 +19,6 @@
     <string name="restApiUrl">https://mdtkr-volunteer.herokuapp.com/</string>
     <string name="com_auth0_audience">https://quickstarts/mdtkr-api-rest</string>
     <string name="token_identifier">AUTH0_TOKEN</string>
+    <string name="token_expiry">AUTH0_TOK_EXPIRY</string>
+    <string name="token_refresh">AUTH0_REFRESH_TOKEN</string>
 </resources>
