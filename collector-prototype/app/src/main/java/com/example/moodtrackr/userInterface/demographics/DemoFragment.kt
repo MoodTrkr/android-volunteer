@@ -1,4 +1,4 @@
-package com.example.moodtrackr.userInterface.login
+package com.example.moodtrackr.userInterface.demographics
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
