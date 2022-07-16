@@ -21,4 +21,29 @@
     <string name="token_identifier">AUTH0_TOKEN</string>
     <string name="token_expiry">AUTH0_TOK_EXPIRY</string>
     <string name="token_refresh">AUTH0_REFRESH_TOKEN</string>
+    <string name="token_user_id">AUTH0_USER_ID</string>
+
+    <string name="demographics_title">Let\'s get you set up!</string>
+    <string name="dobPrompt">Date of Birth</string>
+    <string name="genderPrompt">Gender</string>
+    <string name="racePrompt">Race</string>
+    <string name="login_status_identifier">LOGIN_IDENTIFIER</string>
+    <string name="setup_status_identifier">SETUP_IDENTIFIER</string>
+    <string name="auth0_user_metadata">AUTH0_USER_METADATA</string>
+
+    <string-array name="genderOptions">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Intersex</item>
+        <item>Trans</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="raceOptions">
+        <item>White</item>
+        <item>Black or African American</item>
+        <item>American Indian or Alaska Native</item>
+        <item>Asian</item>
+        <item>Native Hawaiian or Other Pacific Islander</item>
+        <item>Other</item>
+    </string-array>
 </resources>

@@ -88,9 +88,6 @@ class FirstFragment : Fragment() {
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()
 
-            val geoExtractor = GeoDataExtractor(activity, permsManager)
-            val loc = geoExtractor.getLoc()
-
             val screenOnTime: Long = DatesUtil.yesterdayQueryWrapper( usageExtractor::screenOnTimeQuery ) as Long
             Log.e("DEBUG", "Screen Time: $screenOnTime")
 

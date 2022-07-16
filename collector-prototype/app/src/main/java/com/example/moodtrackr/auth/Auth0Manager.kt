@@ -9,11 +9,15 @@ import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.CredentialsManagerException
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.auth0.android.callback.Callback
+import com.auth0.android.management.ManagementException
+import com.auth0.android.management.UsersAPIClient
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.auth0.android.result.UserProfile
 import com.example.moodtrackr.R
+import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
+import okhttp3.internal.toImmutableMap
 
 class Auth0Manager(context: Context) {
     private val context: Context = context //must be activity context (get using requireActivity())
@@ -23,6 +27,7 @@ class Auth0Manager(context: Context) {
     )
     private val apiClient = AuthenticationAPIClient(account)
     private val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
+    private lateinit var usersClient: UsersAPIClient
 
     fun loginWithBrowser() {
         // Setup the WebAuthProvider, using the custom scheme and scope.
@@ -41,10 +46,8 @@ class Auth0Manager(context: Context) {
                 override fun onSuccess(credentials: Credentials) {
                     // Get the access token from the credentials object.
                     // This can be used to call APIs
-                    val accessToken = credentials.accessToken
                     credentialsManager.saveCredentials(credentials)
                     retrieveAccessToken()
-                    Log.e("DEBUG", "access token: $accessToken")
                 }
             })
     }
@@ -56,6 +59,8 @@ class Auth0Manager(context: Context) {
                 override fun onSuccess(payload: Void?) {
                     // The user has been logged out!
                     credentialsManager.clearCredentials()
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.login_status_identifier),
+                        false)
                 }
 
                 override fun onFailure(error: AuthenticationException) {
@@ -121,6 +126,28 @@ class Auth0Manager(context: Context) {
         Companion.retrieveAccessToken(context, credentialsManager)
     }
 
+    fun getUserMetadata() {
+        val accessToken: String? = SharedPreferencesStorage(context)
+            .retrieveString(context.resources.getString(R.string.token_identifier))
+        val userId: String? = SharedPreferencesStorage(context)
+            .retrieveString(context.resources.getString(R.string.token_user_id))
+        if (accessToken != null && userId != null) {
+            this.usersClient = UsersAPIClient(account, accessToken)
+            getUserMetadata(context, userId, accessToken, usersClient)
+        }
+    }
+
+    fun updateUserMetadata(metadata: Map<String, String>) {
+        val accessToken: String? = SharedPreferencesStorage(context)
+            .retrieveString(context.resources.getString(R.string.token_identifier))
+        val userId: String? = SharedPreferencesStorage(context)
+            .retrieveString(context.resources.getString(R.string.token_user_id))
+        if (accessToken != null && userId != null) {
+            this.usersClient = UsersAPIClient(account, accessToken)
+            updateUserMetadata(context, userId, accessToken, usersClient, metadata)
+        }
+    }
+
     companion object {
         private fun authSetup(context: Context): Triple<Auth0, AuthenticationAPIClient, CredentialsManager> {
             val account: Auth0 = Auth0(
@@ -177,9 +204,72 @@ class Auth0Manager(context: Context) {
                             result.expiresAt.time)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_refresh),
                             result.refreshToken)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_user_id),
+                            result.user.getId())
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.login_status_identifier),
+                            true)
                     }
                 })
             }
+        }
+
+        fun getUserMetadata(context: Context) {
+            val accessToken: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_user_id))
+            val userId: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_user_id))
+            if (accessToken != null && userId != null) {
+                val auth = authSetup(context)
+                val usersClient = UsersAPIClient(auth.first, accessToken)
+                getUserMetadata(context, userId, accessToken, usersClient)
+            }
+        }
+
+        fun getUserMetadata(context: Context, userId: String, accessToken: String, usersClient: UsersAPIClient) {
+            // Get the user ID and call the full getUser Management API endpoint, to retrieve the full profile information
+            // Create the user API client using the account details and the access token from Credentials
+            usersClient
+                .getProfile(userId)
+                .start(object: Callback<UserProfile, ManagementException> {
+                    override fun onFailure(exception: ManagementException) {
+                        // Something went wrong!
+                    }
+                    override fun onSuccess(profile: UserProfile) {
+                        val profileMetadata = profile.getUserMetadata()
+                        val gson = Gson().toJson(profileMetadata)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
+                            gson)
+                    }
+                })
+        }
+
+        fun updateUserMetadata(context: Context, metadata: Map<String, String>) {
+            val accessToken: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_user_id))
+            val userId: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_user_id))
+            if (accessToken != null && userId != null) {
+                val auth = authSetup(context)
+                val usersClient = UsersAPIClient(auth.first, accessToken)
+                updateUserMetadata(context, userId, accessToken, usersClient, metadata)
+            }
+        }
+
+        fun updateUserMetadata(context: Context, userId: String, accessToken: String, usersClient: UsersAPIClient, metadata: Map<String, String>) {
+            // Call updateMetadata with the id of the user to update, and the map of data
+            usersClient.updateMetadata(userId, metadata)
+                .start(object: Callback<UserProfile, ManagementException> {
+                    override fun onFailure(exception: ManagementException) {
+                        // Something went wrong!
+                    }
+
+                    override fun onSuccess(profile: UserProfile) {
+                        val profileMetadata = profile.getUserMetadata()
+                        val gson = Gson().toJson(profileMetadata)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
+                            gson)
+                    }
+                })
         }
     }
 }

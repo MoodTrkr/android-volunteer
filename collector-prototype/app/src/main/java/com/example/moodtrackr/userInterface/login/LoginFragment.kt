@@ -26,8 +26,8 @@ class LoginFragment:Fragment(R.layout.login_fragment) {
 
         this.auth0Manager = Auth0Manager(requireActivity())
         binding.loginBtn.setOnClickListener { _ -> auth0Manager.loginWithBrowser()}
-        binding.logoutBtn.setOnClickListener { _ -> auth0Manager.logout()}
-        binding.userProfileBtn.setOnClickListener { _ -> auth0Manager.showUserProfile()}
+//        binding.logoutBtn.setOnClickListener { _ -> auth0Manager.logout()}
+//        binding.userProfileBtn.setOnClickListener { _ -> auth0Manager.showUserProfile()}
         return view;
     }
 
