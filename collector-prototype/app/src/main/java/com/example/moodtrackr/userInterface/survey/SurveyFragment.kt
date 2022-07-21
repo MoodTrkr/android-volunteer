@@ -11,6 +11,8 @@ import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.util.DatabaseManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.math.ceil
+import kotlin.random.Random
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
@@ -21,6 +23,8 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     private val binding get() = _binding!!
     private lateinit var usageRecordsDao: UsageRecordsDAO
     private var usageRecord: MTUsageData? = null
+//    private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
+//        R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,9 +40,9 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         runBlocking {
             usageRecord = usageRecordsDao.getObjOnDay(surveyDO.getSurveyData().time!!)
         }
-        //To DO
-        // Make The complete screen show up if the survey for yesterday is complete.
-        // create themes/templates
+
+
+//        binding.meme.setBackgroundResource(Random.nextInt(imageIds.size))
 
 //        if(usageRecord?.surveyData != null){
 //            // survey is complete!
@@ -81,6 +85,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     private fun setQuestion(){
         if(surveyDO.currentQuestionNumber == surveyDO.questionDOS.size){
             // survey is finished
+            binding.progressBar.setProgress(100);
             showSurveyComplete();
             var surveyData =  surveyDO.getSurveyData();
 
@@ -103,7 +108,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             }
         }
         else{
-            binding.meme.visibility = View.INVISIBLE;
+            binding.meme.visibility = View.GONE;
             binding.options.visibility = View.VISIBLE;
             binding.back.visibility = View.VISIBLE;
             val currentQuestion = surveyDO.getCurrentQuestion();
@@ -117,16 +122,18 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             binding.prompt.text = currentQuestion.prompt;
 
             if(surveyDO.currentQuestionNumber == 0){
-                binding.back.visibility = View.INVISIBLE;
+                binding.back.visibility = View.GONE;
+                binding.progressBar.setProgress(0);
             }
+            binding.progressBar.setProgress(ceil(surveyDO.currentQuestionNumber*100.00/surveyDO.questionDOS.size).toInt());
         }
 
     }
     private fun showSurveyComplete(){
         binding.prompt.text = "Survey Complete! Here's a cute animal as thanks."
         binding.meme.visibility = View.VISIBLE;
-        binding.options.visibility = View.INVISIBLE;
-        binding.back.visibility = View.INVISIBLE;
+        binding.options.visibility = View.GONE;
+        binding.back.visibility = View.GONE;
     }
 
     private fun handleOptionClick(v:View ) {

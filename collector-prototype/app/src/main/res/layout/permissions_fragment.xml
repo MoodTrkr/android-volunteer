@@ -26,7 +26,8 @@
         style="@style/darkText"
         android:text="Grant Permissions"
         android:gravity="center"
-        android:id="@+id/getPermissions">
+        android:id="@+id/getPermissions"
+        android:backgroundTint="#F8FAFF">
     </TextView>
 
 </LinearLayout>

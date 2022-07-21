@@ -1,7 +1,9 @@
 package com.example.moodtrackr.userInterface.permissions
 
+import android.content.Intent
 import android.widget.TextView
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import com.example.moodtrackr.databinding.PermissionsFragmentBinding
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.view.setPadding
 import androidx.fragment.app.FragmentActivity
 import com.example.moodtrackr.util.PermissionsManager
 
@@ -33,16 +36,18 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         val view = binding.root
 
         var permissions = arrayOf(
-            PermissionDO("Calls", "We look at call logs to measure the number of " +
+            PermissionDO("Call logs", "We look at call logs to measure the number of " +
                     "incoming and outgoing calls. Information about who is being called and what is " +
                     "being said is never recorded "),
-            PermissionDO("Cook Book","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Cook Book","We want to see what you are cooking. Good recipes are always welcome.")
+            PermissionDO("Usage Data","We want to see what you are cooking. Good recipes are always welcome."),
+            PermissionDO("Location","We want to see what you are cooking. Good recipes are always welcome."),
+            PermissionDO("Physical Activity","We want to see what you are cooking. Good recipes are always welcome.")
         )
 
         val permsManager: PermissionsManager = PermissionsManager(this)
         binding.getPermissions.setOnClickListener{
             permsManager.checkAllPermissions()
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
 
 
@@ -73,6 +78,8 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
             permButton.setLayoutParams(ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT))
+            permButton.setBackgroundResource(R.drawable.bordered_box);
+            permButton.setPadding(dpAsPixels,dpAsPixels,dpAsPixels,dpAsPixels);
             permButton.setOnClickListener {
                 if(  dropDownContainer.visibility == View.VISIBLE){
                     dropDownContainer.visibility = View.GONE
@@ -101,6 +108,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
 
 
             val explanation: TextView =TextView(activity);
+            explanation.setPadding(0,10,0,0)
             explanation.setTextAppearance(R.style.darkText)
             explanation.setText(permission.explanation)
 
