@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.R
 import com.example.moodtrackr.R.id.*
@@ -14,16 +15,21 @@ import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.DemoFragmentBinding
 import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.util.DatesUtil
+import com.example.moodtrackr.FirstFragment
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.util.PermissionsManager
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import okhttp3.internal.toImmutableMap
 import java.util.*
 
-class DemoFragment:Fragment(R.layout.demo_fragment) {
+class DemoFragment(): Fragment(R.layout.demo_fragment) {
     private lateinit var auth0Manager: Auth0Manager
     private lateinit var geoDataExtractor: GeoDataExtractor
+    private val permissionsManager = MainActivity.permsManager
 
     private var country: String? = null
-    private lateinit var cal: Calendar
+    private var cal: Calendar = Calendar.getInstance()
     private lateinit var race: String
     private lateinit var gender: String
 
@@ -40,7 +46,7 @@ class DemoFragment:Fragment(R.layout.demo_fragment) {
         _binding = DemoFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        this.geoDataExtractor = GeoDataExtractor(requireActivity(), PermissionsManager(requireActivity()))
+        this.geoDataExtractor = GeoDataExtractor(requireActivity(), permissionsManager)
         geoDataExtractor.setCountry()
         Log.e("DEBUG", "Country: $country")
 
@@ -102,17 +108,12 @@ class DemoFragment:Fragment(R.layout.demo_fragment) {
         }
 
         binding.continueBtn.setOnClickListener {
-            country = geoDataExtractor.getCountry()
-            Log.e("DEBUG", "Config: $country, $race, $gender, ${cal?.time}")
-            var metadata = mutableMapOf<String, String>()
-
-            metadata["RACE"] = race
-            metadata["GENDER"] = gender
-            if (country != null) metadata["COUNTRY"] = country!! else metadata["COUNTRY"] = "NULL"
-            metadata["DOB"] = cal?.let { it -> DatesUtil.truncateDate(it.time) }.toString()
-            Auth0Manager.updateUserMetadata(requireContext().applicationContext, metadata.toImmutableMap())
-            SharedPreferencesStorage(requireContext().applicationContext)
-                .store(requireContext().resources.getString(R.string.setup_status_identifier), true)
+            val job = runBlocking {
+                handleComplete()
+            }
+            job.invokeOnCompletion {
+                switchFragment()
+            }
         }
 
 //        binding.logoutBtn.setOnClickListener { _ -> auth0Manager.logout()}
@@ -125,4 +126,31 @@ class DemoFragment:Fragment(R.layout.demo_fragment) {
         _binding = null
     }
 
+    private fun handleComplete(): CompletableDeferred<Boolean> {
+        var deferred = CompletableDeferred<Boolean>()
+
+        country = geoDataExtractor.getCountry()
+        Log.e("DEBUG", "Config: $country, $race, $gender, ${cal?.time}")
+        var metadata = mutableMapOf<String, String>()
+
+        metadata["RACE"] = race
+        metadata["GENDER"] = gender
+        if (country != null) metadata["COUNTRY"] = country!! else metadata["COUNTRY"] = "NULL"
+        metadata["DOB"] = cal?.let { it -> DatesUtil.truncateDate(it.time) }.time.toString()
+        Auth0Manager.updateUserMetadata(requireContext().applicationContext, metadata.toImmutableMap())
+        deferred.complete(true)
+
+        return deferred
+    }
+
+    private fun switchFragment() {
+        try {
+            val fragment = FirstFragment()
+            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
+            fragmentManager.beginTransaction().replace(fragment_container_view, fragment)
+                .commit()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

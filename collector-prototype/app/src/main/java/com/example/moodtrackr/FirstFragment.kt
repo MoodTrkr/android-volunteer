@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
@@ -36,7 +37,7 @@ import java.io.FileWriter
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(R.layout.fragment_first) {
     private lateinit var auth0Manager: Auth0Manager
     private var _binding: FragmentFirstBinding? = null
 
@@ -160,6 +161,15 @@ class FirstFragment : Fragment() {
                 val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
                 Log.e("DEBUG", "Server Results: $get")
             }
+        }
+        binding.refreshUserBtn.setOnClickListener { auth0Manager.refreshCredentials() }
+        binding.metadataBtn.setOnClickListener {
+            auth0Manager.getUserMetadata()
+            val metadata = SharedPreferencesStorage(requireContext().applicationContext).retrieveString(
+                requireContext().applicationContext.resources.getString(
+                    R.string.auth0_user_metadata))
+            Log.e("DEBUG", "$metadata")
+
         }
     }
 

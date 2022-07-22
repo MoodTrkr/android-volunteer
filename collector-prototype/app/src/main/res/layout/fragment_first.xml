@@ -51,6 +51,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Push" />
+
+        <Button
+            android:id="@+id/refreshUserBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh User" />
+
+        <Button
+            android:id="@+id/metadataBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Metadata" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

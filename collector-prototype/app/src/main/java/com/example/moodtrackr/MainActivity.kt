@@ -35,14 +35,17 @@ class MainActivity : AppCompatActivity() {
             this.applicationContext.resources.getString(
                 R.string.setup_status_identifier))
 
+        permsManager = PermissionsManager(this)
+        permsManager.checkAllPermissions()
+
         // inject fragment if it has not been added to the activity
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 //add<SurveyFragment>(R.id.fragment_container_view)
                 if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
-                if (setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
-                //add<FirstFragment>(R.id.fragment_container_view)
+                if (loginStatus == true && setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
+                if (loginStatus == true && setupStatus == true) add<FirstFragment>(R.id.fragment_container_view)
             }
         }
 
@@ -50,9 +53,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
-
-        val permsManager: PermissionsManager = PermissionsManager(this)
-        permsManager.checkAllPermissions()
 
         val dbManager = DatabaseManager.getInstance(this.applicationContext)
 
@@ -92,5 +92,8 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+    companion object {
+        lateinit var permsManager: PermissionsManager
     }
 }
