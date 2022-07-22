@@ -12,7 +12,6 @@ import com.auth0.android.callback.Callback
 import com.auth0.android.management.ManagementException
 import com.auth0.android.management.UsersAPIClient
 import com.auth0.android.provider.WebAuthProvider
-import com.auth0.android.request.DefaultClient
 import com.auth0.android.result.Credentials
 import com.auth0.android.result.UserProfile
 import com.example.moodtrackr.R
@@ -20,7 +19,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
-import okhttp3.internal.toImmutableMap
 
 class Auth0Manager(context: Context) {
     private val context: Context = context //must be activity context (get using requireActivity())
@@ -76,7 +74,9 @@ class Auth0Manager(context: Context) {
                     // This can be used to call APIs
                     credentialsManager.saveCredentials(credentials)
                     retrieveAccessToken()
-                    getUserMetadata()
+                    runBlocking {
+                        getUserMetadataAsync(context, credentials.idToken, usersClient)
+                    }
                     deferred.complete(credentials)
                 }
             })
@@ -283,6 +283,30 @@ class Auth0Manager(context: Context) {
                             profileMetadata.size>1)
                     }
                 })
+        }
+
+        fun getUserMetadataAsync(context: Context, userId: String, usersClient: UsersAPIClient): Deferred<Map<String, Any>?> {
+            var deferredUser = CompletableDeferred<Map<String, Any>?>()
+            usersClient
+                .getProfile(userId)
+                .start(object: Callback<UserProfile, ManagementException> {
+                    override fun onFailure(exception: ManagementException) {
+                        // Something went wrong!
+                        Log.e("DEBUG", "$exception")
+                    }
+                    override fun onSuccess(profile: UserProfile) {
+                        val profileMetadata = profile.getUserMetadata()
+                        Log.e("DEBUG", "User Metadata: $profileMetadata")
+                        Log.e("DEBUG", "User Metadata Size: ${profileMetadata.size}")
+                        val gson = Gson().toJson(profileMetadata)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
+                            gson)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.setup_status_identifier),
+                            profileMetadata.size>1)
+                        deferredUser.complete(profileMetadata)
+                    }
+                })
+            return deferredUser
         }
 
         fun updateUserMetadata(context: Context, metadata: Map<String, String>) {
