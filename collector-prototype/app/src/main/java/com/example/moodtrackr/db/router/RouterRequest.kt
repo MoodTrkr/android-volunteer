@@ -12,4 +12,9 @@ data class RouterRequest constructor(
     @ColumnInfo(name = "type") var type: String = "",
     @ColumnInfo(name = "params") var params: String = "",
     @ColumnInfo(name = "body") var payload: String = ""
-)
+) {
+    companion object {
+        val GET_USAGE: String = "GET_USAGE"
+        val INSERT_USAGE: String = "INSERT_USAGE"
+    }
+}

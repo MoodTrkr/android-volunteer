@@ -98,7 +98,7 @@ interface RestClient : UsageDataRoutes {
             return deferred
         }
 
-        suspend fun <T, R, S> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend (R, S) -> T?, inp1: R, inp2: S): CompletableDeferred<Pair<T?, Int>> {
+        suspend fun <T, R, S> safeApiCall(context: Context, dispatcher: CoroutineDispatcher, apiCall: suspend (R, S) -> T?, inp1: R, inp2: S): CompletableDeferred<Pair<T?, Int>> {
             val deferred = CompletableDeferred<Pair<T?, Int>>()
             withContext(dispatcher) {
                 try {
@@ -129,8 +129,21 @@ interface RestClient : UsageDataRoutes {
                 }
             }
         }
-        private fun <T, R> queueRequest(deferred: CompletableDeferred<Pair<T?, Int>>, inp1: T, inp2: R?) {
-            if (inp1 is MTUsageData)
+        private fun <T, R> queueRequest(context: Context, deferred: CompletableDeferred<Pair<T?, Int>>, inp1: T, inp2: R?) {
+            if (deferred.)
+            when (inp1) {
+                (is MTUsageData) -> {
+                    DatabaseManager.getInstance(context).routerRequestsDAO.insert(
+                        RouterRequest(
+                            Date(),
+                            RouterRequest.INSERT_USAGE,
+                            inp2,
+                            inp1
+                        )
+                    )
+                }
+                else -> Log.e("DEBUG", "Unsupported Rest request type")
+            }
         }
     }
 }
