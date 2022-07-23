@@ -27,6 +27,7 @@ import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileWriter
@@ -148,20 +149,30 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
             }
             Log.e("DEBUG", "Pushing to Server!")
             runBlocking {
-                usage?.let { it -> restClient.insertUsageData(
-                    DatesUtil.getYesterdayTruncated().time,
-                    it
-                ) }
+                usage?.let {
+                    RestClient.safeApiCall(
+                        Dispatchers.Default,
+                        restClient::insertUsageData,
+                        DatesUtil.getYesterdayTruncated().time,
+                        it
+                    )}
             }
         }
+
         binding.getUsageObjBtn.setOnClickListener {
             val restClient = RestClient.getInstance(requireContext().applicationContext)
             Log.e("DEBUG", "Getting from Server!")
             runBlocking {
-                val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
+                //val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
+                val get = RestClient.safeApiCall(
+                    Dispatchers.Default,
+                    restClient::getUsageData,
+                    DatesUtil.getYesterdayTruncated().time
+                    )
                 Log.e("DEBUG", "Server Results: $get")
             }
         }
+
         binding.refreshUserBtn.setOnClickListener { auth0Manager.refreshCredentials() }
         binding.metadataBtn.setOnClickListener {
             auth0Manager.getUserMetadata()

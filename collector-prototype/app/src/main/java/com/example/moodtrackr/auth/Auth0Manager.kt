@@ -67,7 +67,6 @@ class Auth0Manager(context: Context) {
                 override fun onFailure(exception: AuthenticationException) {
                     // Something went wrong!
                 }
-
                 // Called when authentication completed successfully
                 override fun onSuccess(credentials: Credentials) {
                     // Get the access token from the credentials object.
@@ -182,7 +181,7 @@ class Auth0Manager(context: Context) {
     }
 
     companion object {
-        private fun authSetup(context: Context): Triple<Auth0, AuthenticationAPIClient, CredentialsManager> {
+        fun authSetup(context: Context): Triple<Auth0, AuthenticationAPIClient, CredentialsManager> {
             val account: Auth0 = Auth0(
                 context.resources.getString(R.string.com_auth0_clientId),
                 context.resources.getString(R.string.com_auth0_domain),
@@ -341,6 +340,31 @@ class Auth0Manager(context: Context) {
                             profileMetadata.size>1)
                     }
                 })
+        }
+
+        fun retrieveAccessTokenAsync(context: Context, credentialsManager: CredentialsManager): CompletableDeferred<String> {
+            val deferred = CompletableDeferred<String>()
+            credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
+                override fun onFailure(exception: CredentialsManagerException) {
+                    // Something went wrong!
+                    Log.e("DEBUG", "Failed to refresh credentials: $exception")
+                }
+                override fun onSuccess(result: Credentials) {
+                    // We have the user's credentials!
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
+                        result.accessToken)
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
+                        result.expiresAt.time)
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_refresh),
+                        result.refreshToken)
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_user_id),
+                        result.user.getId())
+                    SharedPreferencesStorage(context).store(context.resources.getString(R.string.login_status_identifier),
+                        true)
+                    deferred.complete(result.accessToken)
+                }
+            })
+            return deferred
         }
     }
 }

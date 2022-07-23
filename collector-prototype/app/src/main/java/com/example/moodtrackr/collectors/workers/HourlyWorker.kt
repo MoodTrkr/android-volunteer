@@ -20,11 +20,11 @@ class HourlyWorker(context: Context, parameters: WorkerParameters) : Worker(cont
 
         //Run daily collection sequence for yesterday
         CollectionUtil.dailyCollectYesterday(context)
-        val tokenExpiry = DataCollectorService.tokenExpiry
-        if (tokenExpiry !== null && tokenExpiry < Date().time - 2*60*60*1000) {
-            Auth0Manager.refreshCredentials(context)
-            DataCollectorService.tokenExpiry = Date().time
-        }
+//        val tokenExpiry = DataCollectorService.tokenExpiry
+//        if (tokenExpiry !== null && tokenExpiry < Date().time - 2*60*60*1000) {
+//            Auth0Manager.refreshCredentials(context)
+//            DataCollectorService.tokenExpiry = Date().time
+//        }
         return Result.success()
     }
 }
