@@ -9,12 +9,12 @@ import com.auth0.android.management.UsersAPIClient
 import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.data.MTUsageData
+import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
 import com.example.moodtrackr.router.routes.UsageDataRoutes
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import com.example.moodtrackr.util.DatabaseManager
+import com.google.gson.Gson
+import kotlinx.coroutines.*
 import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -27,6 +27,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.util.*
 
 
 /**
@@ -108,6 +109,10 @@ interface RestClient : UsageDataRoutes {
                     ))
                 } catch (t: Throwable) {
                     safeApiCallExceptionHandler(deferred, t)
+                    launch(Dispatchers.Default) {
+                        val def = deferred.getCompleted()
+                        queueRequest(context, def.first, def.second)
+                    }
                 }
             }
             return deferred
@@ -129,16 +134,16 @@ interface RestClient : UsageDataRoutes {
                 }
             }
         }
-        private fun <T, R> queueRequest(context: Context, deferred: CompletableDeferred<Pair<T?, Int>>, inp1: T, inp2: R?) {
-            if (deferred.)
+        private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
             when (inp1) {
-                (is MTUsageData) -> {
+                is MTUsageData -> {
+                    val gson = Gson()
                     DatabaseManager.getInstance(context).routerRequestsDAO.insert(
                         RouterRequest(
                             Date(),
                             RouterRequest.INSERT_USAGE,
-                            inp2,
-                            inp1
+                            inp2 as String,
+                            gson.toJson(inp1)
                         )
                     )
                 }
