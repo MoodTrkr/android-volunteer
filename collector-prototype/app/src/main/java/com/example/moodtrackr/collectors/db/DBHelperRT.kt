@@ -1,7 +1,10 @@
 package com.example.moodtrackr.collectors.db
 
 import android.content.Context
+import com.example.moodtrackr.collectors.service.DataCollectorService
+import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.db.realtime.RTUsageRecord
+import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +29,7 @@ class DBHelperRT {
                 record = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(day.time)
             }
             if (record == null) {
-                return checkSequence(context, record)
+                return handleNull(context, record)
             }
             return record
         }
@@ -38,14 +41,17 @@ class DBHelperRT {
                     DatesUtil.getTodayTruncated().time
                 )
             }
-            record = checkSequence(context, record)
+            record = handleNull(context, record)
 
             record!!.unlocks = unlocks
             record!!.steps = steps
             CoroutineScope(Dispatchers.IO).launch { DatabaseManager.getInstance(context).rtUsageRecordsDAO.update(record!!) }
+
+            DataCollectorService.localSteps = steps
+            DataCollectorService.localUnlocks = unlocks
         }
 
-        fun checkSequence(context: Context, record: RTUsageRecord?): RTUsageRecord {
+        fun handleNull(context: Context, record: RTUsageRecord?): RTUsageRecord {
             var recordNew : RTUsageRecord
             runBlocking {
                 if (record === null) {
@@ -55,12 +61,20 @@ class DBHelperRT {
                         0
                     )
                     DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(recordNew)
+                    refreshStaticVars()
                 }
                 else {
                     recordNew = record
                 }
             }
             return recordNew
+        }
+
+        private fun refreshStaticVars() {
+            StepsCountExtractor.steps = 0
+            StepsCountExtractor.stepsDBLastUpdate = 0
+            DataCollectorService.localSteps = 0
+            DataCollectorService.localUnlocks = 0
         }
     }
 }

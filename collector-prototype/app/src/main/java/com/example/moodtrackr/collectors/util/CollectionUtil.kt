@@ -10,6 +10,7 @@ import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
+import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.CoroutineScope
@@ -43,13 +44,15 @@ class CollectionUtil(context: Context) {
             CoroutineScope(Dispatchers.IO).launch {
                 val rtRecord: RTUsageRecord = DBHelperRT.getObjSafe(context, dayTruncated)
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
-                if (!record.periodicCollBook.isFull()) {
-                    record.periodicCollBook.insert(
-                        PeriodicCollection(Date(), rtRecord.steps, rtRecord.unlocks)
-                    )
-                    DBHelper.updateDB(context, record)
-                }
+                record.periodicCollBook.insert(
+                    PeriodicCollection(Date().time, rtRecord.steps, rtRecord.unlocks)
+                )
+                DBHelper.updateDB(context, record)
             }
+        }
+
+        fun dailyCollectYesterday(context: Context) {
+            dailyCollect(context, DatesUtil.getYesterday())
         }
 
         fun dailyCollectToday(context: Context) {
@@ -63,13 +66,14 @@ class CollectionUtil(context: Context) {
 
             CoroutineScope(Dispatchers.IO).launch {
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
-                val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                 if (!record.dailyCollection.complete) {
+                    val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                     record.dailyCollection = DailyCollection(
-                        dayTruncated,
+                        dayTruncated.time,
                         usageExtractor.usageStatsQuery(timeBounds.first, timeBounds.second),
                         usageExtractor.usageEventsQuery(timeBounds.first, timeBounds.second),
                         callLogsExtractor.queryLogs(timeBounds.first, timeBounds.second),
+                        MTSleepData(0,0),
                         usageExtractor.screenOnTimeQuery(timeBounds.first, timeBounds.second),
                         true
                     )

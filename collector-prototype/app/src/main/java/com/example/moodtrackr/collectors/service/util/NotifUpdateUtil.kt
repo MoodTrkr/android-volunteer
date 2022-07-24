@@ -17,7 +17,7 @@ class NotifUpdateUtil {
             val builder = NotificationCompat.Builder(context, DataCollectorService.NOTIF_ID.toString())
                 .setContentTitle(DataCollectorService.TITLE)
                 .setTicker(DataCollectorService.TITLE)
-                .setContentText("Unlocks: ${DataCollectorService.unlocks} | Steps: ${DataCollectorService.steps}")
+                .setContentText("Unlocks: ${DataCollectorService.localUnlocks} | Steps: ${DataCollectorService.localSteps}")
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)

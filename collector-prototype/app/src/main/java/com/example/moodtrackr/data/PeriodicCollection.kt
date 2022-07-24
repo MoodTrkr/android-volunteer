@@ -3,10 +3,10 @@ package com.example.moodtrackr.data
 import java.util.*
 
 data class PeriodicCollection(
-    val time: Date,
+    val time: Long,
     val steps: Long,
     val unlocks: Long
     )
 {
-    constructor() : this(Date(), 0, 0)
+    constructor() : this(0, 0, 0)
 }

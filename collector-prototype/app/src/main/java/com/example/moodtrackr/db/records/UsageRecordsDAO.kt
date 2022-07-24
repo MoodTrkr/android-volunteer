@@ -13,7 +13,7 @@ interface UsageRecordsDAO {
     suspend fun getByTimeRange(start: Long, end: Long): List<MTUsageData>
 
     @Query("SELECT * FROM usage_records u WHERE u.date = :day LIMIT 1")
-    suspend fun getObjOnDay(day: java.util.Date): MTUsageData?
+    suspend fun getObjOnDay(day: Long): MTUsageData?
 
     @Query("SELECT * FROM usage_records")
     suspend fun getAll(): List<MTUsageData>

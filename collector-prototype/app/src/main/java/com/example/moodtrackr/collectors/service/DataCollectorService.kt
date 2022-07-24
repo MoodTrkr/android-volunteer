@@ -1,5 +1,6 @@
 package com.example.moodtrackr.collectors.service
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -12,6 +13,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.db.realtime.RTUsageRecord
@@ -27,26 +29,29 @@ class DataCollectorService : Service() {
     private lateinit var builder: NotificationCompat.Builder
     private lateinit var notificationManager: NotificationManager
     private lateinit var stepsCounter: StepsCountExtractor
+    private lateinit var unlockReceiver: UnlockReceiver
     private lateinit var context: Context
+    private lateinit var notification: Notification
 
     override fun onCreate() {
         super.onCreate()
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
+        Log.e("DataCollectorService", "DataCollectorService onCreate Triggered!")
 
-        getState()
-
-        builder = createNotif()
+        builder = createNotif(getState())
         createChannel()
-        running = true
+        notification = builder.build()
+        startForeground(NOTIF_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val filter = IntentFilter(Intent.ACTION_USER_PRESENT)
+        val filter = IntentFilter(Intent.ACTION_SCREEN_ON) //formerly ACTION_USER_PRESENT
+        Log.e("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
 
         this.stepsCounter = StepsCountExtractor(this)
-        val unlockReceiver = UnlockReceiver()
+        unlockReceiver = UnlockReceiver()
         registerReceiver(unlockReceiver, filter)
 
         if (intent?.action != null && intent.action.equals(
@@ -55,10 +60,12 @@ class DataCollectorService : Service() {
             stopSelf()
         }
 
-        val notification = builder.build()
-
         // If we get killed, after returning from here, restart
-        startForeground(NOTIF_ID, notification);
+        builder = createNotif(getState())
+        createChannel()
+        notification = builder.build()
+        startForeground(NOTIF_ID, notification)
+        running = true
         return START_STICKY
     }
 
@@ -76,51 +83,43 @@ class DataCollectorService : Service() {
         notificationManager.createNotificationChannel(mChannel)
     }
 
-    private fun createNotif(): NotificationCompat.Builder {
+    private fun createNotif(state: Pair<Long, Long>): NotificationCompat.Builder {
+        Log.e("DataCollectorService", "Notification State: $state")
         return NotificationCompat.Builder(this.applicationContext, NOTIF_ID.toString())
             .setContentTitle(TITLE)
             .setTicker(TITLE)
-            .setContentText("Unlocks: $unlocks | Steps: $steps")
+            .setContentText("Unlocks: ${state.first} | Steps: ${state.second}")
             .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
     }
 
-    private fun getState() {
-        runBlocking {
-            val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
-            unlocks = record.unlocks
-            steps = record.steps
-        }
-    }
+    private fun getState(): Pair<Long, Long> {
+        tokenExpiry = SharedPreferencesStorage(context)
+            .retrieveLong(context.resources.getString(R.string.token_expiry))
 
-    private fun saveState() {
-        CoroutineScope(Dispatchers.IO).launch {
-            DBHelperRT.updateDB(applicationContext, unlocks, steps)
-        }
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        saveState()
-    }
-
-    override fun onTrimMemory(level: Int) {
-        saveState()
+        val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
+        localUnlocks = record.unlocks
+        localSteps = record.steps
+        Log.e("DataCollectorService", "DataCollectorService getState: ${record}")
+        return Pair(localUnlocks, localSteps)
     }
 
     override fun onDestroy() {
         running = false
-        saveState()
-        this.stepsCounter.clean()
+        if(this::stepsCounter.isInitialized) this.stepsCounter.clean()
+        if(this::unlockReceiver.isInitialized) unregisterReceiver(unlockReceiver)
         stopForeground(true)
+        notificationManager.cancel(NOTIF_ID);
     }
 
     companion object {
         val TITLE: String = "MDTKR"
-        val NOTIF_ID: Int = 0
+        val NOTIF_ID: Int = 1000
+        var tokenExpiry: Long? = null
 
-        var steps: Long = 0 //meant to just follow StepsCountExtractor.steps
-        var unlocks: Long = 0
+        var localSteps: Long = 0 //meant to be updated by StepsCountExtractor
+        var localUnlocks: Long = 0 //meant to be updated by UnlocksReceiver
         var running: Boolean = false
     }
 }
