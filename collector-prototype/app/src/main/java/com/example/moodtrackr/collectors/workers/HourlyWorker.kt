@@ -8,7 +8,11 @@ import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.util.CollectionUtil
+import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class HourlyWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
@@ -25,6 +29,8 @@ class HourlyWorker(context: Context, parameters: WorkerParameters) : Worker(cont
 //            Auth0Manager.refreshCredentials(context)
 //            DataCollectorService.tokenExpiry = Date().time
 //        }
+
+        RestClient.popRequest(context.applicationContext, Dispatchers.Default)
         return Result.success()
     }
 }
