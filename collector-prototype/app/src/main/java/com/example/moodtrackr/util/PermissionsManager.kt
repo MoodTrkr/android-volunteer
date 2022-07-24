@@ -86,4 +86,14 @@ class PermissionsManager() {
             ))
         }
     }
+
+    fun allPermissionsGranted():Boolean {
+        mandatoryPermissions.forEach { permission ->
+            if (ActivityCompat.checkSelfPermission(
+                    appContext,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED) { return false}
+        }
+        return true;
+    }
 }

@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.db.realtime.RTUsageRecord
@@ -94,6 +95,9 @@ class DataCollectorService : Service() {
     }
 
     private fun getState(): Pair<Long, Long> {
+        tokenExpiry = SharedPreferencesStorage(context)
+            .retrieveLong(context.resources.getString(R.string.token_expiry))
+
         val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
         localUnlocks = record.unlocks
         localSteps = record.steps
@@ -112,6 +116,7 @@ class DataCollectorService : Service() {
     companion object {
         val TITLE: String = "MDTKR"
         val NOTIF_ID: Int = 1000
+        var tokenExpiry: Long? = null
 
         var localSteps: Long = 0 //meant to be updated by StepsCountExtractor
         var localUnlocks: Long = 0 //meant to be updated by UnlocksReceiver

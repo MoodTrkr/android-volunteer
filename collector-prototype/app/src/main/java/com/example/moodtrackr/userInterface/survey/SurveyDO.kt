@@ -11,27 +11,47 @@ class SurveyDO (
     val questionDOS:Array<QuestionDO> =
         arrayOf(
             QuestionDO(
-                "Have you been bothered by nervousness or your \"nerves\" during \n" +
-                    "the past month?",
+                "Did you feel symptoms of depression today? Select the most extreme description of how you felt.",
                 arrayOf(
-                    OptionDO(0, "Extremely so – to the point where I could not work or take care of things"),
-                    OptionDO(1, "Very much so"),
-                    OptionDO(2, "Quite a bit"),
-                    OptionDO(3, "Some - enough to bother me"),
-                    OptionDO(4, "A little"),
-                    OptionDO(5, "Not at all"),
+                    OptionDO(0, "Extremely depressed, I felt emotionally numb, could not function at all, and did not wish to live"),
+                    OptionDO(1, "Very depressed, had feelings of hopelessness, and functioned very poorly"),
+                    OptionDO(2, "Moderately depressed. Found it difficult to brighten up and did not function well"),
+                    OptionDO(3, "Mildly depressed. Felt more depressed than usual, taking some difficulty to brighten up, but could function"),
+                    OptionDO(4, "Slightly Depressed. Felt a little down, but it did not impair me in any way"),
+                    OptionDO(5, "No feelings of depression"),
                 )
             ),
             QuestionDO(
-                "How much energy, pep, or vitality did you have or feel during\n" +
-                        "the past month?",
+                "Did you feel symptoms of elevation on this day? Select the most extreme description of how you felt.",
                 arrayOf(
-                    OptionDO(0, "No energy or pep at all – I fell drained, sapped"),
-                    OptionDO(1, "Very low in energy or pep most of the time"),
-                    OptionDO(2, "Generally low in energy or pep"),
-                    OptionDO(3, "My energy level varied quite a bit"),
-                    OptionDO(4, "Fairly energetic most of the time"),
-                    OptionDO(5, "Very full of energy – lots of pep"),
+                    OptionDO(0, "Extremely elevated. Could not control self or function at all, making many reckless decisions"),
+                    OptionDO(1, "Very elevated. Feel very happy. Exhibited inappropriate laughing, could control self only briefly and functioned very poorly"),
+                    OptionDO(2, "Moderately elevated. Felt significantly more cheerful than normal, found difficulty with self-control and did not function well"),
+                    OptionDO(3, "Mildly elevated.  Felt more cheerful than normal, but could control self and function"),
+                    OptionDO(4, "Slightly elevated. Felt slightly cheerful, but it did not impair me in any way"),
+                    OptionDO(5, "No feelings of elevation"),
+                )
+            ),
+            QuestionDO(
+                "Did you feel symptoms of anger on this day? Select the most extreme description of how you felt.",
+                arrayOf(
+                    OptionDO(0, "Extremely angry. Felt constant anger, could not be calmed down, control self, or function at all"),
+                    OptionDO(1, "Very elevated. Feel very happy. Exhibited inappropriate laughing, could control self only briefly and functioned very poorly"),
+                    OptionDO(2, "Moderately angry. Felt significantly more angry than normal, found difficulty with self-control and did not function well"),
+                    OptionDO(3, "Mildly angry.  Felt more anger than normal, but could control self and function"),
+                    OptionDO(4, "Slightly angry. Felt slightly angry, but it did not impair me in any way"),
+                    OptionDO(5, "No feelings of anger"),
+                )
+            ),
+            QuestionDO(
+                "Did you feel symptoms of anxiety on this day? Select the most extreme description of how you felt.",
+                arrayOf(
+                    OptionDO(0, "Extremely anxious. Felt constant anxiety, anxiety attacks, could not be calmed down, control self, or function at all"),
+                    OptionDO(1, "Very anxious. Could control self only briefly and functioned very poorly as a result"),
+                    OptionDO(2, "Moderately anxious. Felt significantly more anxious than normal, found difficulty with self-control and did not function well"),
+                    OptionDO(3, "Mildly anxious.  Felt more anxious than normal, but could control self and function"),
+                    OptionDO(4, "Slightly anxious. Felt slightly anxious, but it did not impair me in any way"),
+                    OptionDO(5, "No feelings of anxiety"),
                 )
             )
 

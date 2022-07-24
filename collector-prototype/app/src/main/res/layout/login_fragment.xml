@@ -26,25 +26,6 @@
             tools:layout_editor_absoluteX="125dp"
             tools:layout_editor_absoluteY="243dp" />
 
-        <Button
-            android:id="@+id/logoutBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Logout Button"
-            tools:layout_conversion_absoluteHeight="40dp"
-            tools:layout_conversion_absoluteWidth="161dp"
-            tools:layout_editor_absoluteX="125dp"
-            tools:layout_editor_absoluteY="283dp" />
-
-        <Button
-            android:id="@+id/userProfileBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="User Info"
-            tools:layout_conversion_absoluteHeight="40dp"
-            tools:layout_conversion_absoluteWidth="161dp"
-            tools:layout_editor_absoluteX="125dp"
-            tools:layout_editor_absoluteY="323dp" />
     </LinearLayout>
 
     <LinearLayout

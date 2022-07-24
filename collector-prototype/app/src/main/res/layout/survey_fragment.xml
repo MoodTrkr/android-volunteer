@@ -1,14 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="30dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style ="@style/subHeader"
+            android:paddingRight="10dp"
+            android:text = "0">
+
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style ="@style/subHeader"
+            android:text = "day streak">
+
+        </TextView>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:progress="0"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="20dp" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="@integer/one"
+        style = "@style/simpleCard"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -16,88 +50,62 @@
             android:orientation="@integer/one"
             >
             <TextView
+                style = "@style/subHeader"
                 android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/survey_title"
-                android:textSize="15dp" />
+               />
             <TextView
+                style = "@style/regularHeader"
                 android:id="@+id/prompt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Question"
-                android:textSize="30dp" />
+                android:layout_marginBottom="30dp"/>
 
             <ImageView
                 android:id="@+id/meme"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                android:layout_height="400dp"
+                android:padding="0dp"
+                android:layout_margin="0dp"
+                app:srcCompat="@drawable/cute_animal_0" />
         </LinearLayout>
 
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="@integer/one"
+            style = "@style/defaultColLinLayout"
             android:id="@+id/options"
+            android:layout_marginBottom="10dp"
             >
             <Button
                 android:id="@+id/optionOne"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton"
+                android:backgroundTint="#71ADEA"/>
 
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionTwo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton"
+              />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionThree"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionFour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionFive"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionSix"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
 
         </LinearLayout>
         <TextView
             android:id="@+id/back"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            style="@style/clickableTextDark"
             android:text="Previous Question"
-            android:textSize="30dp" />
+ />
+
 
 
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
+
