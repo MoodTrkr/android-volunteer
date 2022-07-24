@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
@@ -24,7 +23,6 @@ import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.router.util.CompressionUtil
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
@@ -185,20 +183,6 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
                     R.string.auth0_user_metadata))
             Log.e("DEBUG", "$metadata")
 
-        }
-
-        binding.surveyBtn.setOnClickListener {
-            switchFragment(SurveyFragment());
-        }
-    }
-
-    private fun switchFragment(fragment:Fragment) {
-        try {
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

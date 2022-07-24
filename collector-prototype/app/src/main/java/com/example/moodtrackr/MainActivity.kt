@@ -10,8 +10,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import android.view.Menu
 import android.view.MenuItem
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
@@ -51,10 +49,11 @@ class MainActivity : AppCompatActivity() {
                 setReorderingAllowed(true)
                 //add<SurveyFragment>(R.id.fragment_container_view)
                 if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
-                else if (setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
-                else if (!permsManager.allPermissionsGranted()) {
+                if (loginStatus == true && setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
+//                if (loginStatus == true && setupStatus == true) add<FirstFragment>(R.id.fragment_container_view)
+                if (loginStatus == true && setupStatus == true && !permsManager.allPermissionsGranted()) {
                     add<PermissionsFragment>(R.id.fragment_container_view)
-                } else if(permsManager.allPermissionsGranted()){
+                }else{
                     add<SurveyFragment>(R.id.fragment_container_view)
                 }
             }
@@ -75,10 +74,11 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.fab.setOnClickListener {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                switchFragment(FirstFragment())
-            }
+//            To add multiple permissions, uncomment the following requestMultiplePermissions lines
+//            and add the permissions needed!
+
+            permsManager.checkAllPermissions()
+            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
         }
     }
 
@@ -105,15 +105,5 @@ class MainActivity : AppCompatActivity() {
     }
     companion object {
         lateinit var permsManager: PermissionsManager
-    }
-
-    private fun switchFragment(fragment:Fragment) {
-        try {
-            val fragmentManager: FragmentManager = supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

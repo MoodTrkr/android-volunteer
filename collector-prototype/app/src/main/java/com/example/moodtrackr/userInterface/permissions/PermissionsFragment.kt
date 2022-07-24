@@ -15,9 +15,6 @@ import com.example.moodtrackr.databinding.PermissionsFragmentBinding
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.setPadding
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import com.example.moodtrackr.FirstFragment
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 
 
@@ -44,19 +41,13 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
                     "being said is never recorded "),
             PermissionDO("Usage Data","We want to see what you are cooking. Good recipes are always welcome."),
             PermissionDO("Location","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Physical Activity","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Files and Media","We want to see what you are cooking. Good recipes are always welcome.")
+            PermissionDO("Physical Activity","We want to see what you are cooking. Good recipes are always welcome.")
         )
 
         val permsManager: PermissionsManager = PermissionsManager(this)
         binding.getPermissions.setOnClickListener{
-//            To add multiple permissions, uncomment the following requestMultiplePermissions lines
-//            and add the permissions needed!
             permsManager.checkAllPermissions()
             startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
-            if(permsManager.allPermissionsGranted()){
-                switchFragment()
-            }
         }
 
 
@@ -146,15 +137,5 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun switchFragment() {
-        try {
-            val fragment = SurveyFragment()
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

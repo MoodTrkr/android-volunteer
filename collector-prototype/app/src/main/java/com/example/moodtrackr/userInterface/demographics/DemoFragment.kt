@@ -17,8 +17,6 @@ import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.FirstFragment
 import com.example.moodtrackr.MainActivity
-import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -147,8 +145,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
 
     private fun switchFragment() {
         try {
-            val permsManager = PermissionsManager()
-            val fragment = if (permsManager.allPermissionsGranted()) SurveyFragment() else PermissionsFragment()
+            val fragment = FirstFragment()
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(fragment_container_view, fragment)
                 .commit()

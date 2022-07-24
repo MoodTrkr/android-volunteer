@@ -23,8 +23,8 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     private val binding get() = _binding!!
     private lateinit var usageRecordsDao: UsageRecordsDAO
     private var usageRecord: MTUsageData? = null
-    private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
-        R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
+//    private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
+//        R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,12 +42,12 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         }
 
 
+//        binding.meme.setBackgroundResource(Random.nextInt(imageIds.size))
 
-
-        if(usageRecord?.surveyData != null){
-            // survey is complete!
-            showSurveyComplete()
-        }else {
+//        if(usageRecord?.surveyData != null){
+//            // survey is complete!
+//            showSurveyComplete()
+//        }else {
             setQuestion();
 
             binding.back.setOnClickListener {
@@ -78,7 +78,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             binding.optionFour.setTag(R.string.buttonIdForTag, 3);
             binding.optionFive.setTag(R.string.buttonIdForTag, 4);
             binding.optionSix.setTag(R.string.buttonIdForTag, 5);
-        }
+//        }
         return view;
     }
 
@@ -130,7 +130,6 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
     }
     private fun showSurveyComplete(){
-        binding.meme.setBackgroundResource(imageIds[Random.nextInt(imageIds.size)])
         binding.prompt.text = "Survey Complete! Here's a cute animal as thanks."
         binding.meme.visibility = View.VISIBLE;
         binding.options.visibility = View.GONE;
