@@ -111,7 +111,7 @@ interface RestClient : UsageDataRoutes {
                     safeApiCallExceptionHandler(deferred, t)
                     launch(Dispatchers.Default) {
                         val def = deferred.getCompleted()
-                        queueRequest(context, def.first, def.second)
+                        if (def.second == 2) queueRequest(context, def.first, def.second)
                     }
                 }
             }
@@ -134,6 +134,7 @@ interface RestClient : UsageDataRoutes {
                 }
             }
         }
+
         private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
             when (inp1) {
                 is MTUsageData -> {

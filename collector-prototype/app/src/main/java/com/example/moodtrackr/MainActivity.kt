@@ -3,6 +3,7 @@ package com.example.moodtrackr
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,13 +28,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
                 R.string.login_status_identifier))
         val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
                 R.string.setup_status_identifier))
+        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus")
 
         permsManager = PermissionsManager(this)
         permsManager.checkAllPermissions()

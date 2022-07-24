@@ -12,6 +12,7 @@ import com.auth0.android.callback.Callback
 import com.auth0.android.management.ManagementException
 import com.auth0.android.management.UsersAPIClient
 import com.auth0.android.provider.WebAuthProvider
+import com.auth0.android.request.DefaultClient
 import com.auth0.android.result.Credentials
 import com.auth0.android.result.UserProfile
 import com.example.moodtrackr.R
@@ -29,6 +30,10 @@ class Auth0Manager(context: Context) {
     private val apiClient = AuthenticationAPIClient(account)
     private val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
     private lateinit var usersClient: UsersAPIClient
+
+    init {
+        account.networkingClient = DefaultClient(enableLogging = true)
+    }
 
     fun loginWithBrowser() {
         // Setup the WebAuthProvider, using the custom scheme and scope.
@@ -66,17 +71,18 @@ class Auth0Manager(context: Context) {
                 // Called when there is an authentication failure
                 override fun onFailure(exception: AuthenticationException) {
                     // Something went wrong!
+                    deferred.cancel()
                 }
                 // Called when authentication completed successfully
                 override fun onSuccess(credentials: Credentials) {
-                    // Get the access token from the credentials object.
-                    // This can be used to call APIs
                     credentialsManager.saveCredentials(credentials)
                     retrieveAccessToken()
+                    usersClient = UsersAPIClient(account, credentials.accessToken)
                     runBlocking {
                         getUserMetadataAsync(context, credentials.idToken, usersClient)
+                    }.invokeOnCompletion {
+                        deferred.complete(credentials)
                     }
-                    deferred.complete(credentials)
                 }
             })
         return deferred
@@ -186,6 +192,7 @@ class Auth0Manager(context: Context) {
                 context.resources.getString(R.string.com_auth0_clientId),
                 context.resources.getString(R.string.com_auth0_domain),
             )
+            account.networkingClient = DefaultClient(enableLogging = true)
             val apiClient = AuthenticationAPIClient(account);
             val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
             return Triple(account, apiClient, credentialsManager)
@@ -292,6 +299,7 @@ class Auth0Manager(context: Context) {
                     override fun onFailure(exception: ManagementException) {
                         // Something went wrong!
                         Log.e("DEBUG", "$exception")
+                        deferredUser.cancel()
                     }
                     override fun onSuccess(profile: UserProfile) {
                         val profileMetadata = profile.getUserMetadata()
@@ -348,6 +356,7 @@ class Auth0Manager(context: Context) {
                 override fun onFailure(exception: CredentialsManagerException) {
                     // Something went wrong!
                     Log.e("DEBUG", "Failed to refresh credentials: $exception")
+                    deferred.cancel()
                 }
                 override fun onSuccess(result: Credentials) {
                     // We have the user's credentials!

@@ -59,10 +59,10 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
                 requireContext().applicationContext.resources.getString(
                     R.string.setup_status_identifier))
             Log.e("DEBUG", "SETUP STATUS: $setupStatus")
-            var fragment: Fragment = if (setupStatus == false) {
-                DemoFragment()
-            } else {
+            var fragment: Fragment = if (setupStatus == true) {
                 FirstFragment()
+            } else {
+                DemoFragment()
             }
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
