@@ -152,6 +152,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
             runBlocking {
                 usage?.let {
                     RestClient.safeApiCall(
+                        requireContext().applicationContext,
                         Dispatchers.Default,
                         restClient::insertUsageData,
                         DatesUtil.getYesterdayTruncated().time,
