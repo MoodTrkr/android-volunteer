@@ -49,7 +49,12 @@ class MainActivity : AppCompatActivity() {
                 //add<SurveyFragment>(R.id.fragment_container_view)
                 if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
                 if (loginStatus == true && setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
-                if (loginStatus == true && setupStatus == true) add<FirstFragment>(R.id.fragment_container_view)
+//                if (loginStatus == true && setupStatus == true) add<FirstFragment>(R.id.fragment_container_view)
+                if (loginStatus == true && setupStatus == true && !permsManager.allPermissionsGranted()) {
+                    add<PermissionsFragment>(R.id.fragment_container_view)
+                }else{
+                    add<SurveyFragment>(R.id.fragment_container_view)
+                }
             }
         }
 
