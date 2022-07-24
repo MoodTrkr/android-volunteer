@@ -31,9 +31,9 @@ class Auth0Manager(context: Context) {
     private val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
     private lateinit var usersClient: UsersAPIClient
 
-    init {
-        account.networkingClient = DefaultClient(enableLogging = true)
-    }
+//    init {
+//        account.networkingClient = DefaultClient(enableLogging = true)
+//    }
 
     fun loginWithBrowser() {
         // Setup the WebAuthProvider, using the custom scheme and scope.
@@ -77,9 +77,12 @@ class Auth0Manager(context: Context) {
                 override fun onSuccess(credentials: Credentials) {
                     credentialsManager.saveCredentials(credentials)
                     retrieveAccessToken()
+                    Log.e("DEBUG", "tempp")
                     usersClient = UsersAPIClient(account, credentials.accessToken)
                     runBlocking {
-                        getUserMetadataAsync(context, credentials.idToken, usersClient)
+                        var userId = credentials.user.getId()
+                        if (userId == null) userId = ""
+                        getUserMetadataAsync(context, userId, usersClient)
                     }.invokeOnCompletion {
                         deferred.complete(credentials)
                     }
@@ -192,7 +195,7 @@ class Auth0Manager(context: Context) {
                 context.resources.getString(R.string.com_auth0_clientId),
                 context.resources.getString(R.string.com_auth0_domain),
             )
-            account.networkingClient = DefaultClient(enableLogging = true)
+//            account.networkingClient = DefaultClient(enableLogging = true)
             val apiClient = AuthenticationAPIClient(account);
             val credentialsManager = CredentialsManager(apiClient, SharedPreferencesStorage(context))
             return Triple(account, apiClient, credentialsManager)
