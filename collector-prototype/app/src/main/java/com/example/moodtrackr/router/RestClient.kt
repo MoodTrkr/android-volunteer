@@ -52,9 +52,6 @@ interface RestClient : UsageDataRoutes {
         }
 
         private fun buildRestClient(context: Context): RestClient {
-            val token: String? = SharedPreferencesStorage(context)
-                .retrieveString(context.resources.getString(R.string.token_identifier))
-
             val client: OkHttpClient = OkHttpClient.Builder()
 //                .writeTimeout(30, TimeUnit.SECONDS)
 //                .readTimeout(30, TimeUnit.SECONDS)
@@ -62,20 +59,11 @@ interface RestClient : UsageDataRoutes {
                     .setLevel(HttpLoggingInterceptor.Level.BODY)
                 )
                 .addInterceptor(Interceptor { chain ->
-                    var newRequest: Request = chain.request()
-                    val auth = Auth0Manager.authSetup(context.applicationContext)
-                    val job = runBlocking { Auth0Manager.retrieveAccessTokenAsync(context, auth.third) }
-                    job.invokeOnCompletion {
-                        newRequest = chain.request().newBuilder()
-                            .header("authorization", "Bearer ${job.getCompleted()}")
-                            .build()
-                    }
-                    chain.proceed(newRequest)
-                })
-                .addInterceptor(Interceptor { chain ->
+                    val token: String? = SharedPreferencesStorage(context)
+                        .retrieveString(context.resources.getString(R.string.token_identifier))
                     val newRequest: Request = chain.request().newBuilder()
-//                        .header("authorization", "Bearer $token")
-//                        .header("authorization", "Bearer $token")
+//                        .header("authorization", "Bearer 123")
+                        .header("authorization", "Bearer $token")
                         .header("Content-Encoding", "gzip")
                         .method(chain.request().method,
                             CompressedRequestBody(chain.request().body!!))
@@ -132,18 +120,31 @@ interface RestClient : UsageDataRoutes {
                     safeApiCallExceptionHandler(deferred, t)
                     launch(Dispatchers.Default) {
                         val def = deferred.getCompleted()
-                        if (def.second == 2) queueRequest(context, inp1, inp2)
+                        when (def.second) {
+                            2 -> queueRequest(context, inp1, inp2)
+                            4 -> {
+                                Auth0Manager.refreshCredentials(context)
+                                queueRequest(context, inp1, inp2)
+                            }
+                        }
                     }
                 }
             }
             return deferred
         }
 
+        private fun <T> httpExceptionHandler(deferred: CompletableDeferred<Pair<T?, Int>>, exception: HttpException) {
+            when (exception.code()) {
+                401 -> deferred.complete(Pair(null, 4))
+                else -> deferred.complete(Pair(null, 1))
+            }
+        }
+
         private fun <T> safeApiCallExceptionHandler(deferred: CompletableDeferred<Pair<T?, Int>>, t: Throwable) {
             when (t) {
                 is HttpException -> {
+                    httpExceptionHandler(deferred, t)
                     Log.e("MT_REST", "HTTP_ERROR: ${t.message}")
-                    deferred.complete(Pair(null, 1))
                 }
                 is IOException -> {
                     Log.e("MT_REST", "IO_ERROR: ${t.message}")
