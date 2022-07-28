@@ -46,7 +46,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        steps++
+        steps += 1
         //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
 //        stepsTrue = event!!.values[0]
 //        accurateUpdateSequence()
@@ -85,6 +85,8 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
         var stepsDBNew : RTUsageRecord
         runBlocking {
             if (stepsDB === null) {
+                clean()
+                registerListener()
                 stepsDBNew = RTUsageRecord(
                     DatesUtil.getTodayTruncated(),
                     0,

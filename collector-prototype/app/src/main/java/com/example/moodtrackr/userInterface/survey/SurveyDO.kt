@@ -77,6 +77,6 @@ class SurveyDO (
         }
         var convertedDate = Date.from(this.date.atStartOfDay().toInstant(ZoneOffset.UTC));
         convertedDate = DatesUtil.truncateDate(convertedDate);
-        return SurveyData(convertedDate,surveyVersion,answers,isComplete, MTSleepData())
+        return SurveyData(convertedDate,surveyVersion, answers, isComplete, MTSleepData())
     }
 }

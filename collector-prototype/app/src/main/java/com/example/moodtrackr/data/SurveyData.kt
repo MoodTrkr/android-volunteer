@@ -10,7 +10,7 @@ data class SurveyData(
     val questions: MutableMap<Int, Int>,
     var complete: Boolean,
     @Embedded(prefix = "sleep_") var sleepData: MTSleepData
-    )
+)
 {
     constructor(): this(Date().time, 0, mutableMapOf<Int, Int>(), false, MTSleepData())
     constructor(date: Date, version: Int, questions: MutableMap<Int, Int>, complete: Boolean, sleepData: MTSleepData): this(date.time, version, questions, complete, sleepData)
