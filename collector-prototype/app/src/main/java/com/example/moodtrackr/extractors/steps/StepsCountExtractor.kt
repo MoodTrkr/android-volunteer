@@ -48,27 +48,27 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         steps++
         //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
-        stepsTrue = event!!.values[0]
-        accurateUpdateSequence()
+//        stepsTrue = event!!.values[0]
+//        accurateUpdateSequence()
+        updateSequence()
     }
 
     private fun updateSequence() {
-        if ( steps - stepsDBLastUpdate  > 100 ) {
+        if ( steps - stepsDBLastUpdate  > 20 ) {
             updateDB( steps )
             stepsDBLastUpdate = steps
         }
     }
 
-    private fun accurateUpdateSequence() {
-        if ( steps - stepsDBLastUpdate  > 100 ) {
-            if (stepsTrueLastUpdate != 0F) {
-                steps = stepsDBLastUpdate + (stepsTrue - stepsTrueLastUpdate).toLong()
-                updateDB( steps )
-            }
-            else updateDB(steps)
-            stepsTrueLastUpdate = stepsTrue
-        }
-    }
+//    private fun accurateUpdateSequence() {
+//        if ( steps - stepsDBLastUpdate  > 100 ) {
+//            if (stepsTrueLastUpdate != 0F) {
+//                steps = stepsDBLastUpdate + (stepsTrue - stepsTrueLastUpdate).toLong()
+//            }
+//            updateDB(steps)
+//            stepsTrueLastUpdate = stepsTrue
+//        }
+//    }
 
     private fun updateDB(steps: Long) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -78,8 +78,6 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             stepsDB = checkSequence(stepsDB)
             stepsDB.steps = steps
             DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
-
-            DataCollectorService.localSteps = steps
         }
     }
 
@@ -116,7 +114,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
         var steps: Long = 0
         var stepsDBLastUpdate: Long = 0
 
-        var stepsTrue: Float = 0F
-        var stepsTrueLastUpdate: Float = 0F
+//        var stepsTrue: Float = 0F
+//        var stepsTrueLastUpdate: Float = 0F
     }
 }
