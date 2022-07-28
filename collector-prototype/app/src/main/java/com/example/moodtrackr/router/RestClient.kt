@@ -11,9 +11,13 @@ import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
+import com.example.moodtrackr.router.queue.ReportRequestQueue
 import com.example.moodtrackr.router.routes.UsageDataRoutes
+import com.example.moodtrackr.util.ConnectivityUtil
 import com.example.moodtrackr.util.DatabaseManager
+import com.example.moodtrackr.util.DatesUtil
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.Interceptor
 import okhttp3.MediaType
@@ -27,6 +31,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
+import java.lang.reflect.Type
 import java.util.*
 
 
@@ -57,11 +62,14 @@ interface RestClient : UsageDataRoutes {
                     .setLevel(HttpLoggingInterceptor.Level.BODY)
                 )
                 .addInterceptor(Interceptor { chain ->
+                    var newRequest: Request = chain.request()
                     val auth = Auth0Manager.authSetup(context.applicationContext)
                     val job = runBlocking { Auth0Manager.retrieveAccessTokenAsync(context, auth.third) }
-                    val newRequest: Request = chain.request().newBuilder()
-                        .header("authorization", "Bearer ${job.getCompleted()}")
-                        .build()
+                    job.invokeOnCompletion {
+                        newRequest = chain.request().newBuilder()
+                            .header("authorization", "Bearer ${job.getCompleted()}")
+                            .build()
+                    }
                     chain.proceed(newRequest)
                 })
                 .addInterceptor(Interceptor { chain ->
@@ -84,8 +92,14 @@ interface RestClient : UsageDataRoutes {
                 .create(RestClient::class.java)
         }
 
-        suspend fun <T, R> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend (R) -> T?, inp: R): CompletableDeferred<Pair<T?, Int>> {
+        suspend fun <T, R> safeApiCall(context: Context, dispatcher: CoroutineDispatcher, apiCall: suspend (R) -> T?, inp: R): CompletableDeferred<Pair<T?, Int>> {
             val deferred = CompletableDeferred<Pair<T?, Int>>()
+
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                queueRequest(context, inp, null)
+                deferred.complete(Pair<T?, Int>(null, 2))
+                return deferred
+            }
             withContext(dispatcher) {
                 try {
                     deferred.complete(Pair(
@@ -101,6 +115,13 @@ interface RestClient : UsageDataRoutes {
 
         suspend fun <T, R, S> safeApiCall(context: Context, dispatcher: CoroutineDispatcher, apiCall: suspend (R, S) -> T?, inp1: R, inp2: S): CompletableDeferred<Pair<T?, Int>> {
             val deferred = CompletableDeferred<Pair<T?, Int>>()
+
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                queueRequest(context, inp1, inp2)
+                deferred.complete(Pair<T?, Int>(null, 2))
+                return deferred
+            }
+
             withContext(dispatcher) {
                 try {
                     deferred.complete(Pair(
@@ -111,7 +132,7 @@ interface RestClient : UsageDataRoutes {
                     safeApiCallExceptionHandler(deferred, t)
                     launch(Dispatchers.Default) {
                         val def = deferred.getCompleted()
-                        if (def.second == 2) queueRequest(context, def.first, def.second)
+                        if (def.second == 2) queueRequest(context, inp1, inp2)
                     }
                 }
             }
@@ -136,19 +157,44 @@ interface RestClient : UsageDataRoutes {
         }
 
         private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
-            when (inp1) {
+            when (inp2) {
+                null -> null
                 is MTUsageData -> {
                     val gson = Gson()
                     DatabaseManager.getInstance(context).routerRequestsDAO.insert(
                         RouterRequest(
                             Date(),
                             RouterRequest.INSERT_USAGE,
-                            inp2 as String,
-                            gson.toJson(inp1)
+                            inp1.toString(),
+                            gson.toJson(inp2)
                         )
                     )
                 }
                 else -> Log.e("DEBUG", "Unsupported Rest request type")
+            }
+        }
+
+        fun popRequest(context: Context, dispatcher: CoroutineDispatcher) {
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                return
+            }
+
+            CoroutineScope(dispatcher).launch {
+                val req = ReportRequestQueue.peek(context)
+                req?.let {
+                    when (it.type) {
+                        RouterRequest.INSERT_USAGE -> {
+                            val apiCall = RestClient.safeApiCall(
+                                context,
+                                dispatcher,
+                                RestClient.getInstance(context)::insertUsageData,
+                                DatesUtil.getYesterdayTruncated().time,
+                                Gson().fromJson(it.payload, MTUsageData::class.java)
+                            )
+                        }
+                        else -> null
+                    }
+                }
             }
         }
     }

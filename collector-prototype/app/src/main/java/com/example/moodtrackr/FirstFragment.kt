@@ -169,6 +169,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
             runBlocking {
                 //val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
                 val get = RestClient.safeApiCall(
+                    requireContext().applicationContext,
                     Dispatchers.Default,
                     restClient::getUsageData,
                     DatesUtil.getYesterdayTruncated().time
