@@ -13,6 +13,7 @@ import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
 import com.example.moodtrackr.router.queue.ReportRequestQueue
 import com.example.moodtrackr.router.routes.UsageDataRoutes
+import com.example.moodtrackr.util.ConnectivityUtil
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.google.gson.Gson
@@ -91,8 +92,14 @@ interface RestClient : UsageDataRoutes {
                 .create(RestClient::class.java)
         }
 
-        suspend fun <T, R> safeApiCall(dispatcher: CoroutineDispatcher, apiCall: suspend (R) -> T?, inp: R): CompletableDeferred<Pair<T?, Int>> {
+        suspend fun <T, R> safeApiCall(context: Context, dispatcher: CoroutineDispatcher, apiCall: suspend (R) -> T?, inp: R): CompletableDeferred<Pair<T?, Int>> {
             val deferred = CompletableDeferred<Pair<T?, Int>>()
+
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                queueRequest(context, inp, null)
+                deferred.complete(Pair<T?, Int>(null, 2))
+                return deferred
+            }
             withContext(dispatcher) {
                 try {
                     deferred.complete(Pair(
@@ -108,6 +115,13 @@ interface RestClient : UsageDataRoutes {
 
         suspend fun <T, R, S> safeApiCall(context: Context, dispatcher: CoroutineDispatcher, apiCall: suspend (R, S) -> T?, inp1: R, inp2: S): CompletableDeferred<Pair<T?, Int>> {
             val deferred = CompletableDeferred<Pair<T?, Int>>()
+
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                queueRequest(context, inp1, inp2)
+                deferred.complete(Pair<T?, Int>(null, 2))
+                return deferred
+            }
+
             withContext(dispatcher) {
                 try {
                     deferred.complete(Pair(
@@ -144,6 +158,7 @@ interface RestClient : UsageDataRoutes {
 
         private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
             when (inp2) {
+                null -> null
                 is MTUsageData -> {
                     val gson = Gson()
                     DatabaseManager.getInstance(context).routerRequestsDAO.insert(
@@ -160,19 +175,22 @@ interface RestClient : UsageDataRoutes {
         }
 
         fun popRequest(context: Context, dispatcher: CoroutineDispatcher) {
+            if (!ConnectivityUtil.isInternetAvailable(context))  {
+                return
+            }
+
             CoroutineScope(dispatcher).launch {
                 val req = ReportRequestQueue.peek(context)
                 req?.let {
                     when (it.type) {
                         RouterRequest.INSERT_USAGE -> {
-                            val safeApiCall = RestClient.safeApiCall(
+                            val apiCall = RestClient.safeApiCall(
                                 context,
                                 dispatcher,
                                 RestClient.getInstance(context)::insertUsageData,
                                 DatesUtil.getYesterdayTruncated().time,
                                 Gson().fromJson(it.payload, MTUsageData::class.java)
                             )
-                            safeApiCall
                         }
                         else -> null
                     }
