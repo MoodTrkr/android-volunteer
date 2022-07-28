@@ -25,7 +25,6 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
             DBHelperRT.updateDB(context, record.unlocks+1, StepsCountExtractor.steps)
             DataCollectorService.localUnlocks = record.unlocks+1
             DataCollectorService.localSteps = StepsCountExtractor.steps
-            StepsCountExtractor.stepsDBLastUpdate = StepsCountExtractor.steps
         }
         NotifUpdateUtil.updateNotif(this.applicationContext)
         return Result.success()
