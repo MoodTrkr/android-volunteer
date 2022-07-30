@@ -195,6 +195,7 @@ interface RestClient : UsageDataRoutes {
                         }
                         else -> null
                     }
+                    ReportRequestQueue.remove(context, req)
                 }
             }
         }

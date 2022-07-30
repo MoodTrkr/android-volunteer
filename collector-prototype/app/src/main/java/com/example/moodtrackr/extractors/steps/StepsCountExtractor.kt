@@ -84,14 +84,16 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     private fun checkSequence(stepsDB: RTUsageRecord?): RTUsageRecord {
         var stepsDBNew : RTUsageRecord
         runBlocking {
-            if (stepsDB === null) {
-                clean()
-                registerListener()
+            if (stepsDB == null) {
+                //clean()
+                //registerListener()
                 stepsDBNew = RTUsageRecord(
                     DatesUtil.getTodayTruncated(),
                     0,
                     0
                 )
+                steps = 0
+                stepsDBLastUpdate = 0
                 DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(stepsDBNew)
             }
             else {
@@ -102,7 +104,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     fun registerListener() {
-        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
             ?: throw Exception("Got no step sensor")
         Log.e("DEBUG", "Is wake up sensor?: ${sensor!!.isWakeUpSensor}")
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)

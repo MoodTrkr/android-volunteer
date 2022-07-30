@@ -49,6 +49,8 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
                     0
                 )
                 DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(unlocksDBNew)
+                DataCollectorService.localUnlocks = 0
+                DataCollectorService.localSteps = 0
             }
             else {
                 unlocksDBNew = unlocksDB
