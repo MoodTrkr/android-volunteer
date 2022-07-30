@@ -66,7 +66,13 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             return (steps - stepsDBLastUpdate - stepsUponLaunch).toLong()
         }
 
-        fun updateDB(context: Context) {
+        fun resetStepCountExtractor() {
+            stepsUponLaunch = -steps
+            steps = 0F
+            stepsDBLastUpdate = 0F
+        }
+
+        fun calcSteps(context: Context) {
             CoroutineScope(Dispatchers.Default).launch {
                 var stepsDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(
                     DatesUtil.getTodayTruncated().time
@@ -89,9 +95,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
                         0,
                         0
                     )
-                    stepsUponLaunch = -steps
-                    steps = 0F
-                    stepsDBLastUpdate = 0F
+                    resetStepCountExtractor()
 
                     DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(stepsDBNew)
                 }
