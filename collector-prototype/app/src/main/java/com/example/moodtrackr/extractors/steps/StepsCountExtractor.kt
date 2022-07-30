@@ -8,7 +8,6 @@ import android.hardware.SensorEvent
 import androidx.fragment.app.FragmentActivity
 import android.util.Log
 import com.example.moodtrackr.collectors.db.DBHelperRT
-import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
@@ -26,18 +25,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     constructor(activity: FragmentActivity): this(activity.applicationContext)
     init {
         this.context = context
-        if (context == null) {
-            Log.d("StepsCounter", "Context Failed")
-            throw Exception("Context Failed")
-        }
         this.sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        if (sensorManager == null) {
-            Log.d("StepsCounter", "Sensor Manager Failed")
-            throw Exception("Sensor Manager Failed")
-        }
-
-        steps = DBHelperRT.getStepsSafe(context, DatesUtil.getTodayTruncated())
-//        steps = DataCollectorService.steps
         registerListener()
     }
 
@@ -46,65 +34,18 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        steps += 1
+        if (!initialized) {
+            initialized = true
+            stepsUponLaunch = event!!.values[0]
+        }
+        steps = event!!.values[0]
         //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
 //        stepsTrue = event!!.values[0]
 //        accurateUpdateSequence()
-        updateSequence()
-    }
-
-    private fun updateSequence() {
-        if ( steps - stepsDBLastUpdate  > 20 ) {
-            updateDB( steps )
-            stepsDBLastUpdate = steps
-        }
-    }
-
-//    private fun accurateUpdateSequence() {
-//        if ( steps - stepsDBLastUpdate  > 100 ) {
-//            if (stepsTrueLastUpdate != 0F) {
-//                steps = stepsDBLastUpdate + (stepsTrue - stepsTrueLastUpdate).toLong()
-//            }
-//            updateDB(steps)
-//            stepsTrueLastUpdate = stepsTrue
-//        }
-//    }
-
-    private fun updateDB(steps: Long) {
-        CoroutineScope(Dispatchers.Default).launch {
-            var stepsDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(
-                DatesUtil.getTodayTruncated().time
-            )
-            stepsDB = checkSequence(stepsDB)
-            stepsDB.steps = steps
-            DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
-        }
-    }
-
-    private fun checkSequence(stepsDB: RTUsageRecord?): RTUsageRecord {
-        var stepsDBNew : RTUsageRecord
-        runBlocking {
-            if (stepsDB == null) {
-                //clean()
-                //registerListener()
-                stepsDBNew = RTUsageRecord(
-                    DatesUtil.getTodayTruncated(),
-                    0,
-                    0
-                )
-                steps = 0
-                stepsDBLastUpdate = 0
-                DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(stepsDBNew)
-            }
-            else {
-                stepsDBNew = stepsDB
-            }
-        }
-        return stepsDBNew
     }
 
     fun registerListener() {
-        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+        val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
             ?: throw Exception("Got no step sensor")
         Log.e("DEBUG", "Is wake up sensor?: ${sensor!!.isWakeUpSensor}")
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
@@ -115,10 +56,50 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     }
 
     companion object {
-        var steps: Long = 0
-        var stepsDBLastUpdate: Long = 0
+        var initialized: Boolean = false
+        var steps: Float = 0F
+        var stepsDBLastUpdate: Float = 0F
 
-//        var stepsTrue: Float = 0F
-//        var stepsTrueLastUpdate: Float = 0F
+        var stepsUponLaunch: Float = 0F
+
+        fun calcStepsToBeAdded(): Long {
+            return (steps - stepsDBLastUpdate - stepsUponLaunch).toLong()
+        }
+
+        fun updateDB(context: Context) {
+            CoroutineScope(Dispatchers.Default).launch {
+                var stepsDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(
+                    DatesUtil.getTodayTruncated().time
+                )
+                var stepsAdd = calcStepsToBeAdded()
+                stepsDB = checkSequence(context, stepsDB)
+                stepsDB.steps += stepsAdd
+                DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
+            }
+        }
+
+        private fun checkSequence(context: Context, stepsDB: RTUsageRecord?): RTUsageRecord {
+            var stepsDBNew : RTUsageRecord
+            runBlocking {
+                if (stepsDB == null) {
+                    //clean()
+                    //registerListener()
+                    stepsDBNew = RTUsageRecord(
+                        DatesUtil.getTodayTruncated(),
+                        0,
+                        0
+                    )
+                    stepsUponLaunch = -steps
+                    steps = 0F
+                    stepsDBLastUpdate = 0F
+
+                    DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(stepsDBNew)
+                }
+                else {
+                    stepsDBNew = stepsDB
+                }
+            }
+            return stepsDBNew
+        }
     }
 }

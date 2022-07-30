@@ -23,7 +23,7 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
             record = checkSequence(record)
             updateDBUnchecked(record.unlocks+1)
             DataCollectorService.localUnlocks = record.unlocks+1
-            DataCollectorService.localSteps = StepsCountExtractor.steps
+            DataCollectorService.localSteps = StepsCountExtractor.calcStepsToBeAdded()
         }
         NotifUpdateUtil.updateNotif(this.applicationContext)
         return Result.success()
