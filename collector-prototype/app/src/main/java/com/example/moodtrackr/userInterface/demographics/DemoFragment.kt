@@ -147,7 +147,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
 
     private fun switchFragment() {
         try {
-            val permsManager = PermissionsManager()
+            val permsManager = MainActivity.permsManager
             val fragment = if (permsManager.allPermissionsGranted()) SurveyFragment() else PermissionsFragment()
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(fragment_container_view, fragment)

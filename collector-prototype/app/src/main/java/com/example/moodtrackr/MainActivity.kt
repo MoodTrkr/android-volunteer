@@ -47,11 +47,13 @@ class MainActivity : AppCompatActivity() {
 
         // inject fragment if it has not been added to the activity
         if (savedInstanceState == null) {
+            val enableDebugging = true
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 //add<SurveyFragment>(R.id.fragment_container_view)
                 if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
                 else if (setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
+                else if (enableDebugging) add<FirstFragment>(R.id.fragment_container_view)
                 else if (!permsManager.allPermissionsGranted()) {
                     add<PermissionsFragment>(R.id.fragment_container_view)
                 } else if(permsManager.allPermissionsGranted()){
