@@ -36,10 +36,10 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (!initialized) {
             initialized = true
-            stepsUponLaunch = event!!.values[0]
+            stepsLastUpdate = event!!.values[0]
         }
         steps = event!!.values[0]
-        //Log.e("DEBUG", "${steps}, ${stepsDBLastUpdate}")
+//        Log.e("STEPS_COUNT_EXT_STEP", "${steps}, ${stepsLastUpdate}")
 //        stepsTrue = event!!.values[0]
 //        accurateUpdateSequence()
     }
@@ -58,52 +58,22 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     companion object {
         var initialized: Boolean = false
         var steps: Float = 0F
-        var stepsDBLastUpdate: Float = 0F
-
-        var stepsUponLaunch: Float = 0F
+        var stepsLastUpdate: Float = 0F
 
         fun calcStepsToBeAdded(): Long {
-            return (steps - stepsDBLastUpdate - stepsUponLaunch).toLong()
+            return (steps - stepsLastUpdate).toLong()
         }
 
         fun resetStepCountExtractor() {
-            stepsUponLaunch = -steps
-            steps = 0F
-            stepsDBLastUpdate = 0F
+            stepsLastUpdate = steps
         }
 
-        fun calcSteps(context: Context) {
-            CoroutineScope(Dispatchers.Default).launch {
-                var stepsDB = DatabaseManager.getInstance(context).rtUsageRecordsDAO.getObjOnDay(
-                    DatesUtil.getTodayTruncated().time
-                )
-                var stepsAdd = calcStepsToBeAdded()
-                stepsDB = checkSequence(context, stepsDB)
-                stepsDB.steps += stepsAdd
-                DatabaseManager.getInstance(context).rtUsageRecordsDAO.update( stepsDB )
-            }
-        }
-
-        private fun checkSequence(context: Context, stepsDB: RTUsageRecord?): RTUsageRecord {
-            var stepsDBNew : RTUsageRecord
-            runBlocking {
-                if (stepsDB == null) {
-                    //clean()
-                    //registerListener()
-                    stepsDBNew = RTUsageRecord(
-                        DatesUtil.getTodayTruncated(),
-                        0,
-                        0
-                    )
-                    resetStepCountExtractor()
-
-                    DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(stepsDBNew)
-                }
-                else {
-                    stepsDBNew = stepsDB
-                }
-            }
-            return stepsDBNew
+        fun stepsChange(stepsDB: Long): Long {
+            var stepsAdd = calcStepsToBeAdded()
+            stepsLastUpdate = steps
+            val stepsDBUpdate = stepsDB + stepsAdd
+            Log.e("STEPS_COUNT_EXT", "DB: $stepsDB, stepsAdd: $stepsAdd, stepsDBUpdate: $stepsDBUpdate")
+            return stepsDBUpdate
         }
     }
 }

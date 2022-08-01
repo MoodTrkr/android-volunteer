@@ -11,6 +11,7 @@ import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
+import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +46,9 @@ class CollectionUtil(context: Context) {
                 val rtRecord: RTUsageRecord = DBHelperRT.getObjSafe(context, dayTruncated)
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
                 record.periodicCollBook.insert(
-                    PeriodicCollection(Date().time, rtRecord.steps, rtRecord.unlocks)
+                    PeriodicCollection(Date().time,
+                        StepsCountExtractor.stepsChange(rtRecord.steps),
+                        rtRecord.unlocks)
                 )
                 DBHelper.updateDB(context, record)
             }
