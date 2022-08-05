@@ -28,7 +28,7 @@ import java.util.*
 class DemoFragment(): Fragment(R.layout.demo_fragment) {
     private lateinit var auth0Manager: Auth0Manager
     private lateinit var geoDataExtractor: GeoDataExtractor
-    private val permissionsManager = MainActivity.permsManager
+    private lateinit var permissionsManager: PermissionsManager
 
     private var country: String? = null
     private var cal: Calendar = Calendar.getInstance()
@@ -47,7 +47,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
     ): View? {
         _binding = DemoFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
-
+        this.permissionsManager = PermissionsManager(this)
         this.geoDataExtractor = GeoDataExtractor(requireActivity(), permissionsManager)
         geoDataExtractor.setCountry()
         Log.e("DEBUG", "Country: $country")
@@ -138,7 +138,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
         metadata["RACE"] = race
         metadata["GENDER"] = gender
         if (country != null) metadata["COUNTRY"] = country!! else metadata["COUNTRY"] = "NULL"
-        metadata["DOB"] = cal?.let { it -> DatesUtil.truncateDate(it.time) }.time.toString()
+        metadata["DOB"] = cal.let { it -> DatesUtil.truncateDate(it.time) }.time.toString()
         Auth0Manager.updateUserMetadata(requireContext().applicationContext, metadata.toImmutableMap())
         deferred.complete(true)
 
@@ -147,8 +147,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
 
     private fun switchFragment() {
         try {
-            val permsManager = MainActivity.permsManager
-            val fragment = if (permsManager.allPermissionsGranted()) SurveyFragment() else PermissionsFragment()
+            val fragment = if (permissionsManager.allPermissionsGranted()) SurveyFragment() else PermissionsFragment()
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(fragment_container_view, fragment)
                 .commit()

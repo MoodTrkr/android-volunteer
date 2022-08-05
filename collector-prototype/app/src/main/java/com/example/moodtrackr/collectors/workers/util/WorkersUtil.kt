@@ -2,6 +2,7 @@ package com.example.moodtrackr.collectors.workers.util
 
 import android.content.Context
 import androidx.work.*
+import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.workers.DailyWorker
 import com.example.moodtrackr.collectors.workers.HourlyWorker
 import com.example.moodtrackr.collectors.workers.PeriodicWorker
@@ -10,6 +11,15 @@ import java.util.concurrent.TimeUnit
 
 class WorkersUtil {
     companion object {
+        fun queueAll(context: Context) {
+            queueServiceMaintainenceOneTime(context)
+            NotifUpdateUtil.updateNotif(context)
+
+            queueServiceMaintenance(context)
+            queuePeriodic(context)
+            queueHourly(context)
+        }
+
         fun queueServiceMaintainenceOneTime(context: Context) {
             WorkManager
                 .getInstance(context)
