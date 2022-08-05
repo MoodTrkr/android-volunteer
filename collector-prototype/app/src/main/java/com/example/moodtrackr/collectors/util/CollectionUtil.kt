@@ -2,6 +2,8 @@ package com.example.moodtrackr.collectors.util
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.data.DailyCollection
@@ -12,6 +14,8 @@ import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.extractors.steps.StepsCountExtractor
+import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
+import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.CoroutineScope
@@ -43,12 +47,22 @@ class CollectionUtil(context: Context) {
         fun periodicCollect(context: Context, day: Date) {
             val dayTruncated = DatesUtil.truncateDate(day)
             CoroutineScope(Dispatchers.IO).launch {
+                var lastQueried: Long? = SharedPreferencesStorage(context)
+                    .retrieveLong(context.resources.getString(R.string.mdtkr_prev_query))
+                if (lastQueried==null) {
+                    lastQueried = Date().time-20*60*1000
+                }
+
+                val usageStats: MTAppUsageStats = AppUsageExtractor(context.applicationContext)
+                    .usageStatsQuery(lastQueried, Date().time)
                 val rtRecord: RTUsageRecord = DBHelperRT.getObjSafe(context, dayTruncated)
                 val record: MTUsageData = DBHelper.getObjSafe(context, dayTruncated)
                 record.periodicCollBook.insert(
                     PeriodicCollection(Date().time,
+                        usageStats,
                         StepsCountExtractor.stepsChange(rtRecord.steps),
-                        rtRecord.unlocks)
+                        rtRecord.unlocks,
+                    )
                 )
                 DBHelper.updateDB(context, record)
             }
@@ -73,7 +87,6 @@ class CollectionUtil(context: Context) {
                     val timeBounds: Pair<Long, Long> = DatesUtil.getDayBounds(dayTruncated)
                     record.dailyCollection = DailyCollection(
                         dayTruncated.time,
-                        usageExtractor.usageStatsQuery(timeBounds.first, timeBounds.second),
                         usageExtractor.usageEventsQuery(timeBounds.first, timeBounds.second),
                         callLogsExtractor.queryLogs(timeBounds.first, timeBounds.second),
                         MTSleepData(0,0),
