@@ -106,7 +106,15 @@ class SleepExtractor {
 
 
         /**
-         * Merges all individual application time series to a single, large time series
+         * Merges all individual application time series to two MutableLists with the
+         * following properties:
+         *      Time codes: this will be a MutableList<Long> where each index represents
+         *          1 second of time. Each element will store a time code representing the
+         *          number of milliseconds from the unix epoch.
+         *
+         *      Application Activity: This will be a MutableList<Int> where each index
+         *          represents 1 second of time. Each element will store the number of
+         *          application activity states that happened in that second.
          *
          * @param app_stats: MutableMap<String, Pair<MutableList<Long>, MutableList<Int> > >:
          *      A Map where each app ID is mapped to its time-series relation:
@@ -198,9 +206,12 @@ class SleepExtractor {
          *
          * @param x: MutableList<Boolean>:
          *      Boolean array
-         *
+         * @return Pair<Int, Int>:
+         *      The indices to the boolean array (and consequently, to the time code array
+         *      as well as to the activity array) that indicate the start and stop of the
+         *      sleep interval.
          * */
-        fun computeBounds(x: MutableList<Boolean>) {
+        fun computeBounds(x: MutableList<Boolean>) : Pair<Int, Int> {
             var longest_idx = 0
             var ranges = mutableListOf<Pair<Int, Int> >()
             var section_start = -1
@@ -219,12 +230,57 @@ class SleepExtractor {
                         ranges.add(Pair(section_start, section_end))
 
                         if (ranges.size > 1) {
-                            
+                            //if the new range is longer than the longest range,
+                            // set the longest range as the new range
+                            if (ranges.last().second-ranges.last().first >
+                                ranges[longest_idx].second-ranges[longest_idx].first){
+
+                                longest_idx = ranges.size - 1
+                            }
+                        }
+                        section_start = -1
+                    }
+                }
+
+                // If there is a positive range all the way till the end...
+                if (i == x.size-1 && section_start != -1) {
+                    ranges.add(Pair(section_start, x.size-1))
+                    if (ranges.size > 1) {
+                        if (ranges.last().second-ranges.last().first >
+                            ranges[longest_idx].second-ranges[longest_idx].first){
+
+                            longest_idx = ranges.size - 1
                         }
                     }
                 }
             }
+            return ranges[longest_idx]
         }
+
+        /**
+         * Compute the Sleep Wake Bounds from app activities
+         *
+         * @param app_activity_today: MutableList<Int>:
+         *      Time-series list containing the number of app activities
+         *      per second. Every new index is one second in time.
+         *
+         * */
+        fun sleepWakeBoundsFromActivity(app_activity_today: MutableList<Int>,
+                            app_activity_yesterday: MutableList<Int>,
+                            time_codes_today: MutableList<Long>,
+                            time_codes_yesterday: MutableList<Long>) : Pair<Long, Long> {
+            // First merge yesterday's and today's data
+            var slicerange = app_activity_yesterday.size/3 until app_activity_yesterday.size-1
+            var app_activity = (app_activity_yesterday.slice(slicerange) + app_activity_today).toMutableList()
+            var time_codes = (time_codes_yesterday.slice(slicerange) + time_codes_today).toMutableList()
+
+
+            var regions = getCandidateRegions(app_activity, thresh=0.1F)
+            var start_stop_idx = computeBounds(regions)
+
+            return Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second])
+        }
+
 
         /////////////////////////////////////////
         /////////////////////////////////////////
@@ -272,9 +328,6 @@ class SleepExtractor {
             return Pair(min_seen, max_seen)
         }
     }
-
-
-
 
 }
 
