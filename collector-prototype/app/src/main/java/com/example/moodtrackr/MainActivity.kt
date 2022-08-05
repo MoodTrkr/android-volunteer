@@ -28,7 +28,7 @@ import com.example.moodtrackr.userInterface.survey.SurveyFragment
 
 
 class MainActivity : AppCompatActivity() {
-
+    private lateinit var permsManager: PermissionsManager
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
@@ -40,10 +40,10 @@ class MainActivity : AppCompatActivity() {
         val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
                 R.string.setup_status_identifier))
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus")
 
         permsManager = PermissionsManager(this)
-        permsManager.checkAllPermissions()
+//        permsManager.checkAllPermissions()
+        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allPermissionsGranted()}")
 
         // inject fragment if it has not been added to the activity
         if (savedInstanceState == null) {
@@ -53,10 +53,11 @@ class MainActivity : AppCompatActivity() {
                 //add<SurveyFragment>(R.id.fragment_container_view)
                 if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
                 else if (setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
-                else if (enableDebugging) add<FirstFragment>(R.id.fragment_container_view)
                 else if (!permsManager.allPermissionsGranted()) {
                     add<PermissionsFragment>(R.id.fragment_container_view)
-                } else if(permsManager.allPermissionsGranted()){
+                }
+                else if (enableDebugging) add<FirstFragment>(R.id.fragment_container_view)
+                else if(permsManager.allPermissionsGranted()){
                     add<SurveyFragment>(R.id.fragment_container_view)
                 }
             }
@@ -65,16 +66,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
-
         val dbManager = DatabaseManager.getInstance(this.applicationContext)
 
-        NotifUpdateUtil.updateNotif(this.applicationContext)
-
-        WorkersUtil.queueServiceMaintenance(this.applicationContext)
-        WorkersUtil.queuePeriodic(this.applicationContext)
-        WorkersUtil.queueHourly(this.applicationContext)
-
+        if (loginStatus == true) {
+            WorkersUtil.queueAll(this.applicationContext)
+        }
 
         binding.fab.setOnClickListener {
             supportFragmentManager.commit {
@@ -104,9 +100,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-    companion object {
-        lateinit var permsManager: PermissionsManager
     }
 
     private fun switchFragment(fragment:Fragment) {

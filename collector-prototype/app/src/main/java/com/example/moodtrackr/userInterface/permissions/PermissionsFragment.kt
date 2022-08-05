@@ -1,9 +1,7 @@
 package com.example.moodtrackr.userInterface.permissions
 
-import android.content.Intent
 import android.widget.TextView
 import android.os.Bundle
-import android.provider.Settings
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +10,9 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import com.example.moodtrackr.databinding.PermissionsFragmentBinding
-import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.view.setPadding
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.example.moodtrackr.FirstFragment
+import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 
@@ -53,7 +49,10 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
             permsManager.checkAllPermissions()
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            if (!permsManager.allPermissionsGranted()) {
+                permsManager.checkAllPermissions()
+            }
+            permsManager.grantUsageAccessPermission(this)
             if(permsManager.allPermissionsGranted()){
                 switchFragment()
             }
@@ -149,6 +148,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     }
     private fun switchFragment() {
         try {
+            WorkersUtil.queueAll(requireContext().applicationContext)
             val fragment = SurveyFragment()
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)

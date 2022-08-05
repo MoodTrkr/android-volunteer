@@ -62,7 +62,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val permsManager: PermissionsManager = PermissionsManager(this)
-        permsManager.checkAllPermissions()
+        //permsManager.checkAllPermissions()
 
         binding.buttonFirst.setOnClickListener {
 //            if (savedInstanceState == null) {

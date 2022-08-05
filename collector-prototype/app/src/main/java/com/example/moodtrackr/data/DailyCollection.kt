@@ -11,7 +11,6 @@ import java.util.*
 
 data class DailyCollection(
     var date: Long,
-    @Embedded(prefix = "app_usage_stats_") var usageStats: MTAppUsageStats,
     @Embedded(prefix = "app_usage_logs_") var usageLogs: MTAppUsageLogs,
     @Embedded(prefix = "call_stats_") var callLogs: MTCallStats,
     @Embedded(prefix = "sleep_") var sleepData: MTSleepData,
@@ -19,5 +18,5 @@ data class DailyCollection(
     var complete: Boolean = false
     )
 {
-    constructor(): this(Date().time, MTAppUsageStats(), MTAppUsageLogs(), MTCallStats(), MTSleepData(),0,false)
+    constructor(): this(Date().time, MTAppUsageLogs(), MTCallStats(), MTSleepData(),0,false)
 }

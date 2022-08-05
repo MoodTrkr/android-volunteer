@@ -1,14 +1,20 @@
 package com.example.moodtrackr.util
 
 import android.Manifest
+import android.app.AppOpsManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 
 
 class PermissionsManager() {
@@ -55,6 +61,29 @@ class PermissionsManager() {
 
     fun initPermissions() {
         requestPermissions(mandatoryPermissions)
+    }
+
+    fun isUsageAccessGranted(): Boolean {
+        return try {
+            val packageManager: PackageManager = appContext.packageManager
+            val applicationInfo = packageManager.getApplicationInfo(appContext.packageName, 0)
+            val appOpsManager = appContext.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager?
+            var mode = 0
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+                mode = appOpsManager!!.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    applicationInfo.uid, applicationInfo.packageName)
+            }
+            mode == AppOpsManager.MODE_ALLOWED
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    fun grantUsageAccessPermission(fragment: Fragment) {
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+        intent.data = Uri.fromParts("package", appContext.packageName, null)
+        fragment.startActivity(intent)
+
     }
 
     fun checkAllPermissions() {
