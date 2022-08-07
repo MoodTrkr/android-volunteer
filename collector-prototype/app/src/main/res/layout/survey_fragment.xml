@@ -7,28 +7,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <LinearLayout
 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style ="@style/subHeader"
-            android:paddingRight="10dp"
-            android:text = "0">
+<!--     For later...-->
+<!--    <LinearLayout-->
 
-        </TextView>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style ="@style/subHeader"
-            android:text = "day streak">
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center">-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style ="@style/subHeader"-->
+<!--            android:paddingRight="10dp"-->
+<!--            android:text = "0">-->
 
-        </TextView>
-    </LinearLayout>
+<!--        </TextView>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style ="@style/subHeader"-->
+<!--            android:text = "day streak">-->
+
+<!--        </TextView>-->
+<!--    </LinearLayout>-->
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -37,13 +39,20 @@
         android:progress="0"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="20dp"
         android:layout_height="20dp" />
 
     <LinearLayout
         style = "@style/simpleCard"
         >
+        <!-- Circular progress indicator -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,8 +74,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="400dp"
                 android:padding="0dp"
-                android:layout_margin="0dp"
-                app:srcCompat="@drawable/cute_animal_0" />
+                android:layout_marginBottom="10dp"
+
+                 />
         </LinearLayout>
 
 
@@ -98,14 +108,62 @@
                 style="@style/MiddleOptionButton" />
 
         </LinearLayout>
+        <LinearLayout
+            style = "@style/defaultColLinLayout"
+            android:id="@+id/sleepData"
+            android:layout_marginBottom="10dp"
+            >
+            <TextView
+                style = "@style/darkText"
+                android:id="@+id/sleepPrompt"
+                android:text="When did you sleep last night?"
+                android:layout_marginBottom="30dp"/>
+            <TimePicker
+                android:timePickerMode = "spinner"
+                android:id="@+id/sleepTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="time" />
+            <TextView
+                style = "@style/darkText"
+                android:id="@+id/wakeupPrompt"
+                android:text="When did you wake up this morning?"
+                android:layout_marginBottom="30dp"/>
+            <TimePicker
+                android:timePickerMode = "spinner"
+                android:id="@+id/wakeUpTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="time" />
+            <Button
+                android:id="@+id/complete"
+                android:text= "Complete survey"
+                style="@style/MiddleOptionButton" />
+
+        </LinearLayout>
+
+
         <TextView
             android:id="@+id/back"
             style="@style/clickableTextDark"
-            android:text="Previous Question"
- />
+            android:text="Previous Question" />
 
 
 
     </LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/navigationPopupButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:onClick="showPopup"
+        app:srcCompat="@drawable/baseline_settings_black_24dp" />
+
+
 </LinearLayout>
 

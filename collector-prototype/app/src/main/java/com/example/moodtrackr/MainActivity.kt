@@ -9,7 +9,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
@@ -74,13 +77,6 @@ class MainActivity : AppCompatActivity() {
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(this.applicationContext)
         }
-
-        binding.fab.setOnClickListener {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                switchFragment(FirstFragment())
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -114,6 +110,34 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
     }
+
+    fun scrollToTop(){
+        binding.mainScrollView.scrollTo(0, 0)
+    }
+
+//    fun showPopup(v: View) {
+//        val popup = PopupMenu(this, v)
+//        popup.setOnMenuItemClickListener(this@MainActivity)
+//        val inflater: MenuInflater = popup.menuInflater
+//        inflater.inflate(R.menu.navigation_popup, popup.menu)
+//        popup.show()
+//    }
+//    override fun onMenuItemClick(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            R.id.archive -> {
+//                archive(item)
+//                true
+//            }
+//            R.id.delete -> {
+//                delete(item)
+//                true
+//            }
+//            else -> false
+//        }
+//    }
+
+    fun goToDev(){
+        switchFragment(FirstFragment())
 
     companion object {
         val SURVEY_NOTIF_CLICKED = "survey_notif"
