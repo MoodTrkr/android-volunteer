@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.*
 import java.util.*
 
 class SleepExtractor {
@@ -325,6 +326,40 @@ class SleepExtractor {
 
             val timeActivity = appStatsToTimeSeries(appStats)
             return sleepWakeBoundsFromActivity(app_activity = timeActivity.second, time_codes = timeActivity.first)
+        }
+
+
+        /**
+         * This function computes the sleep boundaries of a certain day.
+         * You specify which day by using the days_offset parameter.
+         * This function runs Asynchronously
+         *
+         * @param days_offset: Int:
+         *      number of days offset from today. This param must be positive.
+         *      For example, today == 0, yesterday == 1, the day before yesterday == 2,
+         *      etc, etc.
+         *
+         * @param ctx: Context:
+         *      Context.
+         *
+         * @return Pair<Long, Long>:
+         *      the starting time code as well as the stop timecode, indicating
+         *      the range in time where the person is asleep
+         * */
+        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long> >{
+            val deferred = CompletableDeferred<Pair<Long, Long>>()
+            CoroutineScope(Dispatchers.Default).launch {
+                val appUsageToday = loadAppUsage(days_offset, ctx)
+                val appUsageYesterday = loadAppUsage(days_offset-1, ctx)
+
+                val appUsage = joinTodayYesterday(today = appUsageToday, yesterday = appUsageYesterday)
+                val appStats = indexApps(appUsage)
+
+                val timeActivity = appStatsToTimeSeries(appStats)
+                val computed = sleepWakeBoundsFromActivity(app_activity = timeActivity.second, time_codes = timeActivity.first)
+                deferred.complete(computed)
+            }
+            return deferred
         }
 
         /////////////////////////////////////////
