@@ -37,6 +37,7 @@ class SurveyNotifBuilder {
                 .setContentText("Survey for yesterday now open!")
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                 .setContentIntent(createNotifContext(context))
+                .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
             createChannel(notificationManager)
             notificationManager.notify(NOTIF_ID, builder.build())

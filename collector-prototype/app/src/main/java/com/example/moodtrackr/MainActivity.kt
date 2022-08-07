@@ -18,6 +18,8 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
+import com.example.moodtrackr.collectors.workers.UnlocksWorker
+import com.example.moodtrackr.collectors.workers.notif.SurveyNotifBuilder
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
@@ -26,7 +28,6 @@ import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.SuperPermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
-
 
 class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
@@ -62,11 +63,6 @@ class MainActivity : AppCompatActivity() {
                         enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
                         permsManager.allPermissionsGranted() -> add<SurveyFragment>(R.id.fragment_container_view)
                         }
-                }
-            }
-            (savedInstanceState[MainActivity.SURVEY_NOTIF_CLICKED] == true) -> {
-                supportFragmentManager.commit {
-                    add<SurveyFragment>(R.id.fragment_container_view)
                 }
             }
         }
