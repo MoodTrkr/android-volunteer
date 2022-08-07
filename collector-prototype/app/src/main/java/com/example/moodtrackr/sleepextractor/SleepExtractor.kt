@@ -108,7 +108,7 @@ class SleepExtractor {
 
             // populate apps (Find definition of apps for an overview of the data structure)
             for (key in keys) {
-                if (!apps.containsKey(key = app_usage[key]!!["first"] as String) ) {
+                if (!apps.containsKey(key = app_usage[key]!!["first"].toString()) ) {
                     apps[app_usage[key]!!["first"]!!] = Pair(mutableListOf(key), mutableListOf(app_usage[key]!!["second"]!!.toInt()))
                 } else {
                     apps[app_usage[key]!!["first"]!!]!!.first.add(key)
@@ -383,7 +383,7 @@ class SleepExtractor {
             val b = 1.0-1.0/(window_size).toFloat()
 
             for (i in 1 until seq.size) {
-                y.add((b * (y[i-1] as Float) + (1-b) * seq[i] as Float) as Int)
+                y.add((b * (y[i-1].toFloat()) + (1-b) * seq[i].toFloat()).toInt())
             }
 
             return y
