@@ -138,6 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     fun goToDev(){
         switchFragment(FirstFragment())
+    }
 
     companion object {
         val SURVEY_NOTIF_CLICKED = "survey_notif"
