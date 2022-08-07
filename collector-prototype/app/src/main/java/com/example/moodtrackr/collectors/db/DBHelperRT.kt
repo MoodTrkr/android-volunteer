@@ -1,6 +1,7 @@
 package com.example.moodtrackr.collectors.db
 
 import android.content.Context
+import com.example.moodtrackr.collectors.workers.UnlocksWorker
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.util.DatabaseManager
@@ -56,6 +57,8 @@ class DBHelperRT {
                         StepsCountExtractor.stepsChange(0)
                     )
                     StepsCountExtractor.resetStepCountExtractor()
+                    UnlocksWorker.wasNotifSent = false
+                    UnlocksWorker.setNotifSentStatus(context, false)
                     DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(recordNew)
                 }
                 else {

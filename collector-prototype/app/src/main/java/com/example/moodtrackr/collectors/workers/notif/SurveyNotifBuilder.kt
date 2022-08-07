@@ -1,31 +1,45 @@
-package com.example.moodtrackr.collectors.service.util
+package com.example.moodtrackr.collectors.workers.notif
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.service.DataCollectorService
 
-class NotifUpdateUtil {
+class SurveyNotifBuilder {
     companion object {
-        fun updateNotif(context: Context) {
+        val TITLE: String = "MDTKR"
+        val NOTIF_ID: Int = 1005
+
+        private fun createNotifContext(context: Context): PendingIntent {
+            val bundle = Bundle()
+            bundle.putBoolean(MainActivity.SURVEY_NOTIF_CLICKED, true)
+            return NavDeepLinkBuilder(context)
+                .setComponentName(MainActivity::class.java)
+                .setGraph(R.navigation.nav_graph)
+                .setDestination(R.id.fragment_container_view)
+                .setArguments(bundle)
+                .createPendingIntent()
+        }
+
+        fun buildNotif(context: Context) {
             val notificationManager = context.getSystemService(Service.NOTIFICATION_SERVICE) as
                     NotificationManager
-            val builder = NotificationCompat.Builder(context, DataCollectorService.NOTIF_ID.toString())
-                .setContentTitle(DataCollectorService.TITLE)
-                .setTicker(DataCollectorService.TITLE)
-                .setContentText("Unlocks: ${DataCollectorService.localUnlocks} | Steps: ${DataCollectorService.localSteps}")
+            val builder = NotificationCompat.Builder(context, NOTIF_ID.toString())
+                .setContentTitle(TITLE)
+                .setTicker(TITLE)
+                .setContentText("Survey for yesterday now open!")
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                .setOngoing(true)
+                .setContentIntent(createNotifContext(context))
                 .setOnlyAlertOnce(true)
             createChannel(notificationManager)
-            notificationManager.notify(DataCollectorService.NOTIF_ID, builder.build())
+            notificationManager.notify(NOTIF_ID, builder.build())
         }
 
         private fun createChannel(notificationManager: NotificationManager) {
