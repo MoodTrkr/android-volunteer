@@ -65,11 +65,11 @@ class SleepExtractor {
          *
          * */
         fun joinTodayYesterday(today: MutableMap<Long, MutableMap<String, String> >,
-                               yesterday: MutableMap<Long, MutableMap<String, String> >): MutableMap<Long, MutableMap<String, String> > {
+                               yesterday: MutableMap<Long, MutableMap<String, String> >?): MutableMap<Long, MutableMap<String, String> > {
 
 
             var merged: MutableMap<Long, MutableMap<String, String> > = mutableMapOf()
-            merged = (today.toMap() + yesterday.toMap()).toMutableMap()
+            merged = (today.toMap() + yesterday!!.toMap()).toMutableMap()
             return merged
         }
 
@@ -378,12 +378,12 @@ class SleepExtractor {
          * @param window_size: Int:
          *      How many elements of the array to average across
          * */
-        fun <T> movingAverage(seq: List<T>, window_size: Int): MutableList<T> {
-            val y = mutableListOf<T>(0 as T)
+        fun movingAverage(seq: List<Int>, window_size: Int): MutableList<Int> {
+            val y = mutableListOf<Int>(0)
             val b = 1.0-1.0/(window_size).toFloat()
 
             for (i in 1 until seq.size) {
-                y.add((b * (y[i-1] as Float) + (1-b) * seq[i] as Float) as T)
+                y.add((b * (y[i-1] as Float) + (1-b) * seq[i] as Float) as Int)
             }
 
             return y
