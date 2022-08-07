@@ -24,6 +24,7 @@ import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.router.util.CompressionUtil
+import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
@@ -161,6 +162,17 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
                         it
                     )}
             }
+        }
+
+        binding.sleepBoundsBtn.setOnClickListener {
+            val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
+            job.invokeOnCompletion {
+                Log.e("MDTKR_SLEEP_EXT", it.)
+            }
+            runBlocking {
+                job.await()
+            }
+            Log.e("MDTKR_SLEEP_EXT", job.getCompleted().toString())
         }
 
         binding.getUsageObjBtn.setOnClickListener {
