@@ -1,6 +1,7 @@
 package com.example.moodtrackr.router.routes
 
 import com.example.moodtrackr.data.MTUsageData
+import com.example.moodtrackr.router.data.MTUsageDataStamped
 import retrofit2.Call
 import retrofit2.http.*
 import java.io.ByteArrayInputStream
@@ -25,9 +26,7 @@ interface UsageDataRoutes {
      * Insert Usage Data Object. Date data must provided in Long format.
      */
     @POST("$BASE_PATH/insert")
-    suspend fun insertUsageData(@Query("date") query: Long, @Body usage: MTUsageData): Result<Boolean>?
-    @POST("$BASE_PATH/insert")
-    suspend fun insertUsageData(@Query("date") query: Long, @Body usage: ByteArrayInputStream): Result<Boolean>?
+    suspend fun insertUsageData(@Query("date") query: Long, @Body usage: MTUsageDataStamped): Result<Boolean>?
 
     companion object {
         private const val BASE_PATH = "/api/v1/usage-data"

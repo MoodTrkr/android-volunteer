@@ -23,6 +23,7 @@ import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.router.data.MTUsageDataStamped
 import com.example.moodtrackr.router.util.CompressionUtil
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
@@ -153,12 +154,14 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
             Log.e("DEBUG", "Pushing to Server!")
             runBlocking {
                 usage?.let {
+                    val stamped = MTUsageDataStamped.stampUsageData(
+                        requireContext().applicationContext, it)
                     RestClient.safeApiCall(
                         requireContext().applicationContext,
                         Dispatchers.Default,
                         restClient::insertUsageData,
                         DatesUtil.getYesterdayTruncated().time,
-                        it
+                        stamped
                     )}
             }
         }
