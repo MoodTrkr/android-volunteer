@@ -1,5 +1,11 @@
 package com.example.moodtrackr.sleepextractor
 
+import android.content.Context
+import com.example.moodtrackr.collectors.db.DBHelper
+import com.example.moodtrackr.data.MTUsageData
+import com.example.moodtrackr.util.DatesUtil
+import java.util.*
+
 class SleepExtractor {
     companion object {
 
@@ -22,8 +28,18 @@ class SleepExtractor {
          *      Where State is an integer that is converted into a string (Must be able to convert
          *      back into an integer). Common States are "1", "2", "23"
          * */
-        fun loadAppUsage(days_offset: Int) { //TODO
+        fun loadAppUsage(days_offset: Int, ctx: Context) : MutableMap<Long, MutableMap<String, String> >{ //TODO
+            val dayTruncatedMillis = DatesUtil.getTodayTruncated().time - days_offset * 86400000
+            val dayTruncated = DatesUtil.truncateDate(Date(dayTruncatedMillis + 5000))
+            val record: MTUsageData = DBHelper.getObjSafe(ctx, dayTruncated)
 
+            val appUsage = mutableMapOf<Long, MutableMap<String, String> >()
+            for (entry in record.dailyCollection.usageLogs.data.iterator()) {
+                appUsage.put(entry.key, mutableMapOf(
+                    Pair("first", entry.value.first),
+                    Pair("second", entry.value.second.toString())))
+            }
+            return appUsage
         }
 
 
@@ -92,7 +108,7 @@ class SleepExtractor {
             // populate apps (Find definition of apps for an overview of the data structure)
             for (key in keys) {
                 if (!apps.containsKey(key = app_usage[key]!!["first"] as String) ) {
-                    apps.put(app_usage[key]!!["first"]!!, Pair(mutableListOf(key), mutableListOf(app_usage[key]!!["second"]!!.toInt())))
+                    apps[app_usage[key]!!["first"]!!] = Pair(mutableListOf(key), mutableListOf(app_usage[key]!!["second"]!!.toInt()))
                 } else {
                     apps[app_usage[key]!!["first"]!!]!!.first.add(key)
                     apps[app_usage[key]!!["first"]!!]!!.second.add(app_usage[key]!!["second"]!!.toInt())
@@ -150,7 +166,7 @@ class SleepExtractor {
             // count the occurrences of each bin.
             for (item in x) {
                 if (!bins.containsKey(item / 1000L * 1000L)) {
-                    bins.put(key = item / 1000L * 1000L, value = 1)
+                    bins[item / 1000L * 1000L] = 1
                 } else {
                     bins[item / 1000L * 1000L] = bins[item / 1000L * 1000L]!! + 1
                 }
@@ -185,19 +201,19 @@ class SleepExtractor {
         fun getCandidateRegions(app_activity: MutableList<Int>, thresh: Float) : MutableList<Boolean> {
 
             // define bounds and thresholding cutoff
-            val max_min = maxmin(app_activity)
-            val mx = max_min.second
-            val mn = max_min.first
+            val maxMin = maxmin(app_activity)
+            val mx = maxMin.second
+            val mn = maxMin.first
             val rnge = mx - mn
 
             val dbound = mn + rnge * thresh
 
-            val candidate_regions = mutableListOf<Boolean>()
+            val candidateRegions = mutableListOf<Boolean>()
             // create boolean mask
             for (i in app_activity.indices) {
-                candidate_regions.add(app_activity[i]!! < dbound)
+                candidateRegions.add(app_activity[i]!! < dbound)
             }
-            return candidate_regions
+            return candidateRegions
         }
 
         /**
@@ -212,49 +228,49 @@ class SleepExtractor {
          *      sleep interval.
          * */
         fun computeBounds(x: MutableList<Boolean>) : Pair<Int, Int> {
-            var longest_idx = 0
-            var ranges = mutableListOf<Pair<Int, Int> >()
-            var section_start = -1
-            var section_end = -1
+            var longestIdx = 0
+            val ranges = mutableListOf<Pair<Int, Int> >()
+            var sectionStart = -1
+            var sectionEnd = -1
 
             for (i in x.indices) {
                 if (x[i]) {
                     // set start to current index, prepare end to receive index later
-                    if (section_start == -1) {
-                        section_start = i
-                        section_end = -1
+                    if (sectionStart == -1) {
+                        sectionStart = i
+                        sectionEnd = -1
                     }
                 } else {
-                    if (section_end == -1 && section_start != -1) {
-                        section_end = i
-                        ranges.add(Pair(section_start, section_end))
+                    if (sectionEnd == -1 && sectionStart != -1) {
+                        sectionEnd = i
+                        ranges.add(Pair(sectionStart, sectionEnd))
 
                         if (ranges.size > 1) {
                             //if the new range is longer than the longest range,
                             // set the longest range as the new range
                             if (ranges.last().second-ranges.last().first >
-                                ranges[longest_idx].second-ranges[longest_idx].first){
+                                ranges[longestIdx].second-ranges[longestIdx].first){
 
-                                longest_idx = ranges.size - 1
+                                longestIdx = ranges.size - 1
                             }
                         }
-                        section_start = -1
+                        sectionStart = -1
                     }
                 }
 
                 // If there is a positive range all the way till the end...
-                if (i == x.size-1 && section_start != -1) {
-                    ranges.add(Pair(section_start, x.size-1))
+                if (i == x.size-1 && sectionStart != -1) {
+                    ranges.add(Pair(sectionStart, x.size-1))
                     if (ranges.size > 1) {
                         if (ranges.last().second-ranges.last().first >
-                            ranges[longest_idx].second-ranges[longest_idx].first){
+                            ranges[longestIdx].second-ranges[longestIdx].first){
 
-                            longest_idx = ranges.size - 1
+                            longestIdx = ranges.size - 1
                         }
                     }
                 }
             }
-            return ranges[longest_idx]
+            return ranges[longestIdx]
         }
 
         /**
@@ -263,24 +279,53 @@ class SleepExtractor {
          * @param app_activity_today: MutableList<Int>:
          *      Time-series list containing the number of app activities
          *      per second. Every new index is one second in time.
+         * @param time_codes_today: MutableList<Long>:
+         *      Time-series list containing the number of time codes
+         *      per second. Every new index is one second in time.
+         *
+         *
+         * @return Pair<Long, Long>:
+         *      starting time code, ending time code
          *
          * */
-        fun sleepWakeBoundsFromActivity(app_activity_today: MutableList<Int>,
-                            app_activity_yesterday: MutableList<Int>,
-                            time_codes_today: MutableList<Long>,
-                            time_codes_yesterday: MutableList<Long>) : Pair<Long, Long> {
-            // First merge yesterday's and today's data
-            var slicerange = app_activity_yesterday.size/3 until app_activity_yesterday.size-1
-            var app_activity = (app_activity_yesterday.slice(slicerange) + app_activity_today).toMutableList()
-            var time_codes = (time_codes_yesterday.slice(slicerange) + time_codes_today).toMutableList()
+        fun sleepWakeBoundsFromActivity(app_activity: MutableList<Int>,
+                            time_codes: MutableList<Long>) : Pair<Long, Long> {
 
 
-            var regions = getCandidateRegions(app_activity, thresh=0.1F)
-            var start_stop_idx = computeBounds(regions)
+            val regions = getCandidateRegions(app_activity, thresh=0.1F)
+            val start_stop_idx = computeBounds(regions)
 
             return Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second])
         }
 
+
+
+        /**
+         * This function computes the sleep boundaries of a certain day.
+         * You specify which day by using the days_offset parameter
+         *
+         * @param days_offset: Int:
+         *      number of days offset from today. This param must be positive.
+         *      For example, today == 0, yesterday == 1, the day before yesterday == 2,
+         *      etc, etc.
+         *
+         * @param ctx: Context:
+         *      Context.
+         *
+         * @return Pair<Long, Long>:
+         *      the starting time code as well as the stop timecode, indicating
+         *      the range in time where the person is asleep
+         * */
+        fun computeSleepBounds(days_offset: Int, ctx: Context) : Pair<Long, Long> {
+            val appUsageToday = loadAppUsage(days_offset, ctx)
+            val appUsageYesterday = loadAppUsage(days_offset-1, ctx)
+
+            val appUsage = joinTodayYesterday(today = appUsageToday, yesterday = appUsageYesterday)
+            val appStats = indexApps(appUsage)
+
+            val timeActivity = appStatsToTimeSeries(appStats)
+            return sleepWakeBoundsFromActivity(app_activity = timeActivity.second, time_codes = timeActivity.first)
+        }
 
         /////////////////////////////////////////
         /////////////////////////////////////////
@@ -299,8 +344,8 @@ class SleepExtractor {
          *      How many elements of the array to average across
          * */
         fun <T> movingAverage(seq: List<T>, window_size: Int): MutableList<T> {
-            var y = mutableListOf<T>(0 as T)
-            var b = 1.0-1.0/(window_size).toFloat()
+            val y = mutableListOf<T>(0 as T)
+            val b = 1.0-1.0/(window_size).toFloat()
 
             for (i in 1 until seq.size) {
                 y.add((b * (y[i-1] as Float) + (1-b) * seq[i] as Float) as T)
@@ -311,6 +356,14 @@ class SleepExtractor {
 
 
         /**
+         * Computes the max value and the min value in a
+         * List.
+         *
+         * @param x: MutableList<T>:
+         *      A list of items that are comparable.
+         *
+         * @return Pair<T, T>:
+         *      min value, max value
          *
          * */
         fun <T> maxmin(x: MutableList<T>): Pair<T, T> {
