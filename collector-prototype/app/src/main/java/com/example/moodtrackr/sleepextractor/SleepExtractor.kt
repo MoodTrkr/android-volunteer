@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.util.DatesUtil
+import kotlinx.coroutines.*
 import java.util.*
 
 class SleepExtractor {
@@ -64,11 +65,11 @@ class SleepExtractor {
          *
          * */
         fun joinTodayYesterday(today: MutableMap<Long, MutableMap<String, String> >,
-                               yesterday: MutableMap<Long, MutableMap<String, String> >): MutableMap<Long, MutableMap<String, String> > {
+                               yesterday: MutableMap<Long, MutableMap<String, String> >?): MutableMap<Long, MutableMap<String, String> > {
 
 
             var merged: MutableMap<Long, MutableMap<String, String> > = mutableMapOf()
-            merged = (today.toMap() + yesterday.toMap()).toMutableMap()
+            merged = (today.toMap() + yesterday!!.toMap()).toMutableMap()
             return merged
         }
 
@@ -107,7 +108,7 @@ class SleepExtractor {
 
             // populate apps (Find definition of apps for an overview of the data structure)
             for (key in keys) {
-                if (!apps.containsKey(key = app_usage[key]!!["first"] as String) ) {
+                if (!apps.containsKey(key = app_usage[key]!!["first"].toString()) ) {
                     apps[app_usage[key]!!["first"]!!] = Pair(mutableListOf(key), mutableListOf(app_usage[key]!!["second"]!!.toInt()))
                 } else {
                     apps[app_usage[key]!!["first"]!!]!!.first.add(key)
@@ -327,6 +328,40 @@ class SleepExtractor {
             return sleepWakeBoundsFromActivity(app_activity = timeActivity.second, time_codes = timeActivity.first)
         }
 
+
+        /**
+         * This function computes the sleep boundaries of a certain day.
+         * You specify which day by using the days_offset parameter.
+         * This function runs Asynchronously
+         *
+         * @param days_offset: Int:
+         *      number of days offset from today. This param must be positive.
+         *      For example, today == 0, yesterday == 1, the day before yesterday == 2,
+         *      etc, etc.
+         *
+         * @param ctx: Context:
+         *      Context.
+         *
+         * @return Pair<Long, Long>:
+         *      the starting time code as well as the stop timecode, indicating
+         *      the range in time where the person is asleep
+         * */
+        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long> >{
+            val deferred = CompletableDeferred<Pair<Long, Long>>()
+            CoroutineScope(Dispatchers.Default).launch {
+                val appUsageToday = loadAppUsage(days_offset, ctx)
+                val appUsageYesterday = loadAppUsage(days_offset-1, ctx)
+
+                val appUsage = joinTodayYesterday(today = appUsageToday, yesterday = appUsageYesterday)
+                val appStats = indexApps(appUsage)
+
+                val timeActivity = appStatsToTimeSeries(appStats)
+                val computed = sleepWakeBoundsFromActivity(app_activity = timeActivity.second, time_codes = timeActivity.first)
+                deferred.complete(computed)
+            }
+            return deferred
+        }
+
         /////////////////////////////////////////
         /////////////////////////////////////////
         //////////////// Utils //////////////////
@@ -343,12 +378,12 @@ class SleepExtractor {
          * @param window_size: Int:
          *      How many elements of the array to average across
          * */
-        fun <T> movingAverage(seq: List<T>, window_size: Int): MutableList<T> {
-            val y = mutableListOf<T>(0 as T)
+        fun movingAverage(seq: List<Int>, window_size: Int): MutableList<Int> {
+            val y = mutableListOf<Int>(0)
             val b = 1.0-1.0/(window_size).toFloat()
 
             for (i in 1 until seq.size) {
-                y.add((b * (y[i-1] as Float) + (1-b) * seq[i] as Float) as T)
+                y.add((b * (y[i-1].toFloat()) + (1-b) * seq[i].toFloat()).toInt())
             }
 
             return y
