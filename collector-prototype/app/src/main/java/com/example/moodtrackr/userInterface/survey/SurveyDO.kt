@@ -1,17 +1,22 @@
 package com.example.moodtrackr.userInterface.survey
+import android.view.MenuInflater
+import android.view.View
+import android.widget.PopupMenu
+import com.example.moodtrackr.R
 import com.example.moodtrackr.data.SurveyData
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.util.DatesUtil
 import java.sql.Date
-import java.time.LocalDate
-import java.time.ZoneOffset
+import java.time.*
+import java.util.*
 
 class SurveyDO (
+    var sleepData:MTSleepData = MTSleepData(),
     var currentQuestionNumber:Int = 0,
-    val questionDOS:Array<QuestionDO> =
+    var questionDOS:Array<QuestionDO> =
         arrayOf(
             QuestionDO(
-                "Did you feel symptoms of depression today? Select the most extreme description of how you felt.",
+                "Did you feel symptoms of depression yesterday? Select the most extreme description of how you felt.",
                 arrayOf(
                     OptionDO(0, "Extremely depressed, I felt emotionally numb, could not function at all, and did not wish to live"),
                     OptionDO(1, "Very depressed, had feelings of hopelessness, and functioned very poorly"),
@@ -22,7 +27,7 @@ class SurveyDO (
                 )
             ),
             QuestionDO(
-                "Did you feel symptoms of elevation on this day? Select the most extreme description of how you felt.",
+                "Did you feel symptoms of elevation yesterday? Select the most extreme description of how you felt.",
                 arrayOf(
                     OptionDO(0, "Extremely elevated. Could not control self or function at all, making many reckless decisions"),
                     OptionDO(1, "Very elevated. Feel very happy. Exhibited inappropriate laughing, could control self only briefly and functioned very poorly"),
@@ -33,7 +38,7 @@ class SurveyDO (
                 )
             ),
             QuestionDO(
-                "Did you feel symptoms of anger on this day? Select the most extreme description of how you felt.",
+                "Did you feel symptoms of anger yesterday? Select the most extreme description of how you felt.",
                 arrayOf(
                     OptionDO(0, "Extremely angry. Felt constant anger, could not be calmed down, control self, or function at all"),
                     OptionDO(1, "Very elevated. Feel very happy. Exhibited inappropriate laughing, could control self only briefly and functioned very poorly"),
@@ -44,7 +49,7 @@ class SurveyDO (
                 )
             ),
             QuestionDO(
-                "Did you feel symptoms of anxiety on this day? Select the most extreme description of how you felt.",
+                "Did you feel symptoms of anxiety yesterday? Select the most extreme description of how you felt.",
                 arrayOf(
                     OptionDO(0, "Extremely anxious. Felt constant anxiety, anxiety attacks, could not be calmed down, control self, or function at all"),
                     OptionDO(1, "Very anxious. Could control self only briefly and functioned very poorly as a result"),
@@ -56,8 +61,9 @@ class SurveyDO (
             )
 
         ),
-    val date: LocalDate = LocalDate.now().minusDays(1),
+    var date: LocalDateTime = LocalDateTime.now().minusDays(1),
 ){
+
     fun getCurrentQuestion(): QuestionDO {
         return questionDOS[currentQuestionNumber]
     }
@@ -75,8 +81,23 @@ class SurveyDO (
             answers[index] = this.questionDOS[index].answer!!.id
             index++
         }
-        var convertedDate = Date.from(this.date.atStartOfDay().toInstant(ZoneOffset.UTC));
+        var convertedDate =  Date.from(date.atZone(ZoneId.systemDefault()).toInstant());
         convertedDate = DatesUtil.truncateDate(convertedDate);
-        return SurveyData(convertedDate,surveyVersion, answers, isComplete, MTSleepData())
+        return SurveyData(convertedDate,surveyVersion, answers, isComplete, this.sleepData)
     }
 }
+// May have bugs
+//fun surveyDOFromCompleteSurveyData(surveyData: SurveyData):SurveyDO{
+//        val surveyDO = SurveyDO();
+//
+//        val answers = surveyData.questions
+//        var index = 0;
+//        while(index < surveyDO.questionDOS.size){
+//            surveyDO.questionDOS[index].answer =
+//                surveyDO.questionDOS[index].optionDOS.find{it.id == answers[index]}
+//            index++
+//        }
+//        surveyDO.date = Instant.ofEpochMilli(surveyData.time).atZone(ZoneId.systemDefault()).toLocalDateTime();
+//        surveyDO.currentQuestionNumber = surveyDO.questionDOS.size
+//       return surveyDO
+//}

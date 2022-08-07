@@ -1,114 +1,159 @@
 package com.example.moodtrackr.userInterface.survey
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.example.moodtrackr.FirstFragment
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.SurveyFragmentBinding
 import com.example.moodtrackr.db.records.UsageRecordsDAO
+import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.util.DatabaseManager
+import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.sql.Date
+import java.time.*
 import kotlin.math.ceil
 import kotlin.random.Random
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
-    private lateinit var surveyDO: SurveyDO;
     private var _binding: SurveyFragmentBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private lateinit var surveyDO: SurveyDO;
     private lateinit var usageRecordsDao: UsageRecordsDAO
     private var usageRecord: MTUsageData? = null
+    private var surveyComplete: Boolean? = false;
+
+    private var completeQuestionNumber: Int = 0;
+    private var surveyQuestionNumber: Int = 0;
+
     private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
         R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         _binding = SurveyFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        surveyDO = SurveyDO();
-        val currentQuestion = surveyDO.getCurrentQuestion();
+        // Change this when we have sleep data
+        val currentSurveyDate = LocalDateTime.now().minusDays(1)
+        var convertedDate = Date.from(currentSurveyDate.atZone(ZoneId.systemDefault()).toInstant());
+        convertedDate = DatesUtil.truncateDate(convertedDate);
+
         usageRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).usageRecordsDAO;
         runBlocking {
-            usageRecord = usageRecordsDao.getObjOnDay(surveyDO.getSurveyData().time!!)
+            usageRecord = usageRecordsDao.getObjOnDay(convertedDate.time)
         }
 
-
-
-
-        if(usageRecord?.surveyData != null){
+        surveyComplete = usageRecord?.surveyData?.complete
+        surveyDO = SurveyDO();
+        if( surveyComplete == true){
             // survey is complete!
             showSurveyComplete()
         }else {
             setQuestion();
-
-            binding.back.setOnClickListener {
-                surveyDO.currentQuestionNumber -= 1;
-                setQuestion();
-            };
-            binding.optionOne.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionTwo.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionThree.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionFour.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionFive.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionSix.setOnClickListener { v ->
-                handleOptionClick(v);
-            };
-            binding.optionOne.setTag(R.string.buttonIdForTag, 0);
-            binding.optionTwo.setTag(R.string.buttonIdForTag, 1);
-            binding.optionThree.setTag(R.string.buttonIdForTag, 2);
-            binding.optionFour.setTag(R.string.buttonIdForTag, 3);
-            binding.optionFive.setTag(R.string.buttonIdForTag, 4);
-            binding.optionSix.setTag(R.string.buttonIdForTag, 5);
         }
+        completeQuestionNumber = surveyDO.questionDOS.size + 1
+        surveyQuestionNumber = surveyDO.questionDOS.size
+
+        binding.back.setOnClickListener {
+            if(surveyComplete == true){
+                surveyDO = SurveyDO()
+                surveyComplete = false
+            }
+            else{
+                surveyDO.currentQuestionNumber -= 1;
+            }
+            setQuestion();
+        };
+        binding.optionOne.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.optionTwo.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.optionThree.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.optionFour.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.optionFive.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.optionSix.setOnClickListener { v ->
+            handleOptionClick(v);
+        };
+        binding.complete.setOnClickListener {
+            // We are assuming wakeups are all on the same day
+            // and sleep times are on the previous day if pm, the next day if am
+            var sleepTime = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(binding.sleepTime.hour,binding.sleepTime.minute));
+            var wakeupTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(binding.wakeUpTime.hour,binding.wakeUpTime.minute));
+            surveyDO.sleepData = MTSleepData( sleepTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+                wakeupTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            surveyDO.currentQuestionNumber += 1;
+            setQuestion();
+            // sleep data is one hour ahead at the moment...
+        };
+        binding.optionOne.setTag(R.string.buttonIdForTag, 0);
+        binding.optionTwo.setTag(R.string.buttonIdForTag, 1);
+        binding.optionThree.setTag(R.string.buttonIdForTag, 2);
+        binding.optionFour.setTag(R.string.buttonIdForTag, 3);
+        binding.optionFive.setTag(R.string.buttonIdForTag, 4);
+        binding.optionSix.setTag(R.string.buttonIdForTag, 5);
+
         return view;
     }
-
+    private fun clearCard(){
+        binding.sleepData.visibility = View.GONE;
+        binding.meme.visibility = View.GONE;
+        binding.options.visibility = View.GONE;
+        binding.back.visibility = View.GONE;
+    }
     private fun setQuestion(){
-        if(surveyDO.currentQuestionNumber == surveyDO.questionDOS.size){
+        if(surveyDO.currentQuestionNumber == surveyQuestionNumber ){
+            // Questions finished, need sleep time
+            binding.back.text = "Previous question"
+            binding.prompt.text = "Sleep Quality";
+            clearCard();
+            binding.sleepData.visibility = View.VISIBLE;
+            binding.back.visibility = View.VISIBLE;
+        }
+        else if (surveyDO.currentQuestionNumber == completeQuestionNumber){
             // survey is finished
-            binding.progressBar.setProgress(100);
-            showSurveyComplete();
+
+            binding.loading.visibility= View.VISIBLE;
             var surveyData =  surveyDO.getSurveyData();
+            surveyComplete = true;
 
             runBlocking {
                 launch{
-
-                    // Creates record for testing, remove later!!
-                    if(usageRecordsDao.getObjOnDay(surveyData.time) == null){
-                        var mock = MTUsageData();
-                        mock.date = surveyData.time
-                        usageRecordsDao.insert(mock)
-                    }
-
-                    val usageRecord = usageRecordsDao.getObjOnDay(surveyData.time);
-                    if(usageRecord != null){
-                        usageRecord.surveyData = surveyData;
-                        usageRecordsDao.update(usageRecord)
-                    }
+                    usageRecord!!.surveyData = surveyData;
+                    usageRecordsDao.update(usageRecord!!)
                 }
             }
+            binding.loading.visibility= View.GONE;
+            showSurveyComplete();
         }
         else{
+            binding.back.text = "Previous question"
             binding.meme.visibility = View.GONE;
+            binding.sleepData.visibility = View.GONE;
             binding.options.visibility = View.VISIBLE;
             binding.back.visibility = View.VISIBLE;
             val currentQuestion = surveyDO.getCurrentQuestion();
@@ -125,16 +170,22 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                 binding.back.visibility = View.GONE;
                 binding.progressBar.setProgress(0);
             }
-            binding.progressBar.setProgress(ceil(surveyDO.currentQuestionNumber*100.00/surveyDO.questionDOS.size).toInt());
         }
-
+        binding.progressBar.visibility = View.VISIBLE;
+        binding.progressBar.setProgress(ceil(surveyDO.currentQuestionNumber*100.00/(surveyDO.questionDOS.size + 1)).toInt());
+        binding.loading.visibility= View.GONE;
+        (activity as MainActivity?)!!.scrollToTop();
+        Log.e("DEBUG", surveyDO.currentQuestionNumber.toString())
     }
     private fun showSurveyComplete(){
-        binding.meme.setBackgroundResource(imageIds[Random.nextInt(imageIds.size)])
+//        binding.progressBar.visibility = View.GONE;
+        binding.loading.visibility= View.GONE;
+        binding.meme.setImageResource(imageIds[(0 until (imageIds.size-1)).random()])
         binding.prompt.text = "Survey Complete! Here's a cute animal as thanks."
         binding.meme.visibility = View.VISIBLE;
         binding.options.visibility = View.GONE;
-        binding.back.visibility = View.GONE;
+        binding.sleepData.visibility = View.GONE;
+        binding.back.text = "Redo Survey";
     }
 
     private fun handleOptionClick(v:View ) {
@@ -148,6 +199,28 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun showPopup(v: View) {
+        val popup = PopupMenu(activity, v)
+
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.navigation_popup, popup.menu)
+        popup.show()
+    }
+
+    private fun switchFragment(fragment:Fragment) {
+        try {
+            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
+            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
+                .commit()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun goToDev(){
+        switchFragment(FirstFragment())
     }
 
 }
