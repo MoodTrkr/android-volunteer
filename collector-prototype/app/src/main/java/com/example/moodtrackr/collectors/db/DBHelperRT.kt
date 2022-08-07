@@ -1,7 +1,9 @@
 package com.example.moodtrackr.collectors.db
 
 import android.content.Context
+import com.example.moodtrackr.collectors.workers.UnlocksWorker
 import com.example.moodtrackr.db.realtime.RTUsageRecord
+import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import kotlinx.coroutines.CoroutineScope
@@ -52,8 +54,11 @@ class DBHelperRT {
                     recordNew = RTUsageRecord(
                         DatesUtil.getTodayTruncated(),
                         0,
-                        0
+                        StepsCountExtractor.stepsChange(0)
                     )
+                    StepsCountExtractor.resetStepCountExtractor()
+                    UnlocksWorker.wasNotifSent = false
+                    UnlocksWorker.setNotifSentStatus(context, false)
                     DatabaseManager.getInstance(context).rtUsageRecordsDAO.insertAll(recordNew)
                 }
                 else {

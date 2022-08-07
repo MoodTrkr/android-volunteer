@@ -21,61 +21,62 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
+import com.example.moodtrackr.collectors.workers.UnlocksWorker
+import com.example.moodtrackr.collectors.workers.notif.SurveyNotifBuilder
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
+import com.example.moodtrackr.userInterface.permissions.SuperPermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 
-
 class MainActivity : AppCompatActivity() {
-
+    private lateinit var permsManager: PermissionsManager
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        permsManager = PermissionsManager(this)
         val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
                 R.string.login_status_identifier))
         val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
                 R.string.setup_status_identifier))
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus")
+        val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
-        permsManager = PermissionsManager(this)
-        permsManager.checkAllPermissions()
+//        permsManager.checkAllPermissions()
+        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allPermissionsGranted()}")
 
         // inject fragment if it has not been added to the activity
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                //add<SurveyFragment>(R.id.fragment_container_view)
-                if (loginStatus != true) add<LoginFragment>(R.id.fragment_container_view)
-                else if (setupStatus != true) add<DemoFragment>(R.id.fragment_container_view)
-                else if (!permsManager.allPermissionsGranted()) {
-                    add<PermissionsFragment>(R.id.fragment_container_view)
-                } else if(permsManager.allPermissionsGranted()){
-                    add<SurveyFragment>(R.id.fragment_container_view)
+        when {
+            (savedInstanceState == null) -> {
+                val enableDebugging = true
+                supportFragmentManager.commit {
+                    setReorderingAllowed(true)
+                    //add<SurveyFragment>(R.id.fragment_container_view)
+                    when {
+                        loginStatus != true -> add<LoginFragment>(R.id.fragment_container_view)
+                        setupStatus != true -> add<DemoFragment>(R.id.fragment_container_view)
+                        !permsManager.allPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
+                        !superPermsGranted -> add<SuperPermissionsFragment>(R.id.fragment_container_view)
+                        enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
+                        permsManager.allPermissionsGranted() -> add<SurveyFragment>(R.id.fragment_container_view)
+                        }
                 }
             }
         }
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        WorkersUtil.queueServiceMaintainenceOneTime(this.applicationContext)
-
         val dbManager = DatabaseManager.getInstance(this.applicationContext)
 
-        NotifUpdateUtil.updateNotif(this.applicationContext)
-
-        WorkersUtil.queueServiceMaintenance(this.applicationContext)
-        WorkersUtil.queuePeriodic(this.applicationContext)
-        WorkersUtil.queueHourly(this.applicationContext)
-
+        if (loginStatus == true && setupStatus == true && superPermsGranted) {
+            WorkersUtil.queueAll(this.applicationContext)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -98,9 +99,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-    companion object {
-        lateinit var permsManager: PermissionsManager
     }
 
     private fun switchFragment(fragment:Fragment) {
@@ -140,5 +138,8 @@ class MainActivity : AppCompatActivity() {
 
     fun goToDev(){
         switchFragment(FirstFragment())
+
+    companion object {
+        val SURVEY_NOTIF_CLICKED = "survey_notif"
     }
 }

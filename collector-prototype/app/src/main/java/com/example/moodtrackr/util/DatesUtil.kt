@@ -9,6 +9,10 @@ class DatesUtil() {
             return cal.time
         }
 
+        fun getTodayCalendar(): Calendar {
+            return Calendar.getInstance()
+        }
+
         fun getTodayTruncated(): Date {
             return truncateDate(getToday())
         }

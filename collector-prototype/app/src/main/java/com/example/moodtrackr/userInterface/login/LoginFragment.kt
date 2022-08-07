@@ -13,13 +13,14 @@ import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.LoginFragmentBinding
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
+import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.util.PermissionsManager
 import kotlinx.coroutines.runBlocking
 
 
 class LoginFragment(): Fragment(R.layout.login_fragment) {
     private lateinit var auth0Manager: Auth0Manager
-    private val permissionsManager = MainActivity.permsManager
+    private lateinit var permissionsManager: PermissionsManager
 
     private var _binding: LoginFragmentBinding? = null
     // This property is only valid between onCreateView and
@@ -35,6 +36,7 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
         val view = binding.root
 
         this.auth0Manager = Auth0Manager(requireActivity())
+        this.permissionsManager = PermissionsManager(this)
         binding.loginBtn.setOnClickListener {
             val job = runBlocking {
                 auth0Manager.loginAsync()
@@ -59,9 +61,13 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
                 requireContext().applicationContext.resources.getString(
                     R.string.setup_status_identifier))
             Log.e("DEBUG", "SETUP STATUS: $setupStatus")
-            var fragment: Fragment = if (setupStatus == true) {
+            var fragment: Fragment = if (!permissionsManager.allPermissionsGranted()) {
+                PermissionsFragment()
+            }
+            else if (setupStatus == true) {
                 FirstFragment()
-            } else {
+            }
+            else {
                 DemoFragment()
             }
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
