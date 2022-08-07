@@ -52,7 +52,6 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
             if (!permsManager.allPermissionsGranted()) {
                 permsManager.checkAllPermissions()
             }
-            permsManager.grantUsageAccessPermission(this)
             if(permsManager.allPermissionsGranted()){
                 switchFragment()
             }
@@ -148,8 +147,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     }
     private fun switchFragment() {
         try {
-            WorkersUtil.queueAll(requireContext().applicationContext)
-            val fragment = SurveyFragment()
+            val fragment = SuperPermissionsFragment()
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
                 .commit()

@@ -32,6 +32,10 @@
     <string name="auth0_user_metadata">AUTH0_USER_METADATA</string>
     <string name="com_auth0_scope">openid profile email offline_access read:current_user update:current_user_metadata</string>
     <string name="mdtkr_prev_query">MDTKR_PREV_PERIODIC_COLL</string>
+    <string name="permissionsTitle">Read App Usage Permissions</string>
+    <string name="batteryPermissionsTitle">Protection From Battery Optimization</string>
+    <string name="failurePermsTxtMsg">Permissions has not been provided!</string>
+    <string name="surveyNotifSent">was_survey_requested</string>
 
     <string-array name="genderOptions">
         <item>Male</item>
