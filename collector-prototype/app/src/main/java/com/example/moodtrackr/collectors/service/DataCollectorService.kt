@@ -86,7 +86,7 @@ class DataCollectorService : Service() {
         return NavDeepLinkBuilder(context)
             .setComponentName(MainActivity::class.java)
             .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.fragment_container_view)
+            .setDestination(R.id.surveyFragment)
             .createPendingIntent()
     }
 

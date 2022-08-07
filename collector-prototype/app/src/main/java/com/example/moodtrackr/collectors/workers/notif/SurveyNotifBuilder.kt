@@ -23,7 +23,7 @@ class SurveyNotifBuilder {
             return NavDeepLinkBuilder(context)
                 .setComponentName(MainActivity::class.java)
                 .setGraph(R.navigation.nav_graph)
-                .setDestination(R.id.fragment_container_view)
+                .setDestination(R.id.surveyFragment)
                 .setArguments(bundle)
                 .createPendingIntent()
         }
@@ -46,7 +46,7 @@ class SurveyNotifBuilder {
         private fun createChannel(notificationManager: NotificationManager) {
             val descriptionText = "Used by Mood Tracker"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(DataCollectorService.NOTIF_ID.toString(), DataCollectorService.TITLE, importance)
+            val mChannel = NotificationChannel(NOTIF_ID.toString(), TITLE, importance)
             mChannel.description = descriptionText
             notificationManager.createNotificationChannel(mChannel)
         }
