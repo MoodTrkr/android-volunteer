@@ -41,8 +41,9 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
         wasNotifSent = getNotifSentStatus(context) == true
         if (!wasNotifSent) {
             val hour = DatesUtil.getTodayCalendar().get(Calendar.HOUR_OF_DAY)
-            if (hour>=4) {
+            if (hour>4) {
                 SurveyNotifBuilder.buildNotif(context)
+                setNotifSentStatus(context, true)
             }
         }
     }

@@ -40,6 +40,7 @@ class SurveyNotifBuilder {
                 .setOnlyAlertOnce(true)
             createChannel(notificationManager)
             notificationManager.notify(NOTIF_ID, builder.build())
+
         }
 
         private fun createChannel(notificationManager: NotificationManager) {
