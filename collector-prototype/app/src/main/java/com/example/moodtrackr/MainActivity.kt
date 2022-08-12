@@ -1,8 +1,6 @@
 package com.example.moodtrackr
 
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -13,19 +11,19 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.ActivityMainBinding
-import com.example.moodtrackr.collectors.service.DataCollectorService
-import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
-import com.example.moodtrackr.collectors.workers.UnlocksWorker
-import com.example.moodtrackr.collectors.workers.notif.SurveyNotifBuilder
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
+import com.example.moodtrackr.userInterface.permissions.AppUsagePermissionsFragment
+import com.example.moodtrackr.userInterface.permissions.BatteryPermissionsFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
@@ -38,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState)
         permsManager = PermissionsManager(this)
         val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
@@ -49,26 +48,10 @@ class MainActivity : AppCompatActivity() {
         val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
 //        permsManager.checkAllPermissions()
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allPermissionsGranted()}")
+        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
 
-        // inject fragment if it has not been added to the activity
-        when {
-            (savedInstanceState == null) -> {
-                val enableDebugging = true
-                supportFragmentManager.commit {
-                    setReorderingAllowed(true)
-                    //add<SurveyFragment>(R.id.fragment_container_view)
-                    when {
-                        loginStatus != true -> add<LoginFragment>(R.id.fragment_container_view)
-                        setupStatus != true -> add<DemoFragment>(R.id.fragment_container_view)
-                        !permsManager.allPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
-                        !superPermsGranted -> add<SuperPermissionsFragment>(R.id.fragment_container_view)
-                        enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
-                        permsManager.allPermissionsGranted() -> add<SurveyFragment>(R.id.fragment_container_view)
-                        }
-                }
-            }
-        }
+        redirect(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -76,6 +59,41 @@ class MainActivity : AppCompatActivity() {
 
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(this.applicationContext)
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        if(!permsManager.allBasicPermissionsGranted()){
+            switchFragment(PermissionsFragment())
+        }else if(!permsManager.isIgnoringBatteryOptimizations()){
+            switchFragment(BatteryPermissionsFragment())
+        }else if(!permsManager.isUsageAccessGranted()){
+            switchFragment(AppUsagePermissionsFragment())
+        }
+    }
+    fun redirect(savedInstanceState: Bundle?){
+        val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
+            this.applicationContext.resources.getString(
+                R.string.login_status_identifier))
+        val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
+            this.applicationContext.resources.getString(
+                R.string.setup_status_identifier))
+        val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
+        val usagePermsGranted = permsManager.isUsageAccessGranted()
+
+        val enableDebugging = true
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            //add<SurveyFragment>(R.id.fragment_container_view)
+            when {
+                loginStatus != true -> add<LoginFragment>(R.id.fragment_container_view)
+                setupStatus != true -> add<DemoFragment>(R.id.fragment_container_view)
+                !permsManager.allBasicPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
+                !batteryPermsGranted -> add<BatteryPermissionsFragment>(R.id.fragment_container_view)
+                !usagePermsGranted -> add<AppUsagePermissionsFragment>(R.id.fragment_container_view)
+                enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
+                savedInstanceState == null -> add<SurveyFragment>(R.id.fragment_container_view)
+            }
         }
     }
 
@@ -115,28 +133,29 @@ class MainActivity : AppCompatActivity() {
         binding.mainScrollView.scrollTo(0, 0)
     }
 
-//    fun showPopup(v: View) {
-//        val popup = PopupMenu(this, v)
-//        popup.setOnMenuItemClickListener(this@MainActivity)
-//        val inflater: MenuInflater = popup.menuInflater
-//        inflater.inflate(R.menu.navigation_popup, popup.menu)
-//        popup.show()
-//    }
-//    override fun onMenuItemClick(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            R.id.archive -> {
-//                archive(item)
-//                true
-//            }
-//            R.id.delete -> {
-//                delete(item)
-//                true
-//            }
-//            else -> false
-//        }
-//    }
+    fun showPopup(v: View) {
+        val popup = PopupMenu(this, v)
+        popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
+            when(item.itemId) {
+                R.id.devButton ->
+                    switchFragment(FirstFragment())
+                R.id.permissionsButton ->
+                    switchFragment(PermissionsFragment())
+                R.id.logoutButton ->{
+                    Auth0Manager(this).logout()
+                    switchFragment(LoginFragment())
+                }
+                R.id.demographicsButton ->
+                    switchFragment(DemoFragment())
+            }
+            true
+        });
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.navigation_popup, popup.menu)
+        popup.show()
+    }
 
-    fun goToDev(){
+    fun goToDev() {
         switchFragment(FirstFragment())
     }
 

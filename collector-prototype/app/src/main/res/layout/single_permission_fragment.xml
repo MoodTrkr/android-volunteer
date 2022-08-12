@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/simpleCard"
+    android:padding="0dp"
+    android:id="@+id/card"
+    >
+    <TextView
+        android:padding="30dp"
+        style="@style/darkText"
+        android:text="You can view this page again at any time if you’d like a refresher.">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:id="@+id/container"
+        android:background="@drawable/bordered_box">
+        <TextView
+            style = "@style/subHeader"
+            android:id="@+id/subHeader"
+            android:text="Permissions"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="0dp"
+            android:paddingBottom="0dp"/>
+        <TextView
+            style = "@style/largeHeader"
+            android:id="@+id/largeHeader"
+            android:text="Battery"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="0dp"
+            android:paddingBottom="0dp"/>
+        <TextView
+            style = "@style/regularHeader"
+            android:id="@+id/regularHeader"
+            android:text="What's this for?"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="0dp"
+            android:paddingBottom="0dp"/>
+        <TextView
+            style = "@style/darkText"
+            android:id="@+id/explanation"
+            android:text="Battery"
+            android:includeFontPadding="false"
+            android:layout_marginBottom="0dp"
+            android:paddingBottom="0dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:padding="30dp"
+        style="@style/darkText"
+        android:text="Grant Permission"
+        android:gravity="center"
+        android:id="@+id/grant"
+        android:backgroundTint="#F8FAFF">
+    </TextView>
+
+</LinearLayout>
