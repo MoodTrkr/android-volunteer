@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<!--    <item android:id="@+id/permissionsButton"-->
-<!--        android:title="Permissions"-->
-<!--        android:onClick="goToPermissions" />-->
-<!--    <item android:id="@+id/logoutButton"-->
-<!--        android:title="Logout"-->
-<!--        android:onClick="logout"/>-->
-<!--    <item android:id="@+id/demographicsButton"-->
-<!--        android:title="Edit my profile"-->
-<!--        android:onClick="goToDemographics"/>-->
-<!--    <item android:id="@+id/batteryInfoButton"-->
-<!--        android:title="Battery"-->
-<!--        android:onClick="goToBattery"/>-->
+    <item android:id="@+id/permissionsButton"
+        android:title="About"
+         />
+    <item android:id="@+id/logoutButton"
+        android:title="Logout"
+      />
+    <item android:id="@+id/demographicsButton"
+        android:title="Edit my profile"
+        />
     <item android:id="@+id/devButton"
         android:title="Dev (REMOVE)"
-        android:onClick="goToDev"/>
+        />
 </menu>
