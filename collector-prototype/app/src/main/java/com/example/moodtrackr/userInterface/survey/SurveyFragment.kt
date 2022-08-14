@@ -14,6 +14,7 @@ import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.SurveyFragmentBinding
+import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.router.RestClient
@@ -26,7 +27,6 @@ import java.sql.Date
 import java.time.*
 import java.util.*
 import kotlin.math.ceil
-import kotlin.random.Random
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
@@ -41,7 +41,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     private var surveyComplete: Boolean? = false;
 
     private var completeQuestionNumber: Int = 0;
-    private var surveyQuestionNumber: Int = 0;
+    private var sleepQuestionNumber: Int = 0;
 
     private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
         R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
@@ -63,20 +63,30 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         convertedDate = DatesUtil.truncateDate(convertedDate);
 
         usageRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).usageRecordsDAO;
+        var rtRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).rtUsageRecordsDAO;
+        var rtRecord: RTUsageRecord?;
         runBlocking {
             usageRecord = usageRecordsDao.getObjOnDay(convertedDate.time)
+            rtRecord = rtRecordsDao.getObjOnDay(convertedDate.time)
         }
 
-        surveyComplete = usageRecord?.surveyData?.complete
         surveyDO = SurveyDO();
-        if( surveyComplete == true){
-            // survey is complete!
-            showSurveyComplete()
-        }else {
-            setQuestion();
-        }
         completeQuestionNumber = surveyDO.questionDOS.size + 1
-        surveyQuestionNumber = surveyDO.questionDOS.size
+        sleepQuestionNumber = surveyDO.questionDOS.size
+        if(rtRecord == null){
+            // we start creating rtRecords on the day the app is first installed.
+            clearCard();
+            showSurveyNotReady();
+        }else{
+            surveyComplete = usageRecord?.surveyData?.complete
+
+            if( surveyComplete == true){
+                // survey is complete!
+                showSurveyComplete()
+            }else {
+                setQuestion();
+            }
+        }
 
         binding.back.setOnClickListener {
             if(surveyComplete == true){
@@ -108,14 +118,17 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         };
         binding.complete.setOnClickListener {
             // We are assuming wakeups are all on the same day
-            // and sleep times are on the previous day if pm, the next day if am
-            var sleepTime = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(binding.sleepTime.hour,binding.sleepTime.minute));
+            // and sleep times are on the previous day if pm, the next day if am.
+            // Sketchy assumption. people could sleep yesterday morning...
+            var sleepDay =  if (binding.sleepTime.hour < 12) LocalDate.now() else LocalDate.now().minusDays(1);
+            var sleepTime = LocalDateTime.of(sleepDay, LocalTime.of(binding.sleepTime.hour,binding.sleepTime.minute));
+
             var wakeupTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(binding.wakeUpTime.hour,binding.wakeUpTime.minute));
+
             surveyDO.sleepData = MTSleepData( sleepTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
                 wakeupTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             surveyDO.currentQuestionNumber += 1;
             setQuestion();
-            // sleep data is one hour ahead at the moment...
         };
         binding.optionOne.setTag(R.string.buttonIdForTag, 0);
         binding.optionTwo.setTag(R.string.buttonIdForTag, 1);
@@ -133,7 +146,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         binding.back.visibility = View.GONE;
     }
     private fun setQuestion(){
-        if(surveyDO.currentQuestionNumber == surveyQuestionNumber ){
+        if(surveyDO.currentQuestionNumber == sleepQuestionNumber ){
             // Questions finished, need sleep time
             binding.back.text = "Previous question"
             binding.prompt.text = "Sleep Quality";
@@ -217,6 +230,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
             Log.e("MDTKR_SLEEP_INTERNAL", "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
         }
+        
+    private fun showSurveyNotReady(){
+        binding.progressBar.visibility = View.GONE;
+        binding.prompt.text = "Thank you for installing! A fresh new survey will be right here tomorrow."
     }
 
     private fun handleOptionClick(v:View ) {

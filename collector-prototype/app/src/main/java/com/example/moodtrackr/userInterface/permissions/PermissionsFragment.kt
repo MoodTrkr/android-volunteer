@@ -2,6 +2,7 @@ package com.example.moodtrackr.userInterface.permissions
 
 import android.widget.TextView
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,7 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import com.example.moodtrackr.databinding.PermissionsFragmentBinding
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.example.moodtrackr.collectors.workers.util.WorkersUtil
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 
 
@@ -24,6 +22,8 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     // onDestroyView.
     private val binding get() = _binding!!
     private val collapsablePermissions: MutableList<LinearLayout> = ArrayList();
+    private var permsManager:PermissionsManager? = null;
+    private var isReviewing = false; // User is viewing the perms info after already granting it.
 
 
     override fun onCreateView(
@@ -44,17 +44,23 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
             PermissionDO("Files and Media","We want to see what you are cooking. Good recipes are always welcome.")
         )
 
-        val permsManager: PermissionsManager = PermissionsManager(this)
+        permsManager = PermissionsManager(this)
         binding.getPermissions.setOnClickListener{
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
-            permsManager.checkAllPermissions()
-            if (!permsManager.allPermissionsGranted()) {
-                permsManager.checkAllPermissions()
-            }
-            if(permsManager.allPermissionsGranted()){
+            if(permsManager!!.allBasicPermissionsGranted()){
                 switchFragment()
+            }else{
+                permsManager!!.checkAllBasicPermissions()
             }
+
+        }
+
+        if(permsManager!!.allBasicPermissionsGranted()){
+            binding.getPermissions.text = "Next"
+            isReviewing = true
+        }else{
+            binding.getPermissions.text = "Grant Permissions"
         }
 
 
@@ -133,12 +139,14 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         return view;
     }
 
-    private fun generatePermissionOption(activity: FragmentActivity, permission: PermissionDO){
-
-    }
-
-    private fun handleOptionClick(v:View ) {
-
+    override fun onResume() {
+        super.onResume()
+        if(permsManager!!.allBasicPermissionsGranted()){
+            if(!isReviewing)
+            {
+                switchFragment()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -147,7 +155,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     }
     private fun switchFragment() {
         try {
-            val fragment = SuperPermissionsFragment()
+            val fragment = BatteryPermissionsFragment();
             val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
             fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
                 .commit()
