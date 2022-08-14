@@ -1,5 +1,7 @@
 package com.example.moodtrackr.userInterface.permissions
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import androidx.fragment.app.FragmentManager
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.databinding.SinglePermissionFragmentBinding
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
@@ -45,7 +48,7 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
 
         binding.grant.setOnClickListener{
             if(isReviewing){
-                switchFragment()
+                (activity as MainActivity).switchFragment(SurveyFragment());
             }
 
             if(!permsManager!!.isUsageAccessGranted()) {
@@ -60,7 +63,7 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
         if(permsManager!!.isUsageAccessGranted()){
             if(!isReviewing)
             {
-                switchFragment()
+                (activity as MainActivity).switchFragment(SurveyFragment());
             }
         }
     }
@@ -68,18 +71,5 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-
-    private fun switchFragment() {
-        try {
-            WorkersUtil.queueAll(requireContext().applicationContext)
-            val fragment = SurveyFragment()
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

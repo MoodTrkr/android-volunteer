@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.R.id.*
 import com.example.moodtrackr.auth.Auth0Manager
@@ -144,10 +145,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
 
     private fun switchFragment() {
         try {
-            val fragment = if (permissionsManager.allBasicPermissionsGranted()) SurveyFragment() else PermissionsFragment()
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(fragment_container_view, fragment)
-                .commit()
+            (activity as MainActivity).guardedRedirect(null)
         } catch (e: Exception) {
             e.printStackTrace()
         }

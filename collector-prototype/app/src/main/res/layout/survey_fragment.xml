@@ -6,7 +6,9 @@
     android:layout_marginTop="30dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+
+    android:id="@+id/survey">
 
 <!--     For later...-->
 <!--    <LinearLayout-->
@@ -41,10 +43,12 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="20dp"
-        android:layout_height="20dp" />
+        android:layout_height="20dp"
+        app:trackCornerRadius="2dp"/>
 
     <LinearLayout
         style = "@style/simpleCard"
+        android:minHeight="600dp"
         >
         <!-- Circular progress indicator -->
         <com.google.android.material.progressindicator.CircularProgressIndicator
@@ -73,9 +77,10 @@
             <ImageView
                 android:id="@+id/meme"
                 android:layout_width="wrap_content"
-                android:layout_height="400dp"
+                android:layout_height="300dp"
                 android:padding="0dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
 
                  />
         </LinearLayout>
@@ -114,6 +119,7 @@
             android:id="@+id/sleepData"
             android:layout_marginBottom="10dp"
             >
+
             <TextView
                 style = "@style/darkText"
                 android:id="@+id/sleepPrompt"
@@ -144,6 +150,10 @@
                 android:id="@+id/complete"
                 android:text= "Complete survey"
                 style="@style/MiddleOptionButton" />
+            <Button
+                android:id="@+id/noSleep"
+                android:text= "I did not sleep"
+                style="@style/MiddleOptionButton" />
 
         </LinearLayout>
 
@@ -152,16 +162,24 @@
             android:id="@+id/back"
             style="@style/clickableTextDark"
             android:text="Previous Question" />
+        <Button
+            android:id="@+id/restart"
+            android:text= "Redo survey"
+            android:visibility="gone"
+            style="@style/MiddleOptionButton" />
 
 
 
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/navigationPopupButton"
+        android:backgroundTint="@color/dark_blue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="-20dp"
+        android:layout_marginBottom="16dp"
         android:onClick="showPopup"
         app:srcCompat="@drawable/baseline_settings_black_24dp" />
 

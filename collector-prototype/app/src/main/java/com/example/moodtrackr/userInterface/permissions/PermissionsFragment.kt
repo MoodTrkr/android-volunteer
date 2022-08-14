@@ -2,7 +2,6 @@ package com.example.moodtrackr.userInterface.permissions
 
 import android.widget.TextView
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,8 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import com.example.moodtrackr.databinding.PermissionsFragmentBinding
-import androidx.fragment.app.FragmentManager
+import com.example.moodtrackr.MainActivity
+import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.util.PermissionsManager
 
 
@@ -49,7 +49,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
             if(permsManager!!.allBasicPermissionsGranted()){
-                switchFragment()
+                (activity as MainActivity).switchFragment(BatteryPermissionsFragment());
             }else{
                 permsManager!!.checkAllBasicPermissions()
             }
@@ -94,13 +94,13 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
             permButton.setBackgroundResource(R.drawable.bordered_box);
             permButton.setPadding(dpAsPixels,dpAsPixels,dpAsPixels,dpAsPixels);
             permButton.setOnClickListener {
-                if(  dropDownContainer.visibility == View.VISIBLE){
-                    dropDownContainer.visibility = View.GONE
+                if( dropDownContainer.visibility == View.VISIBLE){
+                    Animations.collapse(dropDownContainer)
                 }else{
                     for(dropDown in collapsablePermissions){
-                        dropDown.visibility = View.GONE
+                        Animations.collapse(dropDown)
                     }
-                    dropDownContainer.visibility = View.VISIBLE;
+                    Animations.expand(dropDownContainer)
                 }
             };
 
@@ -144,7 +144,7 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         if(permsManager!!.allBasicPermissionsGranted()){
             if(!isReviewing)
             {
-                switchFragment()
+                (activity as MainActivity).switchFragment(BatteryPermissionsFragment());
             }
         }
     }
@@ -152,15 +152,5 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun switchFragment() {
-        try {
-            val fragment = BatteryPermissionsFragment();
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }
