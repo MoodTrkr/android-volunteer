@@ -104,6 +104,7 @@ class Auth0Manager(context: Context) {
                         false)
                     SharedPreferencesStorage(context).remove(context.resources.getString(R.string.auth0_user_metadata))
                     SharedPreferencesStorage(context).remove(context.resources.getString(R.string.token_refresh))
+                    SharedPreferencesStorage(context).remove(context.resources.getString(R.string.token_expiry))
                 }
 
                 override fun onFailure(error: AuthenticationException) {
