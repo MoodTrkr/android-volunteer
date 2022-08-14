@@ -371,7 +371,7 @@ class SleepExtractor {
          *      the starting time code as well as the stop timecode, indicating
          *      the range in time where the person is asleep
          * */
-        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long> >{
+        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long>>{
             val deferred = CompletableDeferred<Pair<Long, Long>>()
             CoroutineScope(Dispatchers.Default).launch {
                 val appUsageToday = loadAppUsage(days_offset, ctx)

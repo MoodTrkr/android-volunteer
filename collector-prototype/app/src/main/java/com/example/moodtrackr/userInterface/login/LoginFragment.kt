@@ -57,7 +57,7 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
 
     private fun switchFragment() {
         try {
-            (activity as MainActivity).guardedRedirect(null)
+          (activity as MainActivity).guardedRedirect(null)
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -1,4 +1,6 @@
 package com.example.moodtrackr.userInterface.survey
+
+import android.content.Context
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
@@ -18,13 +20,16 @@ import com.example.moodtrackr.databinding.SurveyFragmentBinding
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
+import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import java.sql.Date
 import java.time.*
+import java.util.*
 import kotlin.math.ceil
 
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
@@ -53,6 +58,8 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         _binding = SurveyFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        //begin computing sleep time bounds
+        sleepBoundsCompute()
 
         // Change this when we have sleep data
         val currentSurveyDate = LocalDateTime.now().minusDays(1)
@@ -333,6 +340,25 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         }
         else if (surveyDO.currentQuestionNumber == completeQuestionNumber){
             // survey is finished
+
+            binding.loading.visibility= View.VISIBLE;
+            var surveyData =  surveyDO.getSurveyData();
+            surveyComplete = true;
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val appContext: Context = requireContext().applicationContext
+                usageRecord?.complete = true
+                usageRecord?.surveyData = surveyData
+                usageRecordsDao.update(usageRecord!!)
+                RestClient.safeApiCall(
+                    appContext,
+                    Dispatchers.IO,
+                    RestClient.getInstance(appContext)::insertUsageData,
+                    DatesUtil.getYesterdayTruncated().time,
+                    usageRecord!!
+                )
+            }
+            binding.loading.visibility= View.GONE;
             transitionToComplete()
         }
         else if(surveyDO.currentQuestionNumber == 0){
@@ -369,6 +395,22 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
     }
 
+    private fun sleepBoundsCompute() {
+        val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
+        job.invokeOnCompletion {
+            val pair = job.getCompleted()
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = pair.first
+            binding.sleepTime.hour = cal.get(Calendar.HOUR)
+            binding.sleepTime.minute = cal.get(Calendar.MINUTE)
+            Log.e("MDTKR_SLEEP_INTERNAL", "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+
+            cal.timeInMillis = pair.second
+            binding.wakeUpTime.hour = cal.get(Calendar.HOUR)
+            binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
+            Log.e("MDTKR_SLEEP_INTERNAL", "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+        }
+        
     private fun showSurveyNotReady(){
         binding.progressBar.visibility = View.GONE;
         binding.prompt.text = "Thank you for installing! A fresh new survey will be right here tomorrow."

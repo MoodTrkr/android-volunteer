@@ -123,7 +123,8 @@ interface RestClient : UsageDataRoutes {
                         when (def.second) {
                             2 -> queueRequest(context, inp1, inp2)
                             4 -> {
-                                Auth0Manager.refreshCredentials(context)
+                                Log.e("MT_REST", "ATTEMPTING REFRESH")
+                                Auth0Manager(context).refreshCredentials()
                                 queueRequest(context, inp1, inp2)
                             }
                         }
