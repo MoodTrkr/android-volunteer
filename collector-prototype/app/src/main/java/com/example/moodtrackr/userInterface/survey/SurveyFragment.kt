@@ -1,4 +1,5 @@
 package com.example.moodtrackr.userInterface.survey
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,12 +16,15 @@ import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.SurveyFragmentBinding
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
+import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import okhttp3.Dispatcher
 import java.sql.Date
 import java.time.*
+import java.util.*
 import kotlin.math.ceil
 import kotlin.random.Random
 
@@ -49,6 +53,9 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     ): View? {
         _binding = SurveyFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
+
+        //begin computing sleep time bounds
+        sleepBoundsCompute()
 
         // Change this when we have sleep data
         val currentSurveyDate = LocalDateTime.now().minusDays(1)
@@ -141,11 +148,18 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             var surveyData =  surveyDO.getSurveyData();
             surveyComplete = true;
 
-            runBlocking {
-                launch{
-                    usageRecord!!.surveyData = surveyData;
-                    usageRecordsDao.update(usageRecord!!)
-                }
+            CoroutineScope(Dispatchers.IO).launch {
+                val appContext: Context = requireContext().applicationContext
+                usageRecord?.complete = true
+                usageRecord?.surveyData = surveyData
+                usageRecordsDao.update(usageRecord!!)
+                RestClient.safeApiCall(
+                    appContext,
+                    Dispatchers.IO,
+                    RestClient.getInstance(appContext)::insertUsageData,
+                    DatesUtil.getYesterdayTruncated().time,
+                    usageRecord!!
+                )
             }
             binding.loading.visibility= View.GONE;
             showSurveyComplete();
@@ -186,6 +200,23 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         binding.options.visibility = View.GONE;
         binding.sleepData.visibility = View.GONE;
         binding.back.text = "Redo Survey";
+    }
+
+    private fun sleepBoundsCompute() {
+        val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
+        job.invokeOnCompletion {
+            val pair = job.getCompleted()
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = pair.first
+            binding.sleepTime.hour = cal.get(Calendar.HOUR)
+            binding.sleepTime.minute = cal.get(Calendar.MINUTE)
+            Log.e("MDTKR_SLEEP_INTERNAL", "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+
+            cal.timeInMillis = pair.second
+            binding.wakeUpTime.hour = cal.get(Calendar.HOUR)
+            binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
+            Log.e("MDTKR_SLEEP_INTERNAL", "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+        }
     }
 
     private fun handleOptionClick(v:View ) {

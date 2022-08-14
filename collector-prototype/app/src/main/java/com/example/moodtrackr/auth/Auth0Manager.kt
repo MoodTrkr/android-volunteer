@@ -103,6 +103,7 @@ class Auth0Manager(context: Context) {
                     SharedPreferencesStorage(context).store(context.resources.getString(R.string.setup_status_identifier),
                         false)
                     SharedPreferencesStorage(context).remove(context.resources.getString(R.string.auth0_user_metadata))
+                    SharedPreferencesStorage(context).remove(context.resources.getString(R.string.token_refresh))
                 }
 
                 override fun onFailure(error: AuthenticationException) {
@@ -213,6 +214,7 @@ class Auth0Manager(context: Context) {
                                credentialsManager: CredentialsManager) {
             val refreshToken = SharedPreferencesStorage(context)
                 .retrieveString(context.resources.getString(R.string.token_refresh))
+            Log.e("MDTKR_AUTH", "refreshToken_Refresh_Credentials: $refreshToken")
             if (refreshToken != null) {
                 val account = Auth0(
                     context.resources.getString(R.string.com_auth0_clientId),
@@ -223,12 +225,14 @@ class Auth0Manager(context: Context) {
                     .start(object: Callback<Credentials, AuthenticationException> {
                         override fun onFailure(exception: AuthenticationException) {
                             // Error
+                            Log.e("MDTKR_AUTH", "${exception.message}: ${exception.getCode()}\n ${exception.getDescription()}")
                         }
 
                         override fun onSuccess(credentials: Credentials) {
                             // Use the credentials
+                            Log.e("MDTKR_AUTH","LOGGED IN")
                             credentialsManager.saveCredentials(credentials)
-                            retrieveAccessToken(context, credentialsManager)
+                            refreshAccessToken(context, credentialsManager)
                         }
                     })
             }
@@ -244,12 +248,37 @@ class Auth0Manager(context: Context) {
                     }
                     override fun onSuccess(result: Credentials) {
                         // We have the user's credentials!
+                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
                             result.accessToken)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
                             result.expiresAt.time)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_refresh),
                             result.refreshToken)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_user_id),
+                            result.user.getId())
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.login_status_identifier),
+                            true)
+                    }
+                })
+            }
+        }
+
+        fun refreshAccessToken(context: Context, credentialsManager: CredentialsManager) {
+            // With the access token, call `userInfo` and get the profile from Auth0.
+            runBlocking {
+                credentialsManager.getCredentials(object: Callback<Credentials, CredentialsManagerException> {
+                    override fun onFailure(exception: CredentialsManagerException) {
+                        // Something went wrong!
+                        Log.e("DEBUG", "Failed to refresh credentials: $exception")
+                    }
+                    override fun onSuccess(result: Credentials) {
+                        // We have the user's credentials!
+                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
+                            result.accessToken)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
+                            result.expiresAt.time)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_user_id),
                             result.user.getId())
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.login_status_identifier),

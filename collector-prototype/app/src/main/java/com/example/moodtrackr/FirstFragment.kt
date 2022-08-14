@@ -167,12 +167,8 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
         binding.sleepBoundsBtn.setOnClickListener {
             val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
             job.invokeOnCompletion {
-                Log.e("MDTKR_SLEEP_EXT", it.toString())
+                Log.e("MDTKR_SLEEP_EXT", "${job.getCompleted().toString()}")
             }
-            runBlocking {
-                job.await()
-            }
-            Log.e("MDTKR_SLEEP_EXT", job.getCompleted().toString())
         }
 
         binding.getUsageObjBtn.setOnClickListener {
