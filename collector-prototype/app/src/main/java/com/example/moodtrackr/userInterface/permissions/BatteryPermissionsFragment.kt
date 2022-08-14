@@ -1,5 +1,7 @@
 package com.example.moodtrackr.userInterface.permissions
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import androidx.fragment.app.FragmentManager
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.databinding.SinglePermissionFragmentBinding
 import com.example.moodtrackr.util.PermissionsManager
@@ -44,7 +47,7 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
 
         binding.grant.setOnClickListener{
             if(isReviewing){
-                switchFragment()
+                (activity as MainActivity).switchFragment(AppUsagePermissionsFragment());
             }
             var isBatteryOptDisabled = permsManager!!.isIgnoringBatteryOptimizations()
             if(!isBatteryOptDisabled) {
@@ -59,7 +62,7 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
         if(permsManager!!.isIgnoringBatteryOptimizations()){
             if(!isReviewing)
             {
-                switchFragment()
+                (activity as MainActivity).switchFragment(AppUsagePermissionsFragment());
             }
         }
     }
@@ -67,16 +70,5 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun switchFragment() {
-        try {
-            WorkersUtil.queueAll(requireContext().applicationContext)
-            val fragment = AppUsagePermissionsFragment()
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

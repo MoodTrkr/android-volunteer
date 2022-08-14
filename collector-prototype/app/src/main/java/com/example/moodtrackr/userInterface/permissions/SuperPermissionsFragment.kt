@@ -14,7 +14,7 @@ import com.example.moodtrackr.databinding.SuperPermissionsFragmentBinding
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 
-
+// Class is unused, only for reference!
 class SuperPermissionsFragment  : Fragment(R.layout.super_permissions_fragment) {
 
     private var _binding: SuperPermissionsFragmentBinding? = null

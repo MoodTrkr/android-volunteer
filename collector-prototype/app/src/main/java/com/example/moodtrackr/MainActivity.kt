@@ -1,5 +1,7 @@
 package com.example.moodtrackr
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,7 @@ import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
+import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
 import com.example.moodtrackr.userInterface.permissions.AppUsagePermissionsFragment
@@ -27,7 +30,6 @@ import com.example.moodtrackr.userInterface.permissions.BatteryPermissionsFragme
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
-import com.example.moodtrackr.userInterface.permissions.SuperPermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 
 class MainActivity : AppCompatActivity() {
@@ -96,6 +98,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    fun guardedRedirect(savedInstanceState: Bundle?){
+        val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
+            this.applicationContext.resources.getString(
+                R.string.login_status_identifier))
+        val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
+            this.applicationContext.resources.getString(
+                R.string.setup_status_identifier))
+        val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
+        val usagePermsGranted = permsManager.isUsageAccessGranted()
+
+        val enableDebugging = true
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            when {
+                loginStatus != true -> switchFragment(LoginFragment())
+                setupStatus != true -> switchFragment(DemoFragment())
+                !permsManager.allBasicPermissionsGranted() -> switchFragment(PermissionsFragment())
+                !batteryPermsGranted -> switchFragment(BatteryPermissionsFragment())
+                !usagePermsGranted -> switchFragment(AppUsagePermissionsFragment())
+                savedInstanceState == null -> switchFragment(SurveyFragment())
+            }
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -119,13 +144,26 @@ class MainActivity : AppCompatActivity() {
                 || super.onSupportNavigateUp()
     }
 
-    private fun switchFragment(fragment:Fragment) {
-        try {
-            val fragmentManager: FragmentManager = supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
+    fun switchFragment(fragment:Fragment) {
+        binding.fragmentContainerView.apply {
+            alpha = 1f
+            visibility = View.VISIBLE
+
+            animate()
+                .alpha(0f)
+                .setDuration(300)
+                .setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        try {
+                            val fragmentManager: FragmentManager = supportFragmentManager
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
+                                .commit()
+                            Animations.fadeIn(400,binding.fragmentContainerView)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                })
         }
     }
 
@@ -153,10 +191,6 @@ class MainActivity : AppCompatActivity() {
         val inflater: MenuInflater = popup.menuInflater
         inflater.inflate(R.menu.navigation_popup, popup.menu)
         popup.show()
-    }
-
-    fun goToDev() {
-        switchFragment(FirstFragment())
     }
 
     companion object {

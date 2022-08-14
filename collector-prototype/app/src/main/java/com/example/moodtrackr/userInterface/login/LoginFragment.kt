@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.FirstFragment
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.LoginFragmentBinding
@@ -56,22 +57,7 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
 
     private fun switchFragment() {
         try {
-            val setupStatus = SharedPreferencesStorage(requireContext().applicationContext).retrieveBoolean(
-                requireContext().applicationContext.resources.getString(
-                    R.string.setup_status_identifier))
-            Log.e("DEBUG", "SETUP STATUS: $setupStatus")
-            var fragment: Fragment = if (!permissionsManager.allBasicPermissionsGranted()) {
-                PermissionsFragment()
-            }
-            else if (setupStatus == true) {
-                FirstFragment()
-            }
-            else {
-                DemoFragment()
-            }
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
+            (activity as MainActivity).guardedRedirect(null)
         } catch (e: Exception) {
             e.printStackTrace()
         }
