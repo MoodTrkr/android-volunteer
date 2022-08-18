@@ -418,13 +418,13 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         job.invokeOnCompletion {
             val pair = job.getCompleted()
             val cal = Calendar.getInstance()
-            cal.timeInMillis = pair.first
+            cal.timeInMillis = pair!!.first
             binding.sleepTime.hour = cal.get(Calendar.HOUR)
             binding.sleepTime.minute = cal.get(Calendar.MINUTE)
             Log.e("MDTKR_SLEEP_INTERNAL",
                 "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
 
-            cal.timeInMillis = pair.second
+            cal.timeInMillis = pair!!.second
             binding.wakeUpTime.hour = cal.get(Calendar.HOUR)
             binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
             Log.e("MDTKR_SLEEP_INTERNAL",
