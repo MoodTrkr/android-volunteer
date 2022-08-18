@@ -314,11 +314,11 @@ class SleepExtractor {
          *
          * */
         fun sleepWakeBoundsFromActivity(app_activity: MutableList<Float>,
-                            time_codes: MutableList<Long>) : Pair<Long, Long> {
+                            time_codes: MutableList<Long>) : Pair<Long, Long>? {
 
 
             val regions = getCandidateRegions(app_activity, thresh=0.1F)
-            val start_stop_idx = computeBounds(regions)
+            val start_stop_idx = computeBounds(regions) ?: return null
 
             Log.e("TIMECODES", Pair(time_codes[start_stop_idx!!.first], time_codes[start_stop_idx!!.second]).toString())
             return Pair(time_codes[start_stop_idx!!.first], time_codes[start_stop_idx!!.second])
@@ -342,7 +342,7 @@ class SleepExtractor {
          *      the starting time code as well as the stop timecode, indicating
          *      the range in time where the person is asleep
          * */
-        fun computeSleepBounds(days_offset: Int, ctx: Context) : Pair<Long, Long> {
+        fun computeSleepBounds(days_offset: Int, ctx: Context) : Pair<Long, Long>? {
             val appUsageToday = loadAppUsage(days_offset, ctx)
             val appUsageYesterday = loadAppUsage(days_offset-1, ctx)
 
@@ -371,8 +371,8 @@ class SleepExtractor {
          *      the starting time code as well as the stop timecode, indicating
          *      the range in time where the person is asleep
          * */
-        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long>>{
-            val deferred = CompletableDeferred<Pair<Long, Long>>()
+        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long>?>{
+            val deferred = CompletableDeferred<Pair<Long, Long>?>()
             CoroutineScope(Dispatchers.Default).launch {
                 val appUsageToday = loadAppUsage(days_offset, ctx)
                 val appUsageYesterday = loadAppUsage(days_offset-1, ctx)
