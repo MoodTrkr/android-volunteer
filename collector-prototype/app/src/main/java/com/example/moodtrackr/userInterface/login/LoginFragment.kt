@@ -57,22 +57,7 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
 
     private fun switchFragment() {
         try {
-            val setupStatus = SharedPreferencesStorage(requireContext().applicationContext).retrieveBoolean(
-                requireContext().applicationContext.resources.getString(
-                    R.string.setup_status_identifier))
-            Log.e("DEBUG", "SETUP STATUS: $setupStatus")
-            var fragment: Fragment = if (!permissionsManager.allPermissionsGranted()) {
-                PermissionsFragment()
-            }
-            else if (setupStatus == true) {
-                FirstFragment()
-            }
-            else {
-                DemoFragment()
-            }
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
+          (activity as MainActivity).guardedRedirect(null)
         } catch (e: Exception) {
             e.printStackTrace()
         }

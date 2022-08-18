@@ -10,10 +10,8 @@ import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import com.example.moodtrackr.R
 import com.example.moodtrackr.databinding.PermissionsFragmentBinding
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import com.example.moodtrackr.collectors.workers.util.WorkersUtil
-import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.MainActivity
+import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.util.PermissionsManager
 
 
@@ -24,6 +22,8 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
     // onDestroyView.
     private val binding get() = _binding!!
     private val collapsablePermissions: MutableList<LinearLayout> = ArrayList();
+    private var permsManager:PermissionsManager? = null;
+    private var isReviewing = false; // User is viewing the perms info after already granting it.
 
 
     override fun onCreateView(
@@ -35,26 +35,30 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         val view = binding.root
 
         var permissions = arrayOf(
-            PermissionDO("Call logs", "We look at call logs to measure the number of " +
-                    "incoming and outgoing calls. Information about who is being called and what is " +
+            PermissionDO("Call logs", "We look at call logs to measure social interaction through the number of " +
+                    "incoming and outgoing calls. Information about what is " +
                     "being said is never recorded "),
-            PermissionDO("Usage Data","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Location","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Physical Activity","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Files and Media","We want to see what you are cooking. Good recipes are always welcome.")
+            PermissionDO("Location","We only use location a single time for demographic information on account setup."),
+            PermissionDO("Physical Activity","Our app logs your daily steps to get a feel for how physically active you are."),
         )
 
-        val permsManager: PermissionsManager = PermissionsManager(this)
+        permsManager = PermissionsManager(this)
         binding.getPermissions.setOnClickListener{
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
-            permsManager.checkAllPermissions()
-            if (!permsManager.allPermissionsGranted()) {
-                permsManager.checkAllPermissions()
+            if(permsManager!!.allBasicPermissionsGranted()){
+                (activity as MainActivity).switchFragment(BatteryPermissionsFragment());
+            }else{
+                permsManager!!.checkAllBasicPermissions()
             }
-            if(permsManager.allPermissionsGranted()){
-                switchFragment()
-            }
+
+        }
+
+        if(permsManager!!.allBasicPermissionsGranted()){
+            binding.getPermissions.text = "Next"
+            isReviewing = true
+        }else{
+            binding.getPermissions.text = "Grant Permissions"
         }
 
 
@@ -88,13 +92,13 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
             permButton.setBackgroundResource(R.drawable.bordered_box);
             permButton.setPadding(dpAsPixels,dpAsPixels,dpAsPixels,dpAsPixels);
             permButton.setOnClickListener {
-                if(  dropDownContainer.visibility == View.VISIBLE){
-                    dropDownContainer.visibility = View.GONE
+                if( dropDownContainer.visibility == View.VISIBLE){
+                    Animations.collapse(dropDownContainer)
                 }else{
                     for(dropDown in collapsablePermissions){
-                        dropDown.visibility = View.GONE
+                        Animations.collapse(dropDown)
                     }
-                    dropDownContainer.visibility = View.VISIBLE;
+                    Animations.expand(dropDownContainer)
                 }
             };
 
@@ -133,26 +137,18 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         return view;
     }
 
-    private fun generatePermissionOption(activity: FragmentActivity, permission: PermissionDO){
-
-    }
-
-    private fun handleOptionClick(v:View ) {
-
+    override fun onResume() {
+        super.onResume()
+        if(permsManager!!.allBasicPermissionsGranted()){
+            if(!isReviewing)
+            {
+                (activity as MainActivity).switchFragment(BatteryPermissionsFragment());
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun switchFragment() {
-        try {
-            val fragment = SuperPermissionsFragment()
-            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                .commit()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 }

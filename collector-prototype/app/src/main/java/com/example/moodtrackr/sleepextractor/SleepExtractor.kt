@@ -1,6 +1,7 @@
 package com.example.moodtrackr.sleepextractor
 
 import android.content.Context
+import android.util.Log
 import com.example.moodtrackr.collectors.db.DBHelper
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.util.DatesUtil
@@ -144,7 +145,7 @@ class SleepExtractor {
          *          y: list of corresponding application activity
          * */
         fun appStatsToTimeSeries(app_stats: MutableMap<String, Pair<MutableList<Long>, MutableList<Int> > >)
-            :Pair<MutableList<Long>, MutableList<Int> > {
+            :Pair<MutableList<Long>, MutableList<Float> > {
             // First, store all timecodes of all apps
             // into a single mutable list
             var x = mutableListOf<Long>()
@@ -152,10 +153,16 @@ class SleepExtractor {
                 for (timecode in app_stats[entry.key]!!.first) {
                     x.add(timecode)
                 }
+                for (state in app_stats[entry.key]!!.second) { //TODO delete
+//                    Log.e("App Y1...Yn", state.toString())
+                }
             }
 
             var first = (x.minOrNull() ?: 0).toLong() / 1000L * 1000L
             var last = (x.maxOrNull() ?: 0).toLong() / 1000L * 1000L
+
+            Log.e("FIRST", first.toString())
+            Log.e("LAST", last.toString())
 
             var bins = mutableMapOf<Long, Int>()
 
@@ -176,10 +183,12 @@ class SleepExtractor {
             // x: time, which is a sorted list of time steps
             // y: values, which are the occurrences at each time step
             var times = bins.keys.sorted()
-            var values = mutableListOf<Int>()
+            var values = mutableListOf<Float>()
             for (time in times) {
-                values.add(bins[time]!!)
+                values.add(bins[time]!!.toFloat())
             }
+
+            Log.e("VALUES BEFORE MOVING AVERAGE", values.toString()) //TODO delete
 
 
 
@@ -199,7 +208,7 @@ class SleepExtractor {
          * @returns candidate_regions: MutableList<Boolean>:
          *      A boolean mask corresponding to app_activity
          * */
-        fun getCandidateRegions(app_activity: MutableList<Int>, thresh: Float) : MutableList<Boolean> {
+        fun getCandidateRegions(app_activity: MutableList<Float>, thresh: Float) : MutableList<Boolean> {
 
             // define bounds and thresholding cutoff
             val maxMin = maxmin(app_activity)
@@ -212,8 +221,12 @@ class SleepExtractor {
             val candidateRegions = mutableListOf<Boolean>()
             // create boolean mask
             for (i in app_activity.indices) {
-                candidateRegions.add(app_activity[i]!! < dbound)
+                candidateRegions.add(app_activity[i] < dbound)
             }
+
+            Log.e("APP ACTIVITY", app_activity.toString())
+
+
             return candidateRegions
         }
 
@@ -228,11 +241,15 @@ class SleepExtractor {
          *      as well as to the activity array) that indicate the start and stop of the
          *      sleep interval.
          * */
-        fun computeBounds(x: MutableList<Boolean>) : Pair<Int, Int> {
+        fun computeBounds(x: MutableList<Boolean>) : Pair<Int, Int>? {
             var longestIdx = 0
             val ranges = mutableListOf<Pair<Int, Int> >()
             var sectionStart = -1
             var sectionEnd = -1
+
+            for (i in x.indices) {
+                Log.e("X", x[i].toString())
+            }
 
             for (i in x.indices) {
                 if (x[i]) {
@@ -271,7 +288,14 @@ class SleepExtractor {
                     }
                 }
             }
-            return ranges[longestIdx]
+            try {
+                Log.e("BOUNDS", ranges[longestIdx].toString())
+                return ranges[longestIdx]
+            } catch (e: Exception) {
+                Log.e("ranges[longestIdx] not found", e.toString())
+                return null
+            }
+
         }
 
         /**
@@ -289,13 +313,14 @@ class SleepExtractor {
          *      starting time code, ending time code
          *
          * */
-        fun sleepWakeBoundsFromActivity(app_activity: MutableList<Int>,
+        fun sleepWakeBoundsFromActivity(app_activity: MutableList<Float>,
                             time_codes: MutableList<Long>) : Pair<Long, Long> {
 
 
             val regions = getCandidateRegions(app_activity, thresh=0.1F)
-            val start_stop_idx = computeBounds(regions)
+            val start_stop_idx = computeBounds(regions) ?: return Pair(0L, 0L)
 
+            Log.e("TIMECODES", Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second]).toString())
             return Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second])
         }
 
@@ -346,7 +371,7 @@ class SleepExtractor {
          *      the starting time code as well as the stop timecode, indicating
          *      the range in time where the person is asleep
          * */
-        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long> >{
+        fun computeSleepBoundsAsync(days_offset: Int, ctx: Context) : CompletableDeferred<Pair<Long, Long>>{
             val deferred = CompletableDeferred<Pair<Long, Long>>()
             CoroutineScope(Dispatchers.Default).launch {
                 val appUsageToday = loadAppUsage(days_offset, ctx)
@@ -378,12 +403,12 @@ class SleepExtractor {
          * @param window_size: Int:
          *      How many elements of the array to average across
          * */
-        fun movingAverage(seq: List<Int>, window_size: Int): MutableList<Int> {
-            val y = mutableListOf<Int>(0)
+        fun movingAverage(seq: List<Float>, window_size: Int): MutableList<Float> {
+            val y = mutableListOf(0.0F)
             val b = 1.0-1.0/(window_size).toFloat()
 
             for (i in 1 until seq.size) {
-                y.add((b * (y[i-1].toFloat()) + (1-b) * seq[i].toFloat()).toInt())
+                y.add((b * (y[i-1].toFloat()) + (1-b) * seq[i].toFloat()).toFloat())
             }
 
             return y

@@ -23,6 +23,12 @@
             android:text="@string/hello_first_fragment" />
 
         <Button
+            android:id="@+id/sleep_bounds_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calculate Sleep Bounds" />
+
+        <Button
             android:id="@+id/button_first"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

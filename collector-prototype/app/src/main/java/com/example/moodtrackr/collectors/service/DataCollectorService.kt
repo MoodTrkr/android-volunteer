@@ -96,7 +96,7 @@ class DataCollectorService : Service() {
             .setContentTitle(TITLE)
             .setTicker(TITLE)
             .setContentText("Unlocks: ${state.first} | Steps: ${state.second}")
-            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(createNotifContext())

@@ -1,47 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="30dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
-        android:id="@+id/linearLayout5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
-        app:layout_constraintEnd_toStartOf="@+id/linearLayout4"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/linearLayout4"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout4">
-
-        <Button
-            android:id="@+id/loginBtn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            tools:layout_conversion_absoluteHeight="40dp"
-            tools:layout_conversion_absoluteWidth="161dp"
-            tools:layout_editor_absoluteX="125dp"
-            tools:layout_editor_absoluteY="243dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout4"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:orientation="vertical">
+    <TextView
+        style = "@style/largeHeader"
+        android:id="@+id/largeHeader"
+        android:textSize="80dp"
+        android:text="Thanks!"
+        android:includeFontPadding="false"
+        android:layout_marginBottom="0dp"
+        android:paddingBottom="0dp"/>
+    <TextView
+        style = "@style/subHeader"
+        android:id="@+id/subtitle"
+        android:text="Our app is nothing without it's users"
+        android:textSize="20dp"
+        android:layout_marginBottom="40dp"/>
+    <Button
+        android:id="@+id/loginBtn"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/meme"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout_conversion_absoluteHeight="673dp"
-            tools:layout_conversion_absoluteWidth="411dp"
-            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:layout_height="wrap_content"
+        android:text="Login"
+        tools:layout_conversion_absoluteHeight="40dp"
+        tools:layout_conversion_absoluteWidth="161dp"
+        tools:layout_editor_absoluteX="125dp"
+        tools:layout_editor_absoluteY="243dp" />
+</LinearLayout>
 
 
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
