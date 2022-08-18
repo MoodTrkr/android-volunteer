@@ -11,6 +11,7 @@ import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
+import com.example.moodtrackr.router.data.MTUsageDataStamped
 import com.example.moodtrackr.router.queue.ReportRequestQueue
 import com.example.moodtrackr.router.routes.UsageDataRoutes
 import com.example.moodtrackr.util.ConnectivityUtil
@@ -191,7 +192,7 @@ interface RestClient : UsageDataRoutes {
                                 dispatcher,
                                 RestClient.getInstance(context)::insertUsageData,
                                 DatesUtil.getYesterdayTruncated().time,
-                                Gson().fromJson(it.payload, MTUsageData::class.java)
+                                Gson().fromJson(it.payload, MTUsageDataStamped::class.java)
                             )
                         }
                         else -> null
