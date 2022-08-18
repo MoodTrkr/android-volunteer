@@ -23,6 +23,12 @@
             android:text="@string/hello_first_fragment" />
 
         <Button
+            android:id="@+id/sleep_bounds_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calculate Sleep Bounds" />
+
+        <Button
             android:id="@+id/button_first"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,6 +57,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Push" />
+
+        <Button
+            android:id="@+id/refreshUserBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh User" />
+
+        <Button
+            android:id="@+id/metadataBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Metadata" />
+
+        <Button
+            android:id="@+id/surveyBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Return to Survey" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

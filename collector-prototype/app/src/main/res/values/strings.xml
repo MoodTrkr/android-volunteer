@@ -17,6 +17,39 @@
     <string name="com_auth0_clientId">HSMJ0SyYwxlfXh9IKhYMTYYekMe62qmU</string>
     <string name="com_auth0_clientSecret">Z0kLtmA7uy77hE6MCqe4jqdzIXX_i5ph5LDT8Rm8Kwp1QDp8vkkGZ5K26COhd51B</string>
     <string name="restApiUrl">https://mdtkr-volunteer.herokuapp.com/</string>
-    <string name="com_auth0_audience">https://quickstarts/mdtkr-api-rest</string>
-    <string name="token_identifier">AUTH0_TOKEN</string>
+    <string name="com_auth0_audience">https://dev-dh23pufb.us.auth0.com/api/v2/</string>
+    <string name="token_identifier">MDTKR_AUTH0_TOKEN</string>
+    <string name="token_expiry">MDTKR_AUTH0_TOK_EXPIRY</string>
+    <string name="token_refresh">MDTKR_AUTH0_REFRESH_TOKEN</string>
+    <string name="token_user_id">MDTKR_AUTH0_USER_ID</string>
+
+    <string name="demographics_title">Let\'s get you set up!</string>
+    <string name="dobPrompt">Date of Birth</string>
+    <string name="genderPrompt">Gender</string>
+    <string name="racePrompt">Race</string>
+    <string name="login_status_identifier">MDTKR_LOGIN_IDENTIFIER</string>
+    <string name="setup_status_identifier">MDTKR_SETUP_IDENTIFIER</string>
+    <string name="auth0_user_metadata">MDTKR_AUTH0_USER_METADATA</string>
+    <string name="com_auth0_scope">openid profile email offline_access read:current_user update:current_user_metadata</string>
+    <string name="mdtkr_prev_query">MDTKR_PREV_PERIODIC_COLL</string>
+    <string name="permissionsTitle">Read App Usage Permissions</string>
+    <string name="batteryPermissionsTitle">Protection From Battery Optimization</string>
+    <string name="failurePermsTxtMsg">Permissions has not been provided!</string>
+    <string name="surveyNotifSent">was_survey_requested</string>
+
+    <string-array name="genderOptions">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Intersex</item>
+        <item>Trans</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="raceOptions">
+        <item>White</item>
+        <item>Black or African American</item>
+        <item>American Indian or Alaska Native</item>
+        <item>Asian</item>
+        <item>Native Hawaiian or Other Pacific Islander</item>
+        <item>Other</item>
+    </string-array>
 </resources>

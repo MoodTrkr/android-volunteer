@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
@@ -21,11 +23,15 @@ import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.router.data.MTUsageDataStamped
 import com.example.moodtrackr.router.util.CompressionUtil
+import com.example.moodtrackr.sleepextractor.SleepExtractor
+import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.FileWriter
@@ -36,7 +42,7 @@ import java.io.FileWriter
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(R.layout.fragment_first) {
     private lateinit var auth0Manager: Auth0Manager
     private var _binding: FragmentFirstBinding? = null
 
@@ -58,6 +64,7 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val permsManager: PermissionsManager = PermissionsManager(this)
+        //permsManager.checkAllPermissions()
 
         binding.buttonFirst.setOnClickListener {
 //            if (savedInstanceState == null) {
@@ -87,9 +94,6 @@ class FirstFragment : Fragment() {
 
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()
-
-            val geoExtractor = GeoDataExtractor(activity, permsManager)
-            val loc = geoExtractor.getLoc()
 
             val screenOnTime: Long = DatesUtil.yesterdayQueryWrapper( usageExtractor::screenOnTimeQuery ) as Long
             Log.e("DEBUG", "Screen Time: $screenOnTime")
@@ -150,19 +154,63 @@ class FirstFragment : Fragment() {
             }
             Log.e("DEBUG", "Pushing to Server!")
             runBlocking {
-                usage?.let { it -> restClient.insertUsageData(
-                    DatesUtil.getYesterdayTruncated().time,
-                    it
-                ) }
+                usage?.let {
+                    val stamped = MTUsageDataStamped.stampUsageData(
+                        requireContext().applicationContext, it)
+                    RestClient.safeApiCall(
+                        requireContext().applicationContext,
+                        Dispatchers.Default,
+                        restClient::insertUsageData,
+                        DatesUtil.getYesterdayTruncated().time,
+                        stamped
+                    )}
             }
         }
+
+        binding.sleepBoundsBtn.setOnClickListener {
+            val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
+            job.invokeOnCompletion {
+                Log.e("MDTKR_SLEEP_EXT", "${job.getCompleted().toString()}")
+            }
+        }
+
         binding.getUsageObjBtn.setOnClickListener {
             val restClient = RestClient.getInstance(requireContext().applicationContext)
             Log.e("DEBUG", "Getting from Server!")
             runBlocking {
-                val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
+                //val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
+                val get = RestClient.safeApiCall(
+                    requireContext().applicationContext,
+                    Dispatchers.Default,
+                    restClient::getUsageData,
+                    DatesUtil.getYesterdayTruncated().time
+                    )
                 Log.e("DEBUG", "Server Results: $get")
             }
+        }
+
+        binding.refreshUserBtn.setOnClickListener { auth0Manager.refreshCredentials() }
+        binding.metadataBtn.setOnClickListener {
+            auth0Manager.getUserMetadata()
+            val metadata = SharedPreferencesStorage(requireContext().applicationContext).retrieveString(
+                requireContext().applicationContext.resources.getString(
+                    R.string.auth0_user_metadata))
+            Log.e("DEBUG", "$metadata")
+
+        }
+
+        binding.surveyBtn.setOnClickListener {
+            switchFragment(SurveyFragment());
+        }
+    }
+
+    private fun switchFragment(fragment:Fragment) {
+        try {
+            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
+            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
+                .commit()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

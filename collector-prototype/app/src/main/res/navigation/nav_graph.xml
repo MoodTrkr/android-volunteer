@@ -9,20 +9,42 @@
         android:id="@+id/FirstFragment"
         android:name="com.example.moodtrackr.FirstFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
-
+        tools:layout="@layout/fragment_first"/>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.moodtrackr.MainActivity"
+        android:label="MainActivity" />
+    <fragment
+        android:id="@+id/surveyFragment"
+        android:name="com.example.moodtrackr.userInterface.survey.SurveyFragment"
+        android:label="SurveyFragment" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.moodtrackr.userInterface.login.LoginFragment"
+        android:label="LoginFragment" >
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_loginFragment_to_demoFragment"
+            app:destination="@id/demoFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.example.moodtrackr.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
-
+        android:id="@+id/demoFragment"
+        android:name="com.example.moodtrackr.userInterface.demographics.DemoFragment"
+        android:label="DemoFragment" >
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_demoFragment_to_permissionsFragment"
+            app:destination="@id/permissionsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/permissionsFragment"
+        android:name="com.example.moodtrackr.userInterface.permissions.PermissionsFragment"
+        android:label="PermissionsFragment" >
+        <action
+            android:id="@+id/action_permissionsFragment_to_superPermissionsFragment"
+            app:destination="@id/superPermissionsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/superPermissionsFragment"
+        android:name="com.example.moodtrackr.userInterface.permissions.SuperPermissionsFragment"
+        android:label="SuperPermissionsFragment" />
+    <action android:id="@+id/action_global_surveyFragment" app:destination="@id/surveyFragment" />
 </navigation>

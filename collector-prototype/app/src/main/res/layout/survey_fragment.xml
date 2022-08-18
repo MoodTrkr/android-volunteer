@@ -1,103 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginTop="30dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+
+    android:id="@+id/survey">
+
+<!--     For later...-->
+<!--    <LinearLayout-->
+
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:gravity="center">-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style ="@style/subHeader"-->
+<!--            android:paddingRight="10dp"-->
+<!--            android:text = "0">-->
+
+<!--        </TextView>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style ="@style/subHeader"-->
+<!--            android:text = "day streak">-->
+
+<!--        </TextView>-->
+<!--    </LinearLayout>-->
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:progress="0"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="20dp"
+        android:layout_height="20dp"
+        app:trackCornerRadius="2dp"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="@integer/one"
+        style = "@style/simpleCard"
+        android:minHeight="600dp"
         >
+        <!-- Circular progress indicator -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="@integer/one"
             >
             <TextView
+                style = "@style/subHeader"
                 android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="@string/survey_title"
-                android:textSize="15dp" />
+               />
             <TextView
+                style = "@style/regularHeader"
                 android:id="@+id/prompt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Question"
-                android:textSize="30dp" />
+                android:layout_marginBottom="30dp"/>
 
             <ImageView
                 android:id="@+id/meme"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                android:layout_height="300dp"
+                android:padding="0dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+
+                 />
         </LinearLayout>
 
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="@integer/one"
+            style = "@style/defaultColLinLayout"
             android:id="@+id/options"
+            android:layout_marginBottom="10dp"
             >
             <Button
                 android:id="@+id/optionOne"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton"
+                android:backgroundTint="#71ADEA"/>
 
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionTwo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton"
+              />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionThree"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionFour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionFive"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
             <Button
-                android:textAllCaps="false"
                 android:id="@+id/optionSix"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout_editor_absoluteX="151dp"
-                tools:layout_editor_absoluteY="300dp" />
+                style="@style/MiddleOptionButton" />
 
         </LinearLayout>
+        <LinearLayout
+            style = "@style/defaultColLinLayout"
+            android:id="@+id/sleepData"
+            android:layout_marginBottom="10dp"
+            >
+
+            <TextView
+                style = "@style/darkText"
+                android:id="@+id/sleepPrompt"
+                android:text="When did you sleep last night?"
+                android:layout_marginBottom="30dp"/>
+            <TimePicker
+                android:timePickerMode = "spinner"
+                android:id="@+id/sleepTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="time" />
+            <TextView
+                style = "@style/darkText"
+                android:id="@+id/wakeupPrompt"
+                android:text="When did you wake up this morning?"
+                android:layout_marginBottom="30dp"/>
+            <TimePicker
+                android:timePickerMode = "spinner"
+                android:id="@+id/wakeUpTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="time" />
+            <Button
+                android:id="@+id/complete"
+                android:text= "Complete survey"
+                style="@style/MiddleOptionButton" />
+            <Button
+                android:id="@+id/noSleep"
+                android:text= "I did not sleep"
+                style="@style/MiddleOptionButton" />
+
+        </LinearLayout>
+
+
         <TextView
             android:id="@+id/back"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Previous Question"
-            android:textSize="30dp" />
+            style="@style/clickableTextDark"
+            android:text="Previous Question" />
+        <Button
+            android:id="@+id/restart"
+            android:text= "Redo survey"
+            android:visibility="gone"
+            style="@style/MiddleOptionButton" />
+
 
 
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/navigationPopupButton"
+        android:backgroundTint="@color/dark_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="-20dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="showPopup"
+        app:srcCompat="@drawable/baseline_settings_black_24dp" />
+
+
+</LinearLayout>
+

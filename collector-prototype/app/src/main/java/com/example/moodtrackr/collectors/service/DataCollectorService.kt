@@ -1,9 +1,6 @@
 package com.example.moodtrackr.collectors.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -13,6 +10,9 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavDeepLinkBuilder
+import com.auth0.android.authentication.storage.SharedPreferencesStorage
+import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.db.DBHelperRT
 import com.example.moodtrackr.db.realtime.RTUsageRecord
@@ -76,10 +76,18 @@ class DataCollectorService : Service() {
     private fun createChannel() {
         // Create the NotificationChannel
         val descriptionText = "Used by Mood Tracker"
-        val importance = NotificationManager.IMPORTANCE_HIGH
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
         val mChannel = NotificationChannel(NOTIF_ID.toString(), TITLE, importance)
         mChannel.description = descriptionText
         notificationManager.createNotificationChannel(mChannel)
+    }
+
+    private fun createNotifContext(): PendingIntent {
+        return NavDeepLinkBuilder(context)
+            .setComponentName(MainActivity::class.java)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.surveyFragment)
+            .createPendingIntent()
     }
 
     private fun createNotif(state: Pair<Long, Long>): NotificationCompat.Builder {
@@ -88,12 +96,16 @@ class DataCollectorService : Service() {
             .setContentTitle(TITLE)
             .setTicker(TITLE)
             .setContentText("Unlocks: ${state.first} | Steps: ${state.second}")
-            .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+            .setSmallIcon(R.drawable.ic_stat_name)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
+            .setContentIntent(createNotifContext())
     }
 
     private fun getState(): Pair<Long, Long> {
+        tokenExpiry = SharedPreferencesStorage(context)
+            .retrieveLong(context.resources.getString(R.string.token_expiry))
+
         val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
         localUnlocks = record.unlocks
         localSteps = record.steps
@@ -112,6 +124,7 @@ class DataCollectorService : Service() {
     companion object {
         val TITLE: String = "MDTKR"
         val NOTIF_ID: Int = 1000
+        var tokenExpiry: Long? = null
 
         var localSteps: Long = 0 //meant to be updated by StepsCountExtractor
         var localUnlocks: Long = 0 //meant to be updated by UnlocksReceiver

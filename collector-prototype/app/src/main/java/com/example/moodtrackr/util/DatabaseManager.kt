@@ -6,12 +6,14 @@ import androidx.room.RoomDatabase
 import com.example.moodtrackr.db.AppDatabase
 import com.example.moodtrackr.db.realtime.RTUsageRecordsDAO
 import com.example.moodtrackr.db.records.UsageRecordsDAO
+import com.example.moodtrackr.db.router.RouterRequestsDAO
 
 class DatabaseManager() {
     companion object {
         @Volatile private var db: AppDatabase? = null
         lateinit var usageRecordsDAO : UsageRecordsDAO
         lateinit var rtUsageRecordsDAO : RTUsageRecordsDAO
+        lateinit var routerRequestsDAO: RouterRequestsDAO
 
         fun getInstance(context: Context): AppDatabase {
             return db ?: synchronized(this) {
@@ -30,6 +32,7 @@ class DatabaseManager() {
                 .build()
             usageRecordsDAO = db!!.usageRecordsDAO
             rtUsageRecordsDAO = db!!.rtUsageRecordsDAO
+            routerRequestsDAO = db!!.routerRequestsDAO
             return db
         }
     }
