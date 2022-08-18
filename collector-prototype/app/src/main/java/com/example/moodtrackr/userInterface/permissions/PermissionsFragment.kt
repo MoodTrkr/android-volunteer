@@ -35,13 +35,11 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         val view = binding.root
 
         var permissions = arrayOf(
-            PermissionDO("Call logs", "We look at call logs to measure the number of " +
-                    "incoming and outgoing calls. Information about who is being called and what is " +
+            PermissionDO("Call logs", "We look at call logs to measure social interaction through the number of " +
+                    "incoming and outgoing calls. Information about what is " +
                     "being said is never recorded "),
-            PermissionDO("Usage Data","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Location","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Physical Activity","We want to see what you are cooking. Good recipes are always welcome."),
-            PermissionDO("Files and Media","We want to see what you are cooking. Good recipes are always welcome.")
+            PermissionDO("Location","We only use location a single time for demographic information on account setup."),
+            PermissionDO("Physical Activity","Our app logs your daily steps to get a feel for how physically active you are."),
         )
 
         permsManager = PermissionsManager(this)

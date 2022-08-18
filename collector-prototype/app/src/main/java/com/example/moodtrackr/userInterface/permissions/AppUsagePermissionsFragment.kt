@@ -44,8 +44,9 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
         }
 
         binding.largeHeader.text = "App Usage";
-        binding.explanation.text = "Um dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id es";
-
+        binding.explanation.text = " Our app logs this information to build correlations between mood and the apps people are using."+
+                " We also use it to look for a connection between screen time and mood."+
+                "You will remain anonymous and your data will never be viewed directly."
         binding.grant.setOnClickListener{
             if(isReviewing){
                 (activity as MainActivity).switchFragment(SurveyFragment());

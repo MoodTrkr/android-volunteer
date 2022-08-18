@@ -35,6 +35,7 @@ import kotlin.math.ceil
 class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
     private var _binding: SurveyFragmentBinding? = null
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -47,8 +48,8 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     private var completeQuestionNumber: Int = 0;
     private var sleepQuestionNumber: Int = 0;
 
-    private val imageIds = arrayOf(R.drawable.cute_animal_0,R.drawable.cute_animal_1,
-        R.drawable.cute_animal_2, R.drawable.cute_animal_3 )
+    private val imageIds = arrayOf(R.drawable.cute_animal_0, R.drawable.cute_animal_1,
+        R.drawable.cute_animal_2, R.drawable.cute_animal_3)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,8 +67,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         var convertedDate = Date.from(currentSurveyDate.atZone(ZoneId.systemDefault()).toInstant());
         convertedDate = DatesUtil.truncateDate(convertedDate);
 
-        usageRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).usageRecordsDAO;
-        var rtRecordsDao = DatabaseManager.getInstance(requireActivity().applicationContext).rtUsageRecordsDAO;
+        usageRecordsDao =
+            DatabaseManager.getInstance(requireActivity().applicationContext).usageRecordsDAO;
+        var rtRecordsDao =
+            DatabaseManager.getInstance(requireActivity().applicationContext).rtUsageRecordsDAO;
         var rtRecord: RTUsageRecord?;
         runBlocking {
             usageRecord = usageRecordsDao.getObjOnDay(convertedDate.time)
@@ -77,32 +80,33 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         surveyDO = SurveyDO();
         completeQuestionNumber = surveyDO.questionDOS.size + 1
         sleepQuestionNumber = surveyDO.questionDOS.size
-        if(rtRecord == null){
+        if (rtRecord == null) {
             // we start creating rtRecords on the day the app is first installed.
             clearCard();
             showSurveyNotReady();
-        }else{
+        } else {
             surveyComplete = usageRecord?.surveyData?.complete
 
-            if( surveyComplete == true){
+            if (surveyComplete == true) {
                 // survey is complete!
                 showSurveyComplete()
-            }else {
+            } else {
                 setQuestion();
             }
         }
 
-        binding.noSleep.setOnClickListener{
+        binding.noSleep.setOnClickListener {
             var sleepDateTime = LocalDateTime.now()
-            surveyDO.sleepData = MTSleepData( sleepDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-                sleepDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            surveyDO.sleepData =
+                MTSleepData(sleepDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+                    sleepDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             surveyDO.currentQuestionNumber += 1;
             setQuestion();
         }
-        binding.restart.setOnClickListener{
+        binding.restart.setOnClickListener {
             surveyDO = SurveyDO()
-            Animations.fadeToGone(400,binding.meme)
-            Animations.fadeToGone(400,binding.restart)
+            Animations.fadeToGone(400, binding.meme)
+            Animations.fadeToGone(400, binding.restart)
             Animations.fadeIn(400, binding.progressBar)
             binding.prompt.apply {
                 alpha = 1f
@@ -147,13 +151,17 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             // We are assuming wakeups are all on the same day
             // and sleep times are on the previous day if pm, the next day if am.
             // Sketchy assumption. people could sleep yesterday morning...
-            var sleepDay =  if (binding.sleepTime.hour < 12) LocalDate.now() else LocalDate.now().minusDays(1);
-            var sleepTime = LocalDateTime.of(sleepDay, LocalTime.of(binding.sleepTime.hour,binding.sleepTime.minute));
+            var sleepDay =
+                if (binding.sleepTime.hour < 12) LocalDate.now() else LocalDate.now().minusDays(1);
+            var sleepTime = LocalDateTime.of(sleepDay,
+                LocalTime.of(binding.sleepTime.hour, binding.sleepTime.minute));
 
-            var wakeupTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(binding.wakeUpTime.hour,binding.wakeUpTime.minute));
+            var wakeupTime = LocalDateTime.of(LocalDate.now(),
+                LocalTime.of(binding.wakeUpTime.hour, binding.wakeUpTime.minute));
 
-            surveyDO.sleepData = MTSleepData( sleepTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-                wakeupTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            surveyDO.sleepData =
+                MTSleepData(sleepTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+                    wakeupTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
             surveyDO.currentQuestionNumber += 1;
             setQuestion();
         };
@@ -167,13 +175,14 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         return view;
     }
 
-    private fun clearCard(){
+    private fun clearCard() {
         binding.sleepData.visibility = View.GONE;
         binding.meme.visibility = View.GONE;
         binding.options.visibility = View.GONE;
         binding.back.visibility = View.GONE;
     }
-    private fun setQuestionData(){
+
+    private fun setQuestionData() {
         binding.back.text = "Previous question"
         binding.meme.visibility = View.GONE;
         binding.sleepData.visibility = View.GONE;
@@ -189,14 +198,15 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
 
         binding.prompt.text = currentQuestion.prompt;
 
-        if(surveyDO.currentQuestionNumber == 0){
+        if (surveyDO.currentQuestionNumber == 0) {
             binding.back.visibility = View.GONE;
             binding.progressBar.setProgress(0);
         }
     }
-    private fun transitionQuestion(){
-        Animations.fadeToInvisible(400,binding.options)
-        Animations.fadeToInvisible(400,binding.back)
+
+    private fun transitionQuestion() {
+        Animations.fadeToInvisible(400, binding.options)
+        Animations.fadeToInvisible(400, binding.back)
         binding.prompt.apply {
             // Set the content view to 0% opacity but visible, so that it is visible
             // (but fully transparent) during the animation.
@@ -217,9 +227,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                 })
         }
     }
-    private fun transitionToSleep(){
-        Animations.fadeToGone(400,binding.options)
-        Animations.fadeToInvisible(400,binding.back)
+
+    private fun transitionToSleep() {
+        Animations.fadeToGone(400, binding.options)
+        Animations.fadeToInvisible(400, binding.back)
         binding.prompt.apply {
             // Set the content view to 0% opacity but visible, so that it is visible
             // (but fully transparent) during the animation.
@@ -240,10 +251,11 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                 })
         }
     }
-    private fun transitionToComplete(){
-        Animations.fadeToGone(400,binding.sleepData)
+
+    private fun transitionToComplete() {
+        Animations.fadeToGone(400, binding.sleepData)
         Animations.fadeToInvisible(300, binding.progressBar)
-        Animations.fadeToInvisible(400,binding.back)
+        Animations.fadeToInvisible(400, binding.back)
         binding.prompt.apply {
             // Set the content view to 0% opacity but visible, so that it is visible
             // (but fully transparent) during the animation.
@@ -264,9 +276,10 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                 })
         }
     }
-    private fun transitionSleepToQuestion(){
-        Animations.fadeToGone(400,binding.sleepData)
-        Animations.fadeToInvisible(400,binding.back)
+
+    private fun transitionSleepToQuestion() {
+        Animations.fadeToGone(400, binding.sleepData)
+        Animations.fadeToInvisible(400, binding.back)
         binding.prompt.apply {
             // Set the content view to 0% opacity but visible, so that it is visible
             // (but fully transparent) during the animation.
@@ -287,25 +300,28 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                 })
         }
     }
-    private fun setSleepPageData(){
+
+    private fun setSleepPageData() {
         binding.back.text = "Previous question"
         binding.prompt.text = "Sleep Quality";
         clearCard();
     }
-    private fun setCompletePageData(){
-        binding.loading.visibility= View.VISIBLE;
-        var surveyData =  surveyDO.getSurveyData();
+
+    private fun setCompletePageData() {
+        binding.loading.visibility = View.VISIBLE;
+        var surveyData = surveyDO.getSurveyData();
         surveyComplete = true;
 
         runBlocking {
-            launch{
+            launch {
                 usageRecord!!.surveyData = surveyData;
                 usageRecordsDao.update(usageRecord!!)
             }
         }
-        binding.loading.visibility= View.GONE;
+        binding.loading.visibility = View.GONE;
     }
-    private fun showQuestion(){
+
+    private fun showQuestion() {
 
         binding.optionOne.alpha = 0f
         binding.optionTwo.alpha = 0f
@@ -314,8 +330,8 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         binding.optionFive.alpha = 0f
         binding.optionSix.alpha = 0f
         binding.options.alpha = 1f
-        binding.options.visibility=View.VISIBLE
-        Animations.fadeInStaggered(400,120,listOf(
+        binding.options.visibility = View.VISIBLE
+        Animations.fadeInStaggered(400, 120, listOf(
             binding.prompt,
             binding.optionOne,
             binding.optionTwo,
@@ -323,26 +339,29 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             binding.optionFour,
             binding.optionFive,
             binding.optionSix,
-            binding.back,))
+            binding.back,
+        ))
     }
-    private fun showSleepPage(){
-        Animations.fadeInStaggered(400,120,listOf(
+
+    private fun showSleepPage() {
+        Animations.fadeInStaggered(400, 120, listOf(
             binding.prompt,
             binding.sleepData,
             binding.complete,
             binding.noSleep,
-            binding.back,))
+            binding.back,
+        ))
     }
-    private fun setQuestion(){
-        if(surveyDO.currentQuestionNumber == sleepQuestionNumber ){
+
+    private fun setQuestion() {
+        if (surveyDO.currentQuestionNumber == sleepQuestionNumber) {
             // Questions finished, need sleep time
             transitionToSleep()
-        }
-        else if (surveyDO.currentQuestionNumber == completeQuestionNumber){
+        } else if (surveyDO.currentQuestionNumber == completeQuestionNumber) {
             // survey is finished
 
-            binding.loading.visibility= View.VISIBLE;
-            var surveyData =  surveyDO.getSurveyData();
+            binding.loading.visibility = View.VISIBLE;
+            var surveyData = surveyDO.getSurveyData();
             surveyComplete = true;
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -358,30 +377,29 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                     usageRecord!!
                 )
             }
-            binding.loading.visibility= View.GONE;
+            binding.loading.visibility = View.GONE;
             transitionToComplete()
-        }
-        else if(surveyDO.currentQuestionNumber == 0){
+        } else if (surveyDO.currentQuestionNumber == 0) {
             setQuestionData()
             showQuestion()
-        }
-        else if(surveyDO.currentQuestionNumber == sleepQuestionNumber-1){
+        } else if (surveyDO.currentQuestionNumber == sleepQuestionNumber - 1) {
             transitionSleepToQuestion()
-        }
-        else{
-            if(binding.progressBar.visibility == View.INVISIBLE){
-                Animations.fadeIn(300,binding.progressBar)
+        } else {
+            if (binding.progressBar.visibility == View.INVISIBLE) {
+                Animations.fadeIn(300, binding.progressBar)
             }
             transitionQuestion();
         }
 
-        val progressPercent = (ceil(surveyDO.currentQuestionNumber*100.00/(surveyDO.questionDOS.size + 1)).toInt());
+        val progressPercent =
+            (ceil(surveyDO.currentQuestionNumber * 100.00 / (surveyDO.questionDOS.size + 1)).toInt());
         ObjectAnimator.ofInt(binding.progressBar, "progress", progressPercent)
             .setDuration(300)
             .start();
-        binding.loading.visibility= View.GONE;
+        binding.loading.visibility = View.GONE;
         (activity as MainActivity?)!!.scrollToTop();
-        Log.e("DEBUG", "showing question "+surveyDO.currentQuestionNumber.toString())
+        Log.e("DEBUG", "showing question " + surveyDO.currentQuestionNumber.toString())
+
     }
     private fun showSurveyComplete(){
         clearCard()
@@ -403,13 +421,16 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             cal.timeInMillis = pair.first
             binding.sleepTime.hour = cal.get(Calendar.HOUR)
             binding.sleepTime.minute = cal.get(Calendar.MINUTE)
-            Log.e("MDTKR_SLEEP_INTERNAL", "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+            Log.e("MDTKR_SLEEP_INTERNAL",
+                "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
 
             cal.timeInMillis = pair.second
             binding.wakeUpTime.hour = cal.get(Calendar.HOUR)
             binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
-            Log.e("MDTKR_SLEEP_INTERNAL", "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
+            Log.e("MDTKR_SLEEP_INTERNAL",
+                "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
         }
+    }
         
     private fun showSurveyNotReady(){
         binding.progressBar.visibility = View.GONE;
@@ -427,35 +448,5 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    fun showPopup(v: View) {
-        val popup = PopupMenu(activity, v)
-
-        val inflater: MenuInflater = popup.menuInflater
-        inflater.inflate(R.menu.navigation_popup, popup.menu)
-        popup.show()
-    }
-
-    private fun switchFragment(fragment:Fragment) {
-        binding.survey.apply {
-            alpha = 1f
-            visibility = View.VISIBLE
-
-            animate()
-                .alpha(0f)
-                .setDuration(400)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        try {
-                            val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container_view, fragment)
-                                .commit()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-                })
-        }
     }
 }
