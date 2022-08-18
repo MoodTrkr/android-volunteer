@@ -21,6 +21,7 @@ import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.router.RestClient
+import com.example.moodtrackr.router.data.MTUsageDataStamped
 import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.util.DatabaseManager
@@ -374,7 +375,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
                     Dispatchers.IO,
                     RestClient.getInstance(appContext)::insertUsageData,
                     DatesUtil.getYesterdayTruncated().time,
-                    usageRecord!!
+                    MTUsageDataStamped.stampUsageData(appContext, usageRecord!!)
                 )
             }
             binding.loading.visibility = View.GONE;

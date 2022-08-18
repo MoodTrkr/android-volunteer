@@ -19,10 +19,11 @@ data class MTUsageDataStamped(
     var periodicCollBook: PeriodicCollectionBook = PeriodicCollectionBook(),
     var dailyCollection: DailyCollection = DailyCollection(),
     var surveyData: SurveyData = SurveyData(),
-    var demographics: Map<String, Any>
+    var demographics: Map<String, Any>,
+    var phoneDetails: Map<String, String>
 )
 {
-    constructor(): this(Date().time, false, PeriodicCollectionBook(), DailyCollection(), SurveyData(), mapOf<String, Any>())
+    constructor(): this(Date().time, false, PeriodicCollectionBook(), DailyCollection(), SurveyData(), mapOf<String, Any>(), mapOf<String, String>())
     companion object {
         private fun getDemographics(context: Context): Map<String, Any> {
             val demographicsStr = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.auth0_user_metadata))
@@ -39,6 +40,16 @@ data class MTUsageDataStamped(
             usageDataStamped.dailyCollection = usageData.dailyCollection
             usageDataStamped.surveyData = usageData.surveyData
             usageDataStamped.demographics = getDemographics(context)
+
+            var phoneDetails = mutableMapOf<String, String>()
+
+            phoneDetails["SDK_INT"] = android.os.Build.VERSION.SDK_INT.toString()
+            phoneDetails["DEVICE"] = android.os.Build.DEVICE.toString()
+            phoneDetails["MODEL"] = android.os.Build.MODEL.toString()
+            phoneDetails["PRODUCT"] = android.os.Build.PRODUCT.toString()
+
+            usageDataStamped.phoneDetails = phoneDetails
+
             return usageDataStamped
         }
     }
