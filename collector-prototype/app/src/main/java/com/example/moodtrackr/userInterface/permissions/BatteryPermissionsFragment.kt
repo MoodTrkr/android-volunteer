@@ -43,7 +43,8 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
         }
 
         binding.largeHeader.text = "Battery";
-        binding.explanation.text = "If battery optimization is enabled on your device, our persistent notification may stop unexpectedly. um dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id es";
+        binding.explanation.text = "Our app needs battery optimization to be disabled on your device to ensure our application does not stop unexpectedly."+
+            "Android is great at keeping your battery topped up, but it can suddenly stop apps even if they use very little power."
 
         binding.grant.setOnClickListener{
             if(isReviewing){
