@@ -30,12 +30,13 @@ class StreamDownloader {
                             break
                         }
                         bytesRead += bytes
-                        worker.updateProgress((100*(bytesRead/totalBytes)).toInt())
+                        worker.updateProgress((bytesRead/1000000).toInt())
                         output.write(buffer, 0, bytes)
                     }
                     output.flush()
                 }
                 SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_update_downloaded), true)
+                worker.completeNotification()
                 return path
             } catch (e:Exception) {
                 Log.e("saveFile", e.toString())

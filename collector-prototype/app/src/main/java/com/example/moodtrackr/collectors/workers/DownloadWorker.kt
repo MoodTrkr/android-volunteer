@@ -1,6 +1,5 @@
 package com.example.moodtrackr.collectors.workers
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -30,8 +29,8 @@ class DownloadWorker(context: Context, parameters: WorkerParameters) :
         val outputFile = inputData.getString(KEY_OUTPUT_FILE_NAME)
             ?: return Result.failure()
         // Mark the Worker as important
-        val progress = "Starting Download"
-        setForeground(createForegroundInfo(progress))
+        val desc = "Starting Download"
+        setForeground(createForegroundInfo(desc))
         Log.e("MDTKR_REST", "DOWNLOADING, $inputUrl, $outputFile")
         download(inputUrl, outputFile)
         return Result.success()
@@ -45,7 +44,7 @@ class DownloadWorker(context: Context, parameters: WorkerParameters) :
     }
     // Creates an instance of ForegroundInfo which can be used to update the
     // ongoing notification.
-    private fun createForegroundInfo(progress: String): ForegroundInfo {
+    private fun createForegroundInfo(text: String): ForegroundInfo {
         val id = MainActivity.DOWNLOAD_SERVICE_NOTIF_ID
         val title = MainActivity.TITLE
         val cancel = "Cancel Download"
@@ -60,7 +59,7 @@ class DownloadWorker(context: Context, parameters: WorkerParameters) :
         builder = NotificationCompat.Builder(applicationContext, "$id")
             .setContentTitle(title)
             .setTicker(title)
-            .setContentText(progress)
+            .setContentText(text)
             .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -81,14 +80,18 @@ class DownloadWorker(context: Context, parameters: WorkerParameters) :
         notificationManager.createNotificationChannel(mChannel)
     }
 
-    fun updateProgress(percentage: Int) {
-        Log.e("MDTKR_REST", "Download Percentage: $percentage")
-        builder.setProgress(100, percentage, false)
+    fun updateProgress(downloaded: Int) {
+        builder.setContentText("Downloaded: ${downloaded}MB")
         notificationManager.notify(MainActivity.DOWNLOAD_SERVICE_NOTIF_ID, builder.build())
     }
 
     fun cancelNotification() {
         notificationManager.cancel(MainActivity.DOWNLOAD_SERVICE_NOTIF_ID)
+    }
+
+    fun completeNotification() {
+        builder.setContentText("Completed Download!")
+        notificationManager.notify(MainActivity.DOWNLOAD_SERVICE_NOTIF_ID, builder.build())
     }
 
     companion object {
