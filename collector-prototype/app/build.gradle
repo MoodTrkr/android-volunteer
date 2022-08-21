@@ -68,4 +68,6 @@ dependencies {
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$roomVersion")
 
+    implementation 'com.github.javiersantos:AppUpdater:2.7'
+
 }

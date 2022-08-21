@@ -137,6 +137,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
         metadata["GENDER"] = gender
         if (country != null) metadata["COUNTRY"] = country!! else metadata["COUNTRY"] = "NULL"
         metadata["DOB"] = cal.let { it -> DatesUtil.truncateDate(it.time) }.time.toString()
+
         Auth0Manager.updateUserMetadata(requireContext().applicationContext, metadata.toImmutableMap())
         deferred.complete(true)
 
