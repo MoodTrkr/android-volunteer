@@ -19,16 +19,16 @@ class NotifUpdateUtil {
         fun updateNotif(context: Context) {
             val notificationManager = context.getSystemService(Service.NOTIFICATION_SERVICE) as
                     NotificationManager
-            val builder = NotificationCompat.Builder(context, DataCollectorService.NOTIF_ID.toString())
-                .setContentTitle(DataCollectorService.TITLE)
-                .setTicker(DataCollectorService.TITLE)
+            val builder = NotificationCompat.Builder(context, MainActivity.PRIMARY_SERVICE_NOTIF_ID.toString())
+                .setContentTitle(MainActivity.TITLE)
+                .setTicker(MainActivity.TITLE)
                 .setContentText("Unlocks: ${DataCollectorService.localUnlocks} | Steps: ${DataCollectorService.localSteps}")
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                 .setOngoing(true)
                 .setContentIntent(createNotifContext(context))
                 .setOnlyAlertOnce(true)
             createChannel(notificationManager)
-            notificationManager.notify(DataCollectorService.NOTIF_ID, builder.build())
+            notificationManager.notify(MainActivity.PRIMARY_SERVICE_NOTIF_ID, builder.build())
         }
 
         private fun createNotifContext(context: Context): PendingIntent {
@@ -42,7 +42,7 @@ class NotifUpdateUtil {
         private fun createChannel(notificationManager: NotificationManager) {
             val descriptionText = "Used by Mood Tracker"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(DataCollectorService.NOTIF_ID.toString(), DataCollectorService.TITLE, importance)
+            val mChannel = NotificationChannel(MainActivity.PRIMARY_SERVICE_NOTIF_ID.toString(), MainActivity.TITLE, importance)
             mChannel.description = descriptionText
             notificationManager.createNotificationChannel(mChannel)
         }

@@ -195,5 +195,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val SURVEY_NOTIF_CLICKED = "survey_notif"
+        val TITLE: String = "MDTKR"
+        val PRIMARY_SERVICE_NOTIF_ID: Int = 1000
+        val SURVEY_NOTIF_ID: Int = 1005
+        val DOWNLOAD_SERVICE_NOTIF_ID: Int = 1010
     }
 }

@@ -30,6 +30,7 @@ import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
+import com.example.moodtrackr.util.UpdateManager
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -170,23 +171,12 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
         binding.sleepBoundsBtn.setOnClickListener {
             val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
             job.invokeOnCompletion {
-                Log.e("MDTKR_SLEEP_EXT", "${job.getCompleted().toString()}")
+                Log.e("MDTKR_SLEEP_EXT", job.getCompleted().toString())
             }
         }
 
-        binding.getUsageObjBtn.setOnClickListener {
-            val restClient = RestClient.getInstance(requireContext().applicationContext)
-            Log.e("DEBUG", "Getting from Server!")
-            runBlocking {
-                //val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
-                val get = RestClient.safeApiCall(
-                    requireContext().applicationContext,
-                    Dispatchers.Default,
-                    restClient::getUsageData,
-                    DatesUtil.getYesterdayTruncated().time
-                    )
-                Log.e("DEBUG", "Server Results: $get")
-            }
+        binding.checkForUpdatesBtn.setOnClickListener {
+            UpdateManager.checkForUpdates(requireContext())
         }
 
         binding.refreshUserBtn.setOnClickListener { auth0Manager.refreshCredentials() }

@@ -14,9 +14,6 @@ import com.example.moodtrackr.collectors.service.DataCollectorService
 
 class SurveyNotifBuilder {
     companion object {
-        val TITLE: String = "MDTKR"
-        val NOTIF_ID: Int = 1005
-
         private fun createNotifContext(context: Context): PendingIntent {
             val bundle = Bundle()
             bundle.putBoolean(MainActivity.SURVEY_NOTIF_CLICKED, true)
@@ -31,23 +28,23 @@ class SurveyNotifBuilder {
         fun buildNotif(context: Context) {
             val notificationManager = context.getSystemService(Service.NOTIFICATION_SERVICE) as
                     NotificationManager
-            val builder = NotificationCompat.Builder(context, NOTIF_ID.toString())
-                .setContentTitle(TITLE)
-                .setTicker(TITLE)
+            val builder = NotificationCompat.Builder(context, MainActivity.SURVEY_NOTIF_ID.toString())
+                .setContentTitle(MainActivity.TITLE)
+                .setTicker(MainActivity.TITLE)
                 .setContentText("Survey for yesterday now open!")
                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
                 .setContentIntent(createNotifContext(context))
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
             createChannel(notificationManager)
-            notificationManager.notify(NOTIF_ID, builder.build())
+            notificationManager.notify(MainActivity.SURVEY_NOTIF_ID, builder.build())
 
         }
 
         private fun createChannel(notificationManager: NotificationManager) {
             val descriptionText = "Used by Mood Tracker"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel(NOTIF_ID.toString(), TITLE, importance)
+            val mChannel = NotificationChannel(MainActivity.SURVEY_NOTIF_ID.toString(), MainActivity.TITLE, importance)
             mChannel.description = descriptionText
             notificationManager.createNotificationChannel(mChannel)
         }

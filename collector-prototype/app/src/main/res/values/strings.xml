@@ -36,6 +36,7 @@
     <string name="batteryPermissionsTitle">Protection From Battery Optimization</string>
     <string name="failurePermsTxtMsg">Permissions has not been provided!</string>
     <string name="surveyNotifSent">was_survey_requested</string>
+    <string name="mdtkr_update_downloaded">MDTKR_IS_UPDATE_DOWNLOADED</string>
 
     <string-array name="genderOptions">
         <item>Male</item>
