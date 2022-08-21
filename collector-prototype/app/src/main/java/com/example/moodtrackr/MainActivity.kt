@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
 
-        val enableDebugging = true
+        val enableDebugging = false
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             //add<SurveyFragment>(R.id.fragment_container_view)
@@ -108,7 +108,6 @@ class MainActivity : AppCompatActivity() {
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
 
-        val enableDebugging = true
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             when {
@@ -120,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                 savedInstanceState == null -> switchFragment(SurveyFragment())
             }
         }
+        Log.e("DEBUG", "Switching fragment...")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -175,8 +175,8 @@ class MainActivity : AppCompatActivity() {
         val popup = PopupMenu(this, v)
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
             when(item.itemId) {
-                R.id.devButton ->
-                    switchFragment(FirstFragment())
+//                R.id.devButton ->
+//                    switchFragment(FirstFragment())
                 R.id.permissionsButton ->
                     switchFragment(PermissionsFragment())
                 R.id.logoutButton ->{
