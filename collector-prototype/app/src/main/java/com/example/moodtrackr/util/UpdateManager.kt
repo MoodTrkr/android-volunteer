@@ -61,7 +61,11 @@ class UpdateManager {
          * https://prakashnitin.medium.com/unzipping-files-in-android-kotlin-2a2a2d5eb7ae
          * */
         fun unzipFile(path:String, destDirectory:String) : Int {
-
+            File(destDirectory).run {
+                if (!exists()) {
+                    mkdirs()
+                }
+            }
             try {
                 ZipFile(path).use { zip ->
                     zip.entries().asSequence().forEach { entry ->
@@ -87,6 +91,7 @@ class UpdateManager {
                         }
                     }
                 }
+                Log.e("MDTKR_ZIP", "I think somethn worked")
                 return 0
             } catch (e: ZipException) {
                 Log.e("ZipException", e.message.toString())
