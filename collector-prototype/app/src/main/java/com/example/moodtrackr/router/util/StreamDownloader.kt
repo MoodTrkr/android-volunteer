@@ -5,7 +5,9 @@ import android.util.Log
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.R
 import com.example.moodtrackr.collectors.workers.DownloadWorker
+import com.example.moodtrackr.util.UpdateManager
 import okhttp3.ResponseBody
+import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 
@@ -35,6 +37,8 @@ class StreamDownloader {
                     }
                     output.flush()
                 }
+                val zipFile = File(path)
+                UpdateManager.unzipFile(path, zipFile.parent+"/"+zipFile.name.substring(0, zipFile.name.length-4))
                 SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_update_downloaded), true)
                 worker.completeNotification()
                 return path

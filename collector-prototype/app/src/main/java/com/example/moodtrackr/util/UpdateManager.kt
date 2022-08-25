@@ -89,12 +89,15 @@ class UpdateManager {
                 }
                 return 0
             } catch (e: ZipException) {
+                Log.e("ZipException", e.message.toString())
                 Log.e("ZipException", "Zip Decode Error")
                 return -1
             } catch (e: IOException) {
+                Log.e("IOException", e.message.toString())
                 Log.e("IOException", "File read error. Check if the file exists")
                 return -1
             } catch (e: SecurityException) {
+                Log.e("SecurityException", e.message.toString())
                 Log.e("SecurityException", "Some random security bullshit happened")
                 return -1
             }
