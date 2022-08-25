@@ -12,9 +12,13 @@ import com.github.javiersantos.appupdater.AppUpdaterUtils.UpdateListener
 import com.github.javiersantos.appupdater.enums.AppUpdaterError
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.github.javiersantos.appupdater.objects.Update
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.*
-
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 
 class UpdateManager {
     companion object {
@@ -51,6 +55,50 @@ class UpdateManager {
                     }
                 })
             appUpdaterUtils.start()
+        }
+
+        /**
+         * https://prakashnitin.medium.com/unzipping-files-in-android-kotlin-2a2a2d5eb7ae
+         * */
+        fun unzipFile(path:String, destDirectory:String) : Int {
+
+            try {
+                ZipFile(path).use { zip ->
+                    zip.entries().asSequence().forEach { entry ->
+                        zip.getInputStream(entry).use { input ->
+
+                            val filePath = destDirectory + File.separator + entry.name
+
+                            if (!entry.isDirectory) {
+                                // if the entry is a file, extracts it
+                                val bos = BufferedOutputStream(FileOutputStream(filePath))
+                                val bytesIn = ByteArray(4096)
+                                var read: Int
+                                while (input.read(bytesIn).also { read = it } != -1) {
+                                    bos.write(bytesIn, 0, read)
+                                }
+                                bos.close()
+
+                            } else {
+                                // if the entry is a directory, make the directory
+                                val dir = File(filePath)
+                                dir.mkdir()
+                            }
+                        }
+                    }
+                }
+                return 0
+            } catch (e: ZipException) {
+                Log.e("ZipException", "Zip Decode Error")
+                return -1
+            } catch (e: IOException) {
+                Log.e("IOException", "File read error. Check if the file exists")
+                return -1
+            } catch (e: SecurityException) {
+                Log.e("SecurityException", "Some random security bullshit happened")
+                return -1
+            }
+
         }
     }
 }
