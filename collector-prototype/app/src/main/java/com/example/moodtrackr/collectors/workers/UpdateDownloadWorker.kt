@@ -16,7 +16,7 @@ import com.example.moodtrackr.R
 import com.example.moodtrackr.router.RestClient
 import kotlinx.coroutines.Dispatchers
 
-class DownloadWorker(context: Context, parameters: WorkerParameters) :
+class UpdateDownloadWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
     private var context = context
     private val notificationManager =

@@ -31,6 +31,7 @@ import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.util.UpdateManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(this.applicationContext)
         }
+        UpdateManager.checkUpdatesDownloaded(this.applicationContext)
     }
     override fun onResume() {
         super.onResume()

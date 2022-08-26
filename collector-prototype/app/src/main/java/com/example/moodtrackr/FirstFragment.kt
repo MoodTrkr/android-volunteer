@@ -17,14 +17,12 @@ import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.UnlockCollector
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.calls.data.MTCallStats
-import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.router.data.MTUsageDataStamped
-import com.example.moodtrackr.router.util.CompressionUtil
 import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
@@ -191,6 +189,10 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 
         binding.surveyBtn.setOnClickListener {
             switchFragment(SurveyFragment());
+        }
+
+        binding.installUpdatesBtn.setOnClickListener {
+            UpdateManager.checkUpdatesDownloaded(requireContext().applicationContext)
         }
     }
 

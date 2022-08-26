@@ -5,7 +5,7 @@ import android.util.Log
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
-import com.example.moodtrackr.collectors.workers.DownloadWorker
+import com.example.moodtrackr.collectors.workers.UpdateDownloadWorker
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
@@ -22,10 +22,8 @@ import kotlinx.coroutines.*
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.HttpException
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
@@ -171,7 +169,7 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
             }
         }
 
-        suspend fun safeUpdateDownload(worker: DownloadWorker, context: Context, dispatcher: CoroutineDispatcher, url: String, path: String) {
+        suspend fun safeUpdateDownload(worker: UpdateDownloadWorker, context: Context, dispatcher: CoroutineDispatcher, url: String, path: String) {
             if (!ConnectivityUtil.isInternetAvailable(context)) return
             withContext(dispatcher) {
                 try {

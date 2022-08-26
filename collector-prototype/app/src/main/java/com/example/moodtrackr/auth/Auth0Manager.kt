@@ -77,7 +77,6 @@ class Auth0Manager(context: Context) {
                 override fun onSuccess(credentials: Credentials) {
                     credentialsManager.saveCredentials(credentials)
                     retrieveAccessToken()
-                    Log.e("DEBUG", "tempp")
                     usersClient = UsersAPIClient(account, credentials.accessToken)
                     runBlocking {
                         var userId = credentials.user.getId()
@@ -131,7 +130,7 @@ class Auth0Manager(context: Context) {
                         }
                         override fun onSuccess(profile: UserProfile) {
                             // We have the user's profile!
-                            Log.e("DEBUG", "User Profile: $profile")
+//                            Log.e("DEBUG", "User Profile: $profile")
                         }
                     })
             }
@@ -158,7 +157,7 @@ class Auth0Manager(context: Context) {
                         }
                         override fun onSuccess(profile: UserProfile) {
                             // We have the user's profile!
-                            Log.e("DEBUG", "User Profile: ${profile}")
+//                            Log.e("DEBUG", "User Profile: ${profile}")
                         }
                     })
             }
@@ -215,7 +214,7 @@ class Auth0Manager(context: Context) {
                                credentialsManager: CredentialsManager) {
             val refreshToken = SharedPreferencesStorage(context)
                 .retrieveString(context.resources.getString(R.string.token_refresh))
-            Log.e("MDTKR_AUTH", "refreshToken_Refresh_Credentials: $refreshToken")
+//            Log.e("MDTKR_AUTH", "refreshToken_Refresh_Credentials: $refreshToken")
             if (refreshToken != null) {
                 val account = Auth0(
                     context.resources.getString(R.string.com_auth0_clientId),
@@ -249,7 +248,7 @@ class Auth0Manager(context: Context) {
                     }
                     override fun onSuccess(result: Credentials) {
                         // We have the user's credentials!
-                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
+//                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
                             result.accessToken)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
@@ -275,7 +274,7 @@ class Auth0Manager(context: Context) {
                     }
                     override fun onSuccess(result: Credentials) {
                         // We have the user's credentials!
-                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
+//                        Log.e("MDTKR_AUTH", "refresh Token: ${result.refreshToken}")
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_identifier),
                             result.accessToken)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.token_expiry),
@@ -313,8 +312,8 @@ class Auth0Manager(context: Context) {
                     }
                     override fun onSuccess(profile: UserProfile) {
                         val profileMetadata = profile.getUserMetadata()
-                        Log.e("DEBUG", "User Metadata: $profileMetadata")
-                        Log.e("DEBUG", "User Metadata Size: ${profileMetadata.size}")
+//                        Log.e("DEBUG", "User Metadata: $profileMetadata")
+//                        Log.e("DEBUG", "User Metadata Size: ${profileMetadata.size}")
                         val gson = Gson().toJson(profileMetadata)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
                             gson)
@@ -336,8 +335,8 @@ class Auth0Manager(context: Context) {
                     }
                     override fun onSuccess(profile: UserProfile) {
                         val profileMetadata = profile.getUserMetadata()
-                        Log.e("DEBUG", "User Metadata: $profileMetadata")
-                        Log.e("DEBUG", "User Metadata Size: ${profileMetadata.size}")
+//                        Log.e("DEBUG", "User Metadata: $profileMetadata")
+//                        Log.e("DEBUG", "User Metadata Size: ${profileMetadata.size}")
                         val gson = Gson().toJson(profileMetadata)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
                             gson)
@@ -376,7 +375,7 @@ class Auth0Manager(context: Context) {
                         val gson = Gson().toJson(profileMetadata)
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
                             gson)
-                        Log.e("DEBUG", "Updated metadata! $gson")
+//                        Log.e("DEBUG", "Updated metadata! $gson")
                         SharedPreferencesStorage(context).store(context.resources.getString(R.string.setup_status_identifier),
                             profileMetadata.size>1)
                     }

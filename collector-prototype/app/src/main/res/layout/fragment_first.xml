@@ -53,6 +53,12 @@
             android:text="Get Updates" />
 
         <Button
+            android:id="@+id/installUpdatesBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Install Updates" />
+
+        <Button
             android:id="@+id/pushUsageObjBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
