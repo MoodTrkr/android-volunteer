@@ -360,6 +360,46 @@ class Auth0Manager(context: Context) {
             }
         }
 
+        fun updateUserMetadataAsync(context: Context, metadata: Map<String, String>): CompletableDeferred<Boolean> {
+            val deferredNever = CompletableDeferred<Boolean>()
+            val accessToken: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_identifier))
+            val userId: String? = SharedPreferencesStorage(context)
+                .retrieveString(context.resources.getString(R.string.token_user_id))
+            if (accessToken != null && userId != null) {
+                val auth = authSetup(context)
+                val usersClient = UsersAPIClient(auth.first, accessToken)
+                return updateUserMetadataAsync(context, userId, accessToken, usersClient, metadata)
+            }
+            deferredNever.complete(false)
+            return deferredNever
+        }
+
+        fun updateUserMetadataAsync(context: Context, userId: String, accessToken: String, usersClient: UsersAPIClient, metadata: Map<String, String>): CompletableDeferred<Boolean> {
+            var userMetadataDeferred = CompletableDeferred<Boolean>()
+            // Call updateMetadata with the id of the user to update, and the map of data
+            usersClient.updateMetadata(userId, metadata)
+                .start(object: Callback<UserProfile, ManagementException> {
+                    override fun onFailure(exception: ManagementException) {
+                        // Something went wrong!
+                        Log.e("DEBUG", "Failed to update metadata!")
+                        Log.e("DEBUG", "$exception")
+                    }
+
+                    override fun onSuccess(profile: UserProfile) {
+                        val profileMetadata = profile.getUserMetadata()
+                        val gson = Gson().toJson(profileMetadata)
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.auth0_user_metadata),
+                            gson)
+                        Log.e("DEBUG", "Updated metadata! $gson")
+                        SharedPreferencesStorage(context).store(context.resources.getString(R.string.setup_status_identifier),
+                            profileMetadata.size>1)
+                        userMetadataDeferred.complete(profileMetadata.size>1)
+                    }
+                })
+            return userMetadataDeferred
+        }
+
         fun updateUserMetadata(context: Context, userId: String, accessToken: String, usersClient: UsersAPIClient, metadata: Map<String, String>) {
             // Call updateMetadata with the id of the user to update, and the map of data
             usersClient.updateMetadata(userId, metadata)
