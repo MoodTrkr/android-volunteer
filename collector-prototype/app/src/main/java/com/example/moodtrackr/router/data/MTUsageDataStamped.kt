@@ -37,6 +37,7 @@ data class MTUsageDataStamped(
         fun stampUsageData(context: Context, usageData: MTUsageData): MTUsageDataStamped {
             val usageDataStamped = MTUsageDataStamped()
 
+            usageDataStamped.usageDataVersion = usageData.dailyCollection.version
             usageDataStamped.date = usageData.date
             usageDataStamped.complete = usageData.complete
             usageDataStamped.periodicCollBook = usageData.periodicCollBook
