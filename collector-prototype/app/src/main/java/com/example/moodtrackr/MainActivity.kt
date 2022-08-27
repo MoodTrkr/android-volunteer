@@ -25,12 +25,14 @@ import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
+import com.example.moodtrackr.userInterface.permissions.AppInstallPermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.AppUsagePermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.BatteryPermissionsFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.util.UpdateManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
 //        permsManager.checkAllPermissions()
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
+        Log.d("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
 
         redirect(savedInstanceState)
 
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(this.applicationContext)
         }
+        UpdateManager.checkUpdatesDownloaded(this.applicationContext)
     }
     override fun onResume() {
         super.onResume()
@@ -82,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
         val enableDebugging = true
         supportFragmentManager.commit {
@@ -93,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
                 !batteryPermsGranted -> add<BatteryPermissionsFragment>(R.id.fragment_container_view)
                 !usagePermsGranted -> add<AppUsagePermissionsFragment>(R.id.fragment_container_view)
+                !appInstallPermsGranted -> add<AppInstallPermissionsFragment>(R.id.fragment_container_view)
                 enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
                 savedInstanceState == null -> add<SurveyFragment>(R.id.fragment_container_view)
             }
@@ -107,6 +112,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
         val enableDebugging = true
         supportFragmentManager.commit {
@@ -117,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> switchFragment(PermissionsFragment())
                 !batteryPermsGranted -> switchFragment(BatteryPermissionsFragment())
                 !usagePermsGranted -> switchFragment(AppUsagePermissionsFragment())
+                !appInstallPermsGranted -> switchFragment(AppInstallPermissionsFragment())
                 savedInstanceState == null -> switchFragment(SurveyFragment())
             }
         }
@@ -195,5 +202,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         val SURVEY_NOTIF_CLICKED = "survey_notif"
+        val TITLE: String = "MDTKR"
+        val PRIMARY_SERVICE_NOTIF_ID: Int = 1000
+        val SURVEY_NOTIF_ID: Int = 1005
+        val DOWNLOAD_SERVICE_NOTIF_ID: Int = 1010
     }
 }

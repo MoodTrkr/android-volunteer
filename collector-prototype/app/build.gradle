@@ -13,7 +13,7 @@ android {
         minSdkVersion 28
         targetSdkVersion 31
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "demo"]
@@ -67,5 +67,7 @@ dependencies {
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    implementation 'com.github.javiersantos:AppUpdater:2.7'
 
 }

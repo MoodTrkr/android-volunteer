@@ -1,9 +1,6 @@
 package com.example.moodtrackr.db.records
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.example.moodtrackr.data.MTUsageData
 
 @Dao
@@ -18,7 +15,7 @@ interface UsageRecordsDAO {
     @Query("SELECT * FROM usage_records")
     suspend fun getAll(): List<MTUsageData>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(usageRecord: MTUsageData)
 
     @Update

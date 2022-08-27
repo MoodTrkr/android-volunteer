@@ -2,54 +2,64 @@ package com.example.moodtrackr.router
 
 import android.content.Context
 import android.util.Log
-import com.auth0.android.Auth0
-import com.auth0.android.authentication.storage.CredentialsManager
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
-import com.auth0.android.management.UsersAPIClient
 import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
+import com.example.moodtrackr.collectors.workers.UpdateDownloadWorker
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.router.data.CompressedRequestBody
 import com.example.moodtrackr.router.data.MTUsageDataStamped
 import com.example.moodtrackr.router.queue.ReportRequestQueue
+import com.example.moodtrackr.router.routes.UpdateRoutes
 import com.example.moodtrackr.router.routes.UsageDataRoutes
+import com.example.moodtrackr.router.util.StreamDownloader
 import com.example.moodtrackr.util.ConnectivityUtil
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import okhttp3.Interceptor
-import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.BufferedSink
-import okio.GzipSink
-import okio.buffer
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
-import java.lang.reflect.Type
 import java.util.*
 
 
 /**
  * Rest Client
  */
-interface RestClient : UsageDataRoutes {
+interface RestClient : UsageDataRoutes, UpdateRoutes {
     companion object {
         private var token: String = ""
         @Volatile
         private var restClient: RestClient? = null
+        @Volatile
+        private var updateClient: RestClient? = null
+
+        fun getUpdateInstance(context: Context): RestClient {
+            return restClient ?: synchronized(this) {
+                restClient ?: buildUpdateClient(context)
+                    .also { restClient = it }
+            }
+        }
 
         fun getInstance(context: Context): RestClient {
             return restClient ?: synchronized(this) {
                 restClient ?: buildRestClient(context)
                     .also { restClient = it }
             }
+        }
+
+        private fun buildUpdateClient(context: Context): RestClient {
+            return Retrofit.Builder()
+                .baseUrl("https://github.com/")
+                .build()
+                .create(RestClient::class.java)
         }
 
         private fun buildRestClient(context: Context): RestClient {
@@ -124,7 +134,7 @@ interface RestClient : UsageDataRoutes {
                         when (def.second) {
                             2 -> queueRequest(context, inp1, inp2)
                             4 -> {
-                                Log.e("MT_REST", "ATTEMPTING REFRESH")
+                                Log.i("MT_REST", "ATTEMPTING REFRESH")
                                 Auth0Manager(context).refreshCredentials()
                                 queueRequest(context, inp1, inp2)
                             }
@@ -155,6 +165,19 @@ interface RestClient : UsageDataRoutes {
                 else -> {
                     Log.e("MT_REST", "OTHER_ERROR: ${t.cause} ${t.message}")
                     deferred.complete(Pair(null, 3))
+                }
+            }
+        }
+
+        suspend fun safeUpdateDownload(worker: UpdateDownloadWorker, context: Context, dispatcher: CoroutineDispatcher, url: String, path: String) {
+            if (!ConnectivityUtil.isInternetAvailable(context)) return
+            withContext(dispatcher) {
+                try {
+                    val body = getUpdateInstance(context).downloadUpdate(url).body()
+                    StreamDownloader.saveFile(worker, context, body, path)
+                } catch (t: Throwable) {
+                    Log.i("MDTKR_REST","DOWNLOAD FAILED")
+                    Log.e("MDTKR_REST","$t")
                 }
             }
         }
