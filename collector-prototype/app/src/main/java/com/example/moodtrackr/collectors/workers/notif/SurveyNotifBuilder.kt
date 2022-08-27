@@ -32,7 +32,7 @@ class SurveyNotifBuilder {
                 .setContentTitle(MainActivity.TITLE)
                 .setTicker(MainActivity.TITLE)
                 .setContentText("Survey for yesterday now open!")
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentIntent(createNotifContext(context))
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)

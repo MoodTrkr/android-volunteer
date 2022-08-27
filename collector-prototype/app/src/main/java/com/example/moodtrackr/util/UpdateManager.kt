@@ -31,6 +31,7 @@ class UpdateManager {
          *  Run this to check for git updates. Add your own function through the callback param.
          * */
         fun checkForGitUpdates(context: Context, callback: (context: Context, update: Update) -> Unit) {
+            if (!ConnectivityUtil.isInternetAvailable(context)) return
             AppUpdaterUtils(context)
                 .setUpdateFrom(UpdateFrom.GITHUB)
                 .setGitHubUserAndRepo("MoodTrkr", "volunteer-app-release")
@@ -73,6 +74,7 @@ class UpdateManager {
                 val data = Data.Builder()
                 var url =
                     "MoodTrkr/volunteer-app-release/archive/refs/tags/${update.latestVersion}.zip"
+                SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_latest_version), update.latestVersion)
                 data.putString(UpdateDownloadWorker.KEY_INPUT_URL, url)
                 data.putString(UpdateDownloadWorker.KEY_OUTPUT_FILE_NAME, myFile.absolutePath)
                 val downloadWorker = OneTimeWorkRequest.Builder(UpdateDownloadWorker::class.java)
@@ -140,20 +142,36 @@ class UpdateManager {
          *  Installs Downloaded Updates!
          * */
         fun checkUpdatesDownloaded(context: Context) {
-            val updateDownloadStatus = SharedPreferencesStorage(context).retrieveBoolean(context.resources.getString(R.string.mdtkr_update_downloaded))
+            var updateDownloadStatus = SharedPreferencesStorage(context).retrieveBoolean(context.resources.getString(R.string.mdtkr_update_downloaded))
             val updateDownloadPath = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.mdtkr_update_loc))
-            if (updateDownloadPath == null || updateDownloadStatus == null) return
-            if (updateDownloadStatus!=true) {
+            if (updateDownloadPath == null || updateDownloadStatus != true) return
+
+            Log.e("MDTKR_UPDATE", "Update State: $updateDownloadStatus $updateDownloadPath")
+            val latestUpdate = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.mdtkr_latest_version))
+            if (updateDownloadStatus == true && latestUpdate == getPackageVersion()) {
                 handleUpdated(context)
-                return
             }
 
+            if (updateDownloadStatus != true) return
+            var updateFile = File("$updateDownloadPath")
+            if (!updateFile.exists() && updateFile.listFiles()==null) return
+            updateFile = updateFile.listFiles()[0]
+            updateFile = File(updateFile.absolutePath+"/main.apk")
+
+            Log.e("MDTKR_UPDATE", "Intent being created!")
             val intent = Intent(Intent.ACTION_VIEW)
-            val updateFile = File("$updateDownloadPath/volunteer-app-release/main.apk")
             intent.setDataAndType( FileProvider.getUriForFile(context, context.packageName+".provider", updateFile), "application/vnd.android.package-archive")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            context.startActivity(intent)
+
+            Log.e("MDTKR_UPDATE", "${PermissionsManager.isInstallAppsPermissionGranted(context)}")
+            if (!PermissionsManager.isInstallAppsPermissionGranted(context)) return
+            try {
+                context.startActivity(intent)
+            }
+            catch (t: Throwable) {
+                Log.e("MDTKR_UPDATE", t.message.toString())
+            }
         }
 
         fun getPackageVersion(): String {
@@ -164,7 +182,8 @@ class UpdateManager {
          *  Run this whenever updated. Deletes update files from app directory.
          * */
         fun handleUpdated(context: Context) {
-            val updateFolder = File(context.filesDir, "updates/")
+            Log.e("MDTKR_UPDATE", "Cleaning updates!")
+            val updateFolder = File(context.filesDir.absolutePath+"/updates/")
             if (updateFolder.exists()) updateFolder.delete()
             SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_update_downloaded), false)
         }

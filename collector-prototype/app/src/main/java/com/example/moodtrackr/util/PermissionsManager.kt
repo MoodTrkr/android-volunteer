@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -86,8 +87,11 @@ class PermissionsManager() {
     }
 
     fun isIgnoringBatteryOptimizations(): Boolean {
-        val pm : PowerManager = appContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        return pm.isIgnoringBatteryOptimizations(appContext.packageName)
+        return isIgnoringBatteryOptimizations(appContext)
+    }
+
+    fun isInstallAppsPermissionGranted(): Boolean {
+        return isInstallAppsPermissionGranted(appContext)
     }
 
     fun disableBatteryOptimizations(fragment: Fragment) {
@@ -106,6 +110,22 @@ class PermissionsManager() {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
         intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         fragment.startActivity(intent)
+    }
+
+    fun grantInstallAppsPermission(fragment: Fragment) {
+        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+        intent.data = Uri.fromParts("package", appContext.packageName, null)
+//        intent.type = "application/vnd.android.package-archive"
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+        fragment.startActivity(intent)
+
+//        this.requestMultiplePermissions = fragment.activity?.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+//            permissions.entries.forEach {
+//                Log.e("DEBUG", "${it.key} = ${it.value}")
+//            }
+//        }
     }
 
     fun checkAllBasicPermissions() {
@@ -145,5 +165,16 @@ class PermissionsManager() {
                 ) != PackageManager.PERMISSION_GRANTED) { return false}
         }
         return true;
+    }
+
+    companion object {
+        fun isIgnoringBatteryOptimizations(context: Context): Boolean {
+            val pm : PowerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            return pm.isIgnoringBatteryOptimizations(context.packageName)
+        }
+
+        fun isInstallAppsPermissionGranted(context: Context): Boolean {
+            return context.packageManager.canRequestPackageInstalls()
+        }
     }
 }

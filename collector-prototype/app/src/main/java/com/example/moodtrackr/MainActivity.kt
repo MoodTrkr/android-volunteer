@@ -25,6 +25,7 @@ import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
+import com.example.moodtrackr.userInterface.permissions.AppInstallPermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.AppUsagePermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.BatteryPermissionsFragment
 import com.example.moodtrackr.util.DatabaseManager
@@ -84,6 +85,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
         val enableDebugging = true
         supportFragmentManager.commit {
@@ -95,6 +97,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
                 !batteryPermsGranted -> add<BatteryPermissionsFragment>(R.id.fragment_container_view)
                 !usagePermsGranted -> add<AppUsagePermissionsFragment>(R.id.fragment_container_view)
+                !appInstallPermsGranted -> add<AppInstallPermissionsFragment>(R.id.fragment_container_view)
                 enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
                 savedInstanceState == null -> add<SurveyFragment>(R.id.fragment_container_view)
             }
@@ -109,6 +112,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
         val enableDebugging = true
         supportFragmentManager.commit {
@@ -119,6 +123,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> switchFragment(PermissionsFragment())
                 !batteryPermsGranted -> switchFragment(BatteryPermissionsFragment())
                 !usagePermsGranted -> switchFragment(AppUsagePermissionsFragment())
+                !appInstallPermsGranted -> switchFragment(AppInstallPermissionsFragment())
                 savedInstanceState == null -> switchFragment(SurveyFragment())
             }
         }
