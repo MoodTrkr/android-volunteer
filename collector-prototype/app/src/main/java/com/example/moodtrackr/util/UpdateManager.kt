@@ -30,6 +30,11 @@ class UpdateManager {
          *  Run this to check for git updates. Add your own function through the callback param.
          * */
         fun checkForGitUpdates(context: Context, callback: (context: Context, update: Update) -> Unit) {
+            if (!ConnectivityUtil.getMobileDataPreferences(context) &&
+                ConnectivityUtil.isMobileDataBeingUsed(context)) {
+                Log.d("MDTKR_UPDATE", "Mobile Data being used, cannot download!")
+                return
+            }
             if (!ConnectivityUtil.isInternetAvailable(context)) return
             AppUpdaterUtils(context)
                 .setUpdateFrom(UpdateFrom.GITHUB)
@@ -39,8 +44,8 @@ class UpdateManager {
                         callback.invoke(context, update)
                     }
                     override fun onFailed(error: AppUpdaterError) {
-                        Log.e("AppUpdater Error", "Something went wrong")
-                        Log.e("AppUpdater Error", error.toString())
+                        Log.e("MDTKR_UPDATE", "Something went wrong")
+                        Log.e("MDTKR_UPDATE", error.toString())
                     }
                 })
             .start()
@@ -154,8 +159,9 @@ class UpdateManager {
             }
 
             if (updateDownloadStatus != true) return
-            var updateFile = File("$updateDownloadPath")
-            if (!updateFile.exists() && updateFile.listFiles()==null) return
+            var updateFile = File(updateDownloadPath)
+            if (!updateFile.exists() || updateFile.listFiles().isEmpty()) return
+            Log.d("MDTKR_UPDATE", "List of Update Dir Files: ${updateFile.listFiles().size} - ${updateFile.listFiles()}")
             updateFile = updateFile.listFiles()[0]
             updateFile = File(updateFile.absolutePath+"/main.apk")
 

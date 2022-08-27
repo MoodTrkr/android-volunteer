@@ -12,8 +12,10 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
@@ -32,6 +34,7 @@ import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.util.ConnectivityUtil
 import com.example.moodtrackr.util.UpdateManager
 
 class MainActivity : AppCompatActivity() {
@@ -59,12 +62,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val dbManager = DatabaseManager.getInstance(this.applicationContext)
+        val dbManager = DatabaseManager.getInstance(applicationContext)
 
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
-            WorkersUtil.queueAll(this.applicationContext)
+            WorkersUtil.queueAll(applicationContext)
         }
-        UpdateManager.checkUpdatesDownloaded(this.applicationContext)
+        UpdateManager.checkForUpdates(applicationContext)
+        UpdateManager.checkUpdatesDownloaded(applicationContext)
     }
     override fun onResume() {
         super.onResume()
@@ -178,6 +182,18 @@ class MainActivity : AppCompatActivity() {
         binding.mainScrollView.scrollTo(0, 0)
     }
 
+    /**
+     *  This sets the text of the Mobile Data Download Permissions button.
+     *  @param inpPref: Boolean?
+     *      Can be left null, in which case, the program will check Shared Preferences for the preference.
+     * */
+    private fun setMobileDataOptBtnText(popup: PopupMenu, inpPref: Boolean?) {
+        var pref: Boolean
+        if (inpPref == null) pref = ConnectivityUtil.getMobileDataPreferences(applicationContext) else pref = inpPref
+        popup.menu[2].title =
+            if (pref) "Disable Downloads using Mobile Data" else "Allow Downloads using Mobile Data"
+    }
+
     fun showPopup(v: View) {
         val popup = PopupMenu(this, v)
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
@@ -192,11 +208,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.demographicsButton ->
                     switchFragment(DemoFragment())
+                R.id.mobileDataOptButton -> {
+                    val pref = ConnectivityUtil.toggleMobileDataPreferences(applicationContext)
+                    setMobileDataOptBtnText(popup, pref)
+                }
             }
             true
         });
         val inflater: MenuInflater = popup.menuInflater
         inflater.inflate(R.menu.navigation_popup, popup.menu)
+        setMobileDataOptBtnText(popup,null)
         popup.show()
     }
 
