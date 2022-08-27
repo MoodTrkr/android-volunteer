@@ -39,6 +39,7 @@
     <string name="mdtkr_update_downloaded">MDTKR_IS_UPDATE_DOWNLOADED</string>
     <string name="mdtkr_update_loc">MDTKR_UPDATE_PATH</string>
     <string name="mdtkr_latest_version">MDTKR_LATEST_VERSION_ONLINE</string>
+    <string name="mdtkr_mobile_data_prefs">MDTKR_MOBILE_DATA_PREFERENCES</string>
 
     <string-array name="genderOptions">
         <item>Male</item>
