@@ -2,7 +2,6 @@ package com.example.moodtrackr.util
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.work.Data
@@ -60,7 +59,7 @@ class UpdateManager {
 
             Log.e("MDTKR_UPDATE","Update Available: ${update}")
             if (update.latestVersion == getPackageVersion() && updateDownloadStatus == true) {
-                handleUpdated(context)
+                cleanUpdateFiles(context)
                 return
             }
             if (update.latestVersion != null) Log.e("Latest Version", update.latestVersion)
@@ -144,12 +143,14 @@ class UpdateManager {
         fun checkUpdatesDownloaded(context: Context) {
             var updateDownloadStatus = SharedPreferencesStorage(context).retrieveBoolean(context.resources.getString(R.string.mdtkr_update_downloaded))
             val updateDownloadPath = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.mdtkr_update_loc))
+            if (updateDownloadStatus==false && File(context.filesDir,"/updates").exists()) cleanUpdateFiles(context)
             if (updateDownloadPath == null || updateDownloadStatus != true) return
 
             Log.e("MDTKR_UPDATE", "Update State: $updateDownloadStatus $updateDownloadPath")
             val latestUpdate = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.mdtkr_latest_version))
             if (updateDownloadStatus == true && latestUpdate == getPackageVersion()) {
-                handleUpdated(context)
+                cleanUpdateFiles(context)
+                return
             }
 
             if (updateDownloadStatus != true) return
@@ -181,11 +182,19 @@ class UpdateManager {
         /**
          *  Run this whenever updated. Deletes update files from app directory.
          * */
-        fun handleUpdated(context: Context) {
+        fun cleanUpdateFiles(context: Context) {
             Log.e("MDTKR_UPDATE", "Cleaning updates!")
-            val updateFolder = File(context.filesDir.absolutePath+"/updates/")
-            if (updateFolder.exists()) updateFolder.delete()
+            val updateFolder = File(context.filesDir,"/updates")
+            if (updateFolder.exists()) deleteFilesRecursively(updateFolder)
             SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_update_downloaded), false)
+        }
+
+        private fun deleteFilesRecursively(file: File) {
+            Log.e("MDTKR", "ATTEMPTING TO DELETE: ${file.absolutePath}")
+            if (file.isDirectory) {
+                file.listFiles().forEach { child -> deleteFilesRecursively(child) }
+            }
+            file.deleteRecursively()
         }
     }
 }
