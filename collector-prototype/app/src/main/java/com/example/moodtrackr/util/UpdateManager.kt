@@ -52,18 +52,18 @@ class UpdateManager {
 
         private fun downloadUpdatesCallback(context: Context, update: Update) {
             if (update.latestVersion == getPackageVersion()) {
-                Log.e("MDTKR_UPDATE","Application on Latest Version: ${getPackageVersion()}")
+                Log.i("MDTKR_UPDATE","Application on Latest Version: ${getPackageVersion()}")
                 return
             }
             val updateDownloadStatus = SharedPreferencesStorage(context).retrieveBoolean(context.resources.getString(R.string.mdtkr_update_downloaded))
 
-            Log.e("MDTKR_UPDATE","Update Available: ${update}")
+            Log.i("MDTKR_UPDATE","Update Available: ${update}")
             if (update.latestVersion == getPackageVersion() && updateDownloadStatus == true) {
                 cleanUpdateFiles(context)
                 return
             }
-            if (update.latestVersion != null) Log.e("Latest Version", update.latestVersion)
-            if (update.urlToDownload != null) Log.e("URL", update.urlToDownload.toString())
+            if (update.latestVersion != null) Log.d("Latest Version", update.latestVersion)
+            if (update.urlToDownload != null) Log.d("URL", update.urlToDownload.toString())
             if (update.latestVersion != null && update.urlToDownload != null) {
                 val myFile = File(context.filesDir, "updates/${update.latestVersion}.zip")
                 if (myFile.exists()) myFile.delete()
@@ -118,7 +118,7 @@ class UpdateManager {
                         }
                     }
                 }
-                Log.e("MDTKR_ZIP", "I think somethn worked")
+                Log.d("MDTKR_ZIP", "I think somethn worked")
                 return 0
             } catch (e: ZipException) {
                 Log.e("ZipException", e.message.toString())
@@ -146,7 +146,7 @@ class UpdateManager {
             if (updateDownloadStatus==false && File(context.filesDir,"/updates").exists()) cleanUpdateFiles(context)
             if (updateDownloadPath == null || updateDownloadStatus != true) return
 
-            Log.e("MDTKR_UPDATE", "Update State: $updateDownloadStatus $updateDownloadPath")
+            Log.d("MDTKR_UPDATE", "Update State: $updateDownloadStatus $updateDownloadPath")
             val latestUpdate = SharedPreferencesStorage(context).retrieveString(context.resources.getString(R.string.mdtkr_latest_version))
             if (updateDownloadStatus == true && latestUpdate == getPackageVersion()) {
                 cleanUpdateFiles(context)
@@ -159,13 +159,13 @@ class UpdateManager {
             updateFile = updateFile.listFiles()[0]
             updateFile = File(updateFile.absolutePath+"/main.apk")
 
-            Log.e("MDTKR_UPDATE", "Intent being created!")
+            Log.d("MDTKR_UPDATE", "Intent being created!")
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setDataAndType( FileProvider.getUriForFile(context, context.packageName+".provider", updateFile), "application/vnd.android.package-archive")
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
-            Log.e("MDTKR_UPDATE", "${PermissionsManager.isInstallAppsPermissionGranted(context)}")
+            Log.d("MDTKR_UPDATE", "${PermissionsManager.isInstallAppsPermissionGranted(context)}")
             if (!PermissionsManager.isInstallAppsPermissionGranted(context)) return
             try {
                 context.startActivity(intent)
@@ -183,7 +183,7 @@ class UpdateManager {
          *  Run this whenever updated. Deletes update files from app directory.
          * */
         fun cleanUpdateFiles(context: Context) {
-            Log.e("MDTKR_UPDATE", "Cleaning updates!")
+            Log.i("MDTKR_UPDATE", "Cleaning updates!")
             val updateFolder = File(context.filesDir,"/updates")
             if (updateFolder.exists()) deleteFilesRecursively(updateFolder)
             SharedPreferencesStorage(context).store(context.resources.getString(R.string.mdtkr_update_downloaded), false)

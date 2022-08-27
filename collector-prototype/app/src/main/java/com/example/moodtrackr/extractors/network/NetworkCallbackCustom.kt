@@ -23,7 +23,7 @@ class NetworkCallbackCustom(context: Context): ConnectivityManager.NetworkCallba
     // network is available for use
     override fun onAvailable(network: Network) {
         super.onAvailable(network)
-        Log.e("DEBUG", "Network Available!")
+        Log.i("DEBUG", "Network Available!")
     }
 
     // Network capabilities have changed for the network
@@ -33,12 +33,12 @@ class NetworkCallbackCustom(context: Context): ConnectivityManager.NetworkCallba
     ) {
         super.onCapabilitiesChanged(network, networkCapabilities)
         val unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
-        Log.e("DEBUG", "Network Capabilities Changed!")
+        Log.i("DEBUG", "Network Capabilities Changed!")
     }
 
     // lost network connection
     override fun onLost(network: Network) {
         super.onLost(network)
-        Log.e("DEBUG", "Network Connection Lost !")
+        Log.i("DEBUG", "Network Connection Lost !")
     }
 }

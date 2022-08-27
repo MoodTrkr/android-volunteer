@@ -30,7 +30,7 @@ class DataCollectorService : Service() {
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
-        Log.e("DataCollectorService", "DataCollectorService onCreate Triggered!")
+        Log.d("DataCollectorService", "DataCollectorService onCreate Triggered!")
 
         builder = createNotif(getState())
         createChannel()
@@ -40,7 +40,7 @@ class DataCollectorService : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val filter = IntentFilter(Intent.ACTION_SCREEN_ON) //formerly ACTION_USER_PRESENT
-        Log.e("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
+        Log.d("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
 
         this.stepsCounter = StepsCountExtractor(this)
         unlockReceiver = UnlockReceiver()
@@ -48,7 +48,7 @@ class DataCollectorService : Service() {
 
         if (intent?.action != null && intent.action.equals(
                 "ACTION_STOP", ignoreCase = true)) {
-            Log.e("DEBUG", "Service Stopped")
+            Log.d("DEBUG", "Service Stopped")
             stopSelf()
         }
 
@@ -84,7 +84,7 @@ class DataCollectorService : Service() {
     }
 
     private fun createNotif(state: Pair<Long, Long>): NotificationCompat.Builder {
-        Log.e("DataCollectorService", "Notification State: $state")
+        Log.d("DataCollectorService", "Notification State: $state")
         return NotificationCompat.Builder(this.applicationContext, MainActivity.PRIMARY_SERVICE_NOTIF_ID.toString())
             .setContentTitle(MainActivity.TITLE)
             .setTicker(MainActivity.TITLE)
@@ -102,7 +102,7 @@ class DataCollectorService : Service() {
         val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
         localUnlocks = record.unlocks
         localSteps = record.steps
-        Log.e("DataCollectorService", "DataCollectorService getState: ${record}")
+        Log.d("DataCollectorService", "DataCollectorService getState: ${record}")
         return Pair(localUnlocks, localSteps)
     }
 

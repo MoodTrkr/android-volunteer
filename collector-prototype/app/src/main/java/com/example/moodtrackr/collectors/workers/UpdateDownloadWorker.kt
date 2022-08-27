@@ -31,7 +31,7 @@ class UpdateDownloadWorker(context: Context, parameters: WorkerParameters) :
         // Mark the Worker as important
         val desc = "Starting Download"
         setForeground(createForegroundInfo(desc))
-        Log.e("MDTKR_REST", "DOWNLOADING, $inputUrl, $outputFile")
+        Log.d("MDTKR_REST", "DOWNLOADING, $inputUrl, $outputFile")
         download(inputUrl, outputFile)
         return Result.success()
     }

@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
 //        permsManager.checkAllPermissions()
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
+        Log.d("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
 
         redirect(savedInstanceState)
 

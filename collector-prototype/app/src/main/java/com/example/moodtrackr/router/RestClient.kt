@@ -134,7 +134,7 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
                         when (def.second) {
                             2 -> queueRequest(context, inp1, inp2)
                             4 -> {
-                                Log.e("MT_REST", "ATTEMPTING REFRESH")
+                                Log.i("MT_REST", "ATTEMPTING REFRESH")
                                 Auth0Manager(context).refreshCredentials()
                                 queueRequest(context, inp1, inp2)
                             }
@@ -176,7 +176,7 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
                     val body = getUpdateInstance(context).downloadUpdate(url).body()
                     StreamDownloader.saveFile(worker, context, body, path)
                 } catch (t: Throwable) {
-                    Log.e("MDTKR_REST","DOWNLOAD FAILED")
+                    Log.i("MDTKR_REST","DOWNLOAD FAILED")
                     Log.e("MDTKR_REST","$t")
                 }
             }

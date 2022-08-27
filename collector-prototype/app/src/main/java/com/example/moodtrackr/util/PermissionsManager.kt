@@ -32,23 +32,23 @@ class PermissionsManager() {
     )
 
     constructor(fragment: Fragment) : this() {
-        Log.e("DEBUG", "Initialized on Fragment")
+        Log.d("DEBUG", "Initialized on Fragment")
         this.appContext = fragment.requireActivity().applicationContext
         this.baseContext = fragment.requireActivity().baseContext
         this.requestMultiplePermissions = fragment.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
-                Log.e("DEBUG", "${it.key} = ${it.value}")
+                Log.d("DEBUG", "${it.key} = ${it.value}")
             }
         }
     }
 
     constructor(activity: FragmentActivity) : this() {
-        Log.e("DEBUG", "Initialized on Activity")
+        Log.d("DEBUG", "Initialized on Activity")
         this.appContext = activity.applicationContext
         this.baseContext = activity.baseContext
         this.requestMultiplePermissions = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
-                Log.e("DEBUG", "${it.key} = ${it.value}")
+                Log.d("DEBUG", "${it.key} = ${it.value}")
             }
         }
     }
@@ -123,13 +123,13 @@ class PermissionsManager() {
 
 //        this.requestMultiplePermissions = fragment.activity?.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
 //            permissions.entries.forEach {
-//                Log.e("DEBUG", "${it.key} = ${it.value}")
+//                Log.d("DEBUG", "${it.key} = ${it.value}")
 //            }
 //        }
     }
 
     fun checkAllBasicPermissions() {
-        Log.e("DEBUG", "Checking all Permissions!")
+        Log.i("DEBUG", "Checking all Permissions!")
         var notProvidedPermissions: Array<String> = emptyArray()
         mandatoryPermissions.forEach { permission ->
             if (ActivityCompat.checkSelfPermission(
@@ -141,7 +141,7 @@ class PermissionsManager() {
     }
 
     fun checkLocPermissions() {
-        Log.e("DEBUG", "Check Loc Permissions!")
+        Log.i("DEBUG", "Check Loc Permissions!")
         if (ActivityCompat.checkSelfPermission(
                 appContext,
                 Manifest.permission.ACCESS_FINE_LOCATION

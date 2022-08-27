@@ -22,7 +22,7 @@ class StreamDownloader {
                 var bytesRead = 0L
                 val totalBytes = body.contentLength()
                 val fos = FileOutputStream(path)
-                Log.e("MDTKR_REST", "CONTENT_LENGTH: $totalBytes")
+                Log.d("MDTKR_REST", "CONTENT_LENGTH: $totalBytes")
                 fos.use { output ->
                     val buffer = ByteArray(4 * 1024) // or other buffer size
                     while (true) {
@@ -45,7 +45,7 @@ class StreamDownloader {
                 worker.completeNotification()
                 return path
             } catch (e:Exception) {
-                Log.e("saveFile", e.toString())
+                Log.d("saveFile", e.toString())
             }
             finally {
                 input?.close()

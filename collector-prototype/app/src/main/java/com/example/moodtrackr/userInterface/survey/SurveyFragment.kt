@@ -399,7 +399,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             .start();
         binding.loading.visibility = View.GONE;
         (activity as MainActivity?)!!.scrollToTop();
-        Log.e("DEBUG", "showing question " + surveyDO.currentQuestionNumber.toString())
+        Log.i("DEBUG", "showing question " + surveyDO.currentQuestionNumber.toString())
 
     }
     private fun showSurveyComplete(){
@@ -422,13 +422,13 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
             cal.timeInMillis = pair!!.first
             binding.sleepTime.hour = cal.get(Calendar.HOUR)
             binding.sleepTime.minute = cal.get(Calendar.MINUTE)
-            Log.e("MDTKR_SLEEP_INTERNAL",
+            Log.d("MDTKR_SLEEP_INTERNAL",
                 "sleep: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
 
             cal.timeInMillis = pair!!.second
             binding.wakeUpTime.hour = cal.get(Calendar.HOUR)
             binding.wakeUpTime.minute = cal.get(Calendar.MINUTE)
-            Log.e("MDTKR_SLEEP_INTERNAL",
+            Log.d("MDTKR_SLEEP_INTERNAL",
                 "wake: ${cal.get(Calendar.HOUR)}, ${cal.get(Calendar.MINUTE)}")
         }
     }
