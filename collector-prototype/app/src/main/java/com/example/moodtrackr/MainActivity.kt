@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         val usagePermsGranted = permsManager.isUsageAccessGranted()
         val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
-        val enableDebugging = true
+        val enableDebugging = false
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             when {
