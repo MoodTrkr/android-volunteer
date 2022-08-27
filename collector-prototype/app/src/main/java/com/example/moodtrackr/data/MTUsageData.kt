@@ -43,4 +43,8 @@ data class MTUsageData(
         this.dailyCollection = dailyCollection
         this.surveyData = surveyData
     }
+
+    companion object {
+        const val version = 1
+    }
 }

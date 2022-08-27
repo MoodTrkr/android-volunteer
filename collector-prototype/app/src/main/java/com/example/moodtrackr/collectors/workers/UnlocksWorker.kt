@@ -20,7 +20,7 @@ class UnlocksWorker(context: Context, parameters: WorkerParameters) :
     private var context: Context = context
 
     override fun doWork(): Result {
-        Log.e("DEBUG", "Test")
+        Log.d("DEBUG", "Test")
         unlocksUpdateSequence()
         surveyNotifSequence()
         return Result.success()

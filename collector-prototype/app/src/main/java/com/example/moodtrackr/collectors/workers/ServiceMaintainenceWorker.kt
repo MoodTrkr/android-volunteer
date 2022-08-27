@@ -14,8 +14,8 @@ class ServiceMaintainenceWorker(context: Context, parameters: WorkerParameters) 
     Worker(context, parameters) {
     private var context: Context = context
     override fun doWork(): Result {
-        Log.e("DEBUG", "doWork called for: " + this.id)
-        Log.e("DEBUG", "Service Running: " + DataCollectorService.running)
+        Log.d("DEBUG", "doWork called for: " + this.id)
+        Log.d("DEBUG", "Service Running: " + DataCollectorService.running)
         if (!DataCollectorService.running) {
             Log.d("DEBUG", "starting service from doWork")
             val intent = Intent(context.applicationContext, DataCollectorService::class.java)

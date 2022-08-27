@@ -13,7 +13,7 @@ import com.example.moodtrackr.db.records.UsageRecordsDAO
 import com.example.moodtrackr.db.router.RouterRequest
 import com.example.moodtrackr.db.router.RouterRequestsDAO
 
-@Database(entities = [MTUsageData::class, RTUsageRecord::class, RouterRequest::class], version = 2)
+@Database(entities = [MTUsageData::class, RTUsageRecord::class, RouterRequest::class], version = 3)
 @TypeConverters(DateConverter::class, MapConverter::class, StringConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract val usageRecordsDAO: UsageRecordsDAO
