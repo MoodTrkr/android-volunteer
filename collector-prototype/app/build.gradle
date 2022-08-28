@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+        storeFile file(sigFilePath)
+            storePassword storePass
+            keyAlias 'MDTKR'
+            keyPassword keyPass
+        }
+    }
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
@@ -17,6 +25,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "demo"]
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
