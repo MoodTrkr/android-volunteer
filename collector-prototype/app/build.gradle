@@ -21,7 +21,7 @@ android {
         minSdkVersion 28
         targetSdkVersion 31
         versionCode 1
-        versionName "0.2"
+        versionName "0.2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "demo"]
