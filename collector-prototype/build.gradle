@@ -1,9 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.kotlin_version = "1.5.0"
-    ext.keyPass = 'PASS'
-    ext.storePass = 'PASS'
-    ext.sigFilePath = 'SIGNATURE_PATH'
+
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('signing.properties').newDataInputStream())
+    
+    ext.keyPass = properties.getProperty('keyPass')?:"NoKeyPassFound"
+    ext.storePass = properties.getProperty('storePass')?:"NoStorePassFound"
+    ext.sigFilePath = properties.getProperty('sigFilePath')?:"NoSigFilePathFound"
 
     repositories {
         google()
