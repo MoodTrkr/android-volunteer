@@ -17,19 +17,18 @@ import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.UnlockCollector
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
 import com.example.moodtrackr.extractors.calls.data.MTCallStats
-import com.example.moodtrackr.extractors.geo.GeoDataExtractor
 import com.example.moodtrackr.extractors.network.OfflineExtractor
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageStats
 import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.router.data.MTUsageDataStamped
-import com.example.moodtrackr.router.util.CompressionUtil
 import com.example.moodtrackr.sleepextractor.SleepExtractor
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.DatesUtil
 import com.example.moodtrackr.util.PermissionsManager
+import com.example.moodtrackr.util.UpdateManager
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -75,35 +74,35 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 //            }
 
             val unlockCollector = UnlockCollector(activity)
-            Log.e("DEBUG", unlockCollector.getUnlockCount24h().toString())
+            Log.d("DEBUG", unlockCollector.getUnlockCount24h().toString())
 
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            val button: Button = view.findViewById(R.id.button1) as Button
-            Log.e("DEBUG", "test_before")
+            Log.d("DEBUG", "test_before")
             val usageExtractor = AppUsageExtractor(activity)
             val usageStatsQuery = DatesUtil.yesterdayQueryWrapper( usageExtractor::usageStatsQuery ) as MTAppUsageStats
             val usageEventsQuery = DatesUtil.yesterdayQueryWrapper( usageExtractor::usageEventsQuery ) as MTAppUsageLogs
 
-            Log.e("DEBUG", "test_after")
-            Log.e("DEBUG", usageStatsQuery.toString())
-            Log.e("DEBUG", usageEventsQuery.toString())
+            Log.d("DEBUG", "test_after")
+            Log.d("DEBUG", usageStatsQuery.toString())
+            Log.d("DEBUG", usageEventsQuery.toString())
 
             val callLogsExtractor = CallLogsStatsExtractor(activity)
             val callLogsOutput: MTCallStats = DatesUtil.yesterdayQueryWrapper( callLogsExtractor::queryLogs ) as MTCallStats
-            callLogsOutput.calls.forEach{(key, value) -> Log.e("DEBUG", "($key, $value)") }
+            callLogsOutput.calls.forEach{(key, value) -> Log.d("DEBUG", "($key, $value)") }
 
             val networkExtractor = OfflineExtractor(activity)
             //val networkQuery = networkExtractor.instantReturn()
 
             val screenOnTime: Long = DatesUtil.yesterdayQueryWrapper( usageExtractor::screenOnTimeQuery ) as Long
-            Log.e("DEBUG", "Screen Time: $screenOnTime")
+            Log.d("DEBUG", "Screen Time: $screenOnTime")
 
             val collectionUtil: CollectionUtil = CollectionUtil(activity)
             //collectionUtil.dbInit()
-            Log.e("DEBUG", collectionUtil.getAll().toString())
+            Log.d("DEBUG", collectionUtil.getAll().toString())
             runBlocking {
-                Log.e("DEBUG", "RT_DB")
-                Log.e("DEBUG", DatabaseManager.getInstance(requireContext().applicationContext).rtUsageRecordsDAO.getAll().toString())
+                Log.d("DEBUG", "RT_DB")
+                Log.d("DEBUG", DatabaseManager.getInstance(requireContext().applicationContext).rtUsageRecordsDAO.getAll().toString())
             }
 
             NotifUpdateUtil.updateNotif(requireContext().applicationContext)
@@ -112,19 +111,19 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 //            WorkersUtil.queuePeriodic(requireActivity().applicationContext)
 //            WorkersUtil.queueHourly(requireActivity().applicationContext)
 //            WorkersUtil.queueDaily(requireActivity().applicationContext)
-            Log.e("DEBUG", "DataCollectorService Vars: ${DataCollectorService.localUnlocks}, ${DataCollectorService.localSteps}")
+            Log.d("DEBUG", "DataCollectorService Vars: ${DataCollectorService.localUnlocks}, ${DataCollectorService.localSteps}")
 
 
             var yesterday = DatesUtil.getYesterdayTruncated()
-            Log.e("DEBUG", "Yesterday: $yesterday")
+            Log.d("DEBUG", "Yesterday: $yesterday")
 
             yesterday = DatesUtil.truncateDate(yesterday)
-            Log.e("DEBUG", "Yesterday Truncated: $yesterday")
-            Log.e("DEBUG", "Yesterday Bounds: ${DatesUtil.getDayBounds(yesterday)}")
+            Log.d("DEBUG", "Yesterday Truncated: $yesterday")
+            Log.d("DEBUG", "Yesterday Bounds: ${DatesUtil.getDayBounds(yesterday)}")
 
 //            val record: MTUsageData = DBHelper.getObjSafe(requireContext().applicationContext, yesterday)
-//            Log.e("DEBUG", "Yesterday Obj: $record")
-//            Log.e("DEBUG", "Yesterday Daily Complete: ${record.dailyCollection.complete}")
+//            Log.d("DEBUG", "Yesterday Obj: $record")
+//            Log.d("DEBUG", "Yesterday Daily Complete: ${record.dailyCollection.complete}")
 
             val myFile = File(requireContext().applicationContext.filesDir, "output.json")
             if (myFile.exists())                    myFile.delete()
@@ -170,23 +169,12 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
         binding.sleepBoundsBtn.setOnClickListener {
             val job = SleepExtractor.computeSleepBoundsAsync(1, requireContext().applicationContext)
             job.invokeOnCompletion {
-                Log.e("MDTKR_SLEEP_EXT", "${job.getCompleted().toString()}")
+                Log.e("MDTKR_SLEEP_EXT", job.getCompleted().toString())
             }
         }
 
-        binding.getUsageObjBtn.setOnClickListener {
-            val restClient = RestClient.getInstance(requireContext().applicationContext)
-            Log.e("DEBUG", "Getting from Server!")
-            runBlocking {
-                //val get = restClient.getUsageData( DatesUtil.getYesterdayTruncated().time )?.execute()
-                val get = RestClient.safeApiCall(
-                    requireContext().applicationContext,
-                    Dispatchers.Default,
-                    restClient::getUsageData,
-                    DatesUtil.getYesterdayTruncated().time
-                    )
-                Log.e("DEBUG", "Server Results: $get")
-            }
+        binding.checkForUpdatesBtn.setOnClickListener {
+            UpdateManager.checkForUpdates(requireContext())
         }
 
         binding.refreshUserBtn.setOnClickListener { auth0Manager.refreshCredentials() }
@@ -201,6 +189,10 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 
         binding.surveyBtn.setOnClickListener {
             switchFragment(SurveyFragment());
+        }
+
+        binding.installUpdatesBtn.setOnClickListener {
+            UpdateManager.checkUpdatesDownloaded(requireContext().applicationContext)
         }
     }
 

@@ -3,10 +3,7 @@ package com.example.moodtrackr.collectors.workers.util
 import android.content.Context
 import androidx.work.*
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
-import com.example.moodtrackr.collectors.workers.DailyWorker
-import com.example.moodtrackr.collectors.workers.HourlyWorker
-import com.example.moodtrackr.collectors.workers.PeriodicWorker
-import com.example.moodtrackr.collectors.workers.ServiceMaintainenceWorker
+import com.example.moodtrackr.collectors.workers.*
 import java.util.concurrent.TimeUnit
 
 class WorkersUtil {
@@ -18,6 +15,19 @@ class WorkersUtil {
             queueServiceMaintenance(context)
             queuePeriodic(context)
             queueHourly(context)
+            queueUpdatesServicePeriodic(context)
+        }
+
+        fun queueUpdatesServiceOneTime(context: Context) {
+            WorkManager
+                .getInstance(context)
+                .enqueue(buildUpdatesWorkerOneTime())
+        }
+
+        fun queueUpdatesServicePeriodic(context: Context) {
+            WorkManager
+                .getInstance(context)
+                .enqueueUniquePeriodicWork("MDTKR_UPDATES_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildUpdatesWorkerPeriodic())
         }
 
         fun queueServiceMaintainenceOneTime(context: Context) {
@@ -29,25 +39,36 @@ class WorkersUtil {
         fun queueServiceMaintenance(context: Context) {
             WorkManager
                 .getInstance(context)
-                .enqueueUniquePeriodicWork("MT_SERVICE_MAINTENANCE_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildServiceMaintainence())
+                .enqueueUniquePeriodicWork("MDTKR_SERVICE_MAINTENANCE_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildServiceMaintainence())
         }
 
         fun queuePeriodic(context: Context) {
             WorkManager
                 .getInstance(context)
-                .enqueueUniquePeriodicWork("MT_PERIODIC_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildPeriodic())
+                .enqueueUniquePeriodicWork("MDTKR_PERIODIC_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildPeriodic())
         }
 
         fun queueHourly(context: Context) {
             WorkManager
                 .getInstance(context)
-                .enqueueUniquePeriodicWork("MT_HOURLY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildHourly())
+                .enqueueUniquePeriodicWork("MDTKR_HOURLY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildHourly())
         }
 
         fun queueDaily(context: Context) {
             WorkManager
                 .getInstance(context)
-                .enqueueUniquePeriodicWork("MT_DAILY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildDaily())
+                .enqueueUniquePeriodicWork("MDTKR_DAILY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildDaily())
+        }
+
+        fun buildUpdatesWorkerOneTime(): OneTimeWorkRequest {
+            return OneTimeWorkRequest.Builder(UpdatesWorker::class.java).build()
+        }
+
+        fun buildUpdatesWorkerPeriodic(): PeriodicWorkRequest {
+            return PeriodicWorkRequestBuilder<UpdatesWorker>(
+                1,
+            TimeUnit.DAYS)
+                .build()
         }
 
         fun buildServiceMaintainenceOneTime(): OneTimeWorkRequest {

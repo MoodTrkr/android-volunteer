@@ -4,9 +4,6 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.hardware.Sensor
-import android.hardware.SensorManager
-import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -19,10 +16,6 @@ import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.extractors.unlocks.UnlockReceiver
 import com.example.moodtrackr.util.DatesUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class DataCollectorService : Service() {
     private lateinit var builder: NotificationCompat.Builder
@@ -37,17 +30,17 @@ class DataCollectorService : Service() {
         this.context = this.applicationContext
         notificationManager = this.getSystemService(NOTIFICATION_SERVICE) as
                 NotificationManager
-        Log.e("DataCollectorService", "DataCollectorService onCreate Triggered!")
+        Log.d("DataCollectorService", "DataCollectorService onCreate Triggered!")
 
         builder = createNotif(getState())
         createChannel()
         notification = builder.build()
-        startForeground(NOTIF_ID, notification)
+        startForeground(MainActivity.PRIMARY_SERVICE_NOTIF_ID, notification)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val filter = IntentFilter(Intent.ACTION_SCREEN_ON) //formerly ACTION_USER_PRESENT
-        Log.e("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
+        Log.d("DataCollectorService", "DataCollectorService onStartCommand Triggered!")
 
         this.stepsCounter = StepsCountExtractor(this)
         unlockReceiver = UnlockReceiver()
@@ -55,7 +48,7 @@ class DataCollectorService : Service() {
 
         if (intent?.action != null && intent.action.equals(
                 "ACTION_STOP", ignoreCase = true)) {
-            Log.e("DEBUG", "Service Stopped")
+            Log.d("DEBUG", "Service Stopped")
             stopSelf()
         }
 
@@ -63,7 +56,7 @@ class DataCollectorService : Service() {
         builder = createNotif(getState())
         createChannel()
         notification = builder.build()
-        startForeground(NOTIF_ID, notification)
+        startForeground(MainActivity.PRIMARY_SERVICE_NOTIF_ID, notification)
         running = true
         return START_STICKY
     }
@@ -77,7 +70,7 @@ class DataCollectorService : Service() {
         // Create the NotificationChannel
         val descriptionText = "Used by Mood Tracker"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(NOTIF_ID.toString(), TITLE, importance)
+        val mChannel = NotificationChannel(MainActivity.PRIMARY_SERVICE_NOTIF_ID.toString(), MainActivity.TITLE, importance)
         mChannel.description = descriptionText
         notificationManager.createNotificationChannel(mChannel)
     }
@@ -91,10 +84,10 @@ class DataCollectorService : Service() {
     }
 
     private fun createNotif(state: Pair<Long, Long>): NotificationCompat.Builder {
-        Log.e("DataCollectorService", "Notification State: $state")
-        return NotificationCompat.Builder(this.applicationContext, NOTIF_ID.toString())
-            .setContentTitle(TITLE)
-            .setTicker(TITLE)
+        Log.d("DataCollectorService", "Notification State: $state")
+        return NotificationCompat.Builder(this.applicationContext, MainActivity.PRIMARY_SERVICE_NOTIF_ID.toString())
+            .setContentTitle(MainActivity.TITLE)
+            .setTicker(MainActivity.TITLE)
             .setContentText("Unlocks: ${state.first} | Steps: ${state.second}")
             .setSmallIcon(R.drawable.ic_stat_name)
             .setOngoing(true)
@@ -109,7 +102,7 @@ class DataCollectorService : Service() {
         val record: RTUsageRecord = DBHelperRT.getObjSafe(context, DatesUtil.getTodayTruncated())
         localUnlocks = record.unlocks
         localSteps = record.steps
-        Log.e("DataCollectorService", "DataCollectorService getState: ${record}")
+        Log.d("DataCollectorService", "DataCollectorService getState: ${record}")
         return Pair(localUnlocks, localSteps)
     }
 
@@ -118,12 +111,10 @@ class DataCollectorService : Service() {
         if(this::stepsCounter.isInitialized) this.stepsCounter.clean()
         if(this::unlockReceiver.isInitialized) unregisterReceiver(unlockReceiver)
         stopForeground(true)
-        notificationManager.cancel(NOTIF_ID);
+        notificationManager.cancel(MainActivity.PRIMARY_SERVICE_NOTIF_ID);
     }
 
     companion object {
-        val TITLE: String = "MDTKR"
-        val NOTIF_ID: Int = 1000
         var tokenExpiry: Long? = null
 
         var localSteps: Long = 0 //meant to be updated by StepsCountExtractor

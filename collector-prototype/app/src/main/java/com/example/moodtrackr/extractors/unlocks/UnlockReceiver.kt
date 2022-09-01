@@ -11,7 +11,7 @@ import androidx.work.WorkManager
 
 class UnlockReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Log.e("DEBUG", "Lock/Unlocked")
+        Log.d("DEBUG", "Lock/Unlocked")
         val manager = WorkManager.getInstance(context)
         val request = OneTimeWorkRequest.Builder(UnlocksWorker::class.java).build()
         manager.enqueue(request)

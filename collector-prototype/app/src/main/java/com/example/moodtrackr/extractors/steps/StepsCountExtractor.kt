@@ -39,7 +39,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             stepsLastUpdate = event!!.values[0]
         }
         steps = event!!.values[0]
-//        Log.e("STEPS_COUNT_EXT_STEP", "${steps}, ${stepsLastUpdate}")
+//        Log.d("STEPS_COUNT_EXT_STEP", "${steps}, ${stepsLastUpdate}")
 //        stepsTrue = event!!.values[0]
 //        accurateUpdateSequence()
     }
@@ -47,7 +47,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
     fun registerListener() {
         val sensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
             ?: throw Exception("Got no step sensor")
-        Log.e("DEBUG", "Is wake up sensor?: ${sensor!!.isWakeUpSensor}")
+        Log.d("DEBUG", "Is wake up sensor?: ${sensor!!.isWakeUpSensor}")
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
@@ -72,7 +72,7 @@ class StepsCountExtractor(context: Context) : SensorEventListener {
             var stepsAdd = calcStepsToBeAdded()
             stepsLastUpdate = steps
             val stepsDBUpdate = stepsDB + stepsAdd
-            Log.e("STEPS_COUNT_EXT", "DB: $stepsDB, stepsAdd: $stepsAdd, stepsDBUpdate: $stepsDBUpdate")
+            Log.d("STEPS_COUNT_EXT", "DB: $stepsDB, stepsAdd: $stepsAdd, stepsDBUpdate: $stepsDBUpdate")
             return stepsDBUpdate
         }
     }

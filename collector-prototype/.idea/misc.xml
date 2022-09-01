@@ -3,6 +3,13 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/layout/fragment_first.xml" value="0.264" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/layout/single_permission_fragment.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/layout/super_permissions_fragment.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/layout/survey_fragment.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/menu/menu_main.xml" value="0.536" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/menu/navigation_popup.xml" value="0.2" />
+        <entry key="..\:/Users/qasim/code/android-volunteer/collector-prototype/app/src/main/res/xml/provider_paths.xml" value="0.10885416666666667" />
         <entry key="..\:/Users/school/Documents/Programming Projects/MoodTrkr/android-volunteer/collector-prototype/app/src/main/res/drawable/bordered_box.xml" value="0.403125" />
         <entry key="..\:/Users/school/Documents/Programming Projects/MoodTrkr/android-volunteer/collector-prototype/app/src/main/res/drawable/main_background.xml" value="0.234375" />
         <entry key="..\:/Users/school/Documents/Programming Projects/MoodTrkr/android-volunteer/collector-prototype/app/src/main/res/drawable/simple_card.xml" value="0.2390625" />

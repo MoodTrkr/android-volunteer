@@ -53,7 +53,7 @@ class GeoDataExtractor(activity: FragmentActivity?, permsManager: PermissionsMan
                 .addOnSuccessListener { location: Location? ->
                     if (location != null) {
                         val addresses: List<Address> = geocoder.getFromLocation(location.latitude, location.longitude, 1)
-                        Log.e("DEBUG", "COUNTRY: ${addresses[0].countryName}")
+                        Log.d("DEBUG", "COUNTRY: ${addresses[0].countryName}")
                         if (addresses.isNotEmpty()) country = addresses[0].countryName
                     }
                 }

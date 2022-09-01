@@ -12,6 +12,7 @@ import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.db.realtime.RTUsageRecord
 import com.example.moodtrackr.extractors.usage.AppUsageExtractor
 import com.example.moodtrackr.extractors.calls.CallLogsStatsExtractor
+import com.example.moodtrackr.extractors.calls.data.MTCallStats
 import com.example.moodtrackr.extractors.sleep.data.MTSleepData
 import com.example.moodtrackr.extractors.steps.StepsCountExtractor
 import com.example.moodtrackr.extractors.usage.data.MTAppUsageLogs
@@ -91,7 +92,8 @@ class CollectionUtil(context: Context) {
                         callLogsExtractor.queryLogs(timeBounds.first, timeBounds.second),
                         MTSleepData(0,0),
                         usageExtractor.screenOnTimeQuery(timeBounds.first, timeBounds.second),
-                        true
+                        true,
+                        MTUsageData.version
                     )
                     DBHelper.updateDB(context, record)
                 }

@@ -16,7 +16,7 @@ import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.PermissionsManager
 
 
-class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragment) {
+class AppInstallPermissionsFragment  : Fragment(R.layout.single_permission_fragment) {
 
     private var _binding: SinglePermissionFragmentBinding? = null
     // This property is only valid between onCreateView and
@@ -36,24 +36,22 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
 
         permsManager = PermissionsManager(this)
 
-        if(permsManager!!.isUsageAccessGranted()){
+        if(permsManager!!.isInstallAppsPermissionGranted()){
             binding.grant.text ="Next"
             isReviewing = true
         }else{
-            binding.grant.text ="Permit usage access"
+            binding.grant.text ="Permit App Installation Permissions"
         }
 
-        binding.largeHeader.text = "App Usage";
-        binding.explanation.text = " Our app logs this information to build correlations between mood and the apps people are using."+
-                " We also use it to look for a connection between screen time and mood."+
-                "You will remain anonymous and your data will never be viewed directly."
+        binding.largeHeader.text = "App Installation Permissions"
+        binding.explanation.text = "Our app uses this in order to install updates. We will never install malware or malicious code to your phone."
         binding.grant.setOnClickListener{
             if(isReviewing){
-                (activity as MainActivity).switchFragment(AppInstallPermissionsFragment());
+                (activity as MainActivity).switchFragment(SurveyFragment());
             }
 
-            if(!permsManager!!.isUsageAccessGranted()) {
-                permsManager!!.grantUsageAccessPermission(this)
+            if(!permsManager!!.isInstallAppsPermissionGranted()) {
+                permsManager!!.grantInstallAppsPermission(this)
             }
         }
         return view;
@@ -61,10 +59,10 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
 
     override fun onResume() {
         super.onResume()
-        if(permsManager!!.isUsageAccessGranted()){
+        if(permsManager!!.isInstallAppsPermissionGranted()){
             if(!isReviewing)
             {
-                (activity as MainActivity).switchFragment(AppInstallPermissionsFragment());
+                (activity as MainActivity).switchFragment(SurveyFragment());
             }
         }
     }

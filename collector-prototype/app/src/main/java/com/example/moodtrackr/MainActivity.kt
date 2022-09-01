@@ -12,8 +12,10 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
@@ -25,12 +27,15 @@ import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
+import com.example.moodtrackr.userInterface.permissions.AppInstallPermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.AppUsagePermissionsFragment
 import com.example.moodtrackr.userInterface.permissions.BatteryPermissionsFragment
 import com.example.moodtrackr.util.DatabaseManager
 import com.example.moodtrackr.util.PermissionsManager
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
+import com.example.moodtrackr.util.ConnectivityUtil
+import com.example.moodtrackr.util.UpdateManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
@@ -50,18 +55,20 @@ class MainActivity : AppCompatActivity() {
         val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
 //        permsManager.checkAllPermissions()
-        Log.e("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
+        Log.d("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
 
         redirect(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val dbManager = DatabaseManager.getInstance(this.applicationContext)
+        val dbManager = DatabaseManager.getInstance(applicationContext)
 
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
-            WorkersUtil.queueAll(this.applicationContext)
+            WorkersUtil.queueAll(applicationContext)
         }
+        UpdateManager.checkForUpdates(applicationContext)
+        UpdateManager.checkUpdatesDownloaded(applicationContext)
     }
     override fun onResume() {
         super.onResume()
@@ -82,6 +89,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
         val enableDebugging = false
         supportFragmentManager.commit {
@@ -93,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
                 !batteryPermsGranted -> add<BatteryPermissionsFragment>(R.id.fragment_container_view)
                 !usagePermsGranted -> add<AppUsagePermissionsFragment>(R.id.fragment_container_view)
+                !appInstallPermsGranted -> add<AppInstallPermissionsFragment>(R.id.fragment_container_view)
                 enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
                 savedInstanceState == null -> add<SurveyFragment>(R.id.fragment_container_view)
             }
@@ -107,7 +116,9 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
+        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
+        val enableDebugging = false
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             when {
@@ -116,6 +127,7 @@ class MainActivity : AppCompatActivity() {
                 !permsManager.allBasicPermissionsGranted() -> switchFragment(PermissionsFragment())
                 !batteryPermsGranted -> switchFragment(BatteryPermissionsFragment())
                 !usagePermsGranted -> switchFragment(AppUsagePermissionsFragment())
+                !appInstallPermsGranted -> switchFragment(AppInstallPermissionsFragment())
                 savedInstanceState == null -> switchFragment(SurveyFragment())
             }
         }
@@ -171,6 +183,18 @@ class MainActivity : AppCompatActivity() {
         binding.mainScrollView.scrollTo(0, 0)
     }
 
+    /**
+     *  This sets the text of the Mobile Data Download Permissions button.
+     *  @param inpPref: Boolean?
+     *      Can be left null, in which case, the program will check Shared Preferences for the preference.
+     * */
+    private fun setMobileDataOptBtnText(popup: PopupMenu, inpPref: Boolean?) {
+        var pref: Boolean
+        if (inpPref == null) pref = ConnectivityUtil.getMobileDataPreferences(applicationContext) else pref = inpPref
+        popup.menu[2].title =
+            if (pref) "Disable Downloads using Mobile Data" else "Allow Downloads using Mobile Data"
+    }
+
     fun showPopup(v: View) {
         val popup = PopupMenu(this, v)
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
@@ -185,15 +209,24 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.demographicsButton ->
                     switchFragment(DemoFragment())
+                R.id.mobileDataOptButton -> {
+                    val pref = ConnectivityUtil.toggleMobileDataPreferences(applicationContext)
+                    setMobileDataOptBtnText(popup, pref)
+                }
             }
             true
         });
         val inflater: MenuInflater = popup.menuInflater
         inflater.inflate(R.menu.navigation_popup, popup.menu)
+        setMobileDataOptBtnText(popup,null)
         popup.show()
     }
 
     companion object {
         val SURVEY_NOTIF_CLICKED = "survey_notif"
+        val TITLE: String = "MDTKR"
+        val PRIMARY_SERVICE_NOTIF_ID: Int = 1000
+        val SURVEY_NOTIF_ID: Int = 1005
+        val DOWNLOAD_SERVICE_NOTIF_ID: Int = 1010
     }
 }
