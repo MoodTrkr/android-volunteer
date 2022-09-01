@@ -36,7 +36,6 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
     private var _binding: DemoFragmentBinding? = null
     // This property is only valid between onCreateView and
     // onDestroyView.
-    // test
     private val binding get() = _binding!!
 
     override fun onCreateView(
