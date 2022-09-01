@@ -15,8 +15,9 @@ data class DailyCollection(
     @Embedded(prefix = "call_stats_") var callLogs: MTCallStats,
     @Embedded(prefix = "sleep_") var sleepData: MTSleepData,
     var screenTime: Long = 0,
-    var complete: Boolean = false
+    var complete: Boolean = false,
+    var version: Int = MTUsageData.version
     )
 {
-    constructor(): this(Date().time, MTAppUsageLogs(), MTCallStats(), MTSleepData(),0,false)
+    constructor(): this(Date().time, MTAppUsageLogs(), MTCallStats(), MTSleepData(),0,false, MTUsageData.version)
 }

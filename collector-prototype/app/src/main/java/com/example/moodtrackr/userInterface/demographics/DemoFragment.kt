@@ -49,7 +49,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
         this.permissionsManager = PermissionsManager(this)
         this.geoDataExtractor = GeoDataExtractor(requireActivity(), permissionsManager)
         geoDataExtractor.setCountry()
-        Log.e("DEBUG", "Country: $country")
+        Log.d("DEBUG", "Country: $country")
 
         this.auth0Manager = Auth0Manager(requireActivity())
 
@@ -131,7 +131,7 @@ class DemoFragment(): Fragment(R.layout.demo_fragment) {
         var deferred = CompletableDeferred<Boolean>()
 
         country = geoDataExtractor.getCountry()
-        Log.e("DEBUG", "Config: $country, $race, $gender, ${cal?.time}")
+        Log.d("DEBUG", "Config: $country, $race, $gender, ${cal?.time}")
         var metadata = mutableMapOf<String, String>()
 
         metadata["RACE"] = race

@@ -154,15 +154,15 @@ class SleepExtractor {
                     x.add(timecode)
                 }
                 for (state in app_stats[entry.key]!!.second) { //TODO delete
-//                    Log.e("App Y1...Yn", state.toString())
+//                    Log.d("App Y1...Yn", state.toString())
                 }
             }
 
             var first = (x.minOrNull() ?: 0).toLong() / 1000L * 1000L
             var last = (x.maxOrNull() ?: 0).toLong() / 1000L * 1000L
 
-            Log.e("FIRST", first.toString())
-            Log.e("LAST", last.toString())
+            Log.d("FIRST", first.toString())
+            Log.d("LAST", last.toString())
 
             var bins = mutableMapOf<Long, Int>()
 
@@ -188,7 +188,7 @@ class SleepExtractor {
                 values.add(bins[time]!!.toFloat())
             }
 
-            Log.e("VALUES BEFORE MOVING AVERAGE", values.toString()) //TODO delete
+            Log.d("VALUES BEFORE MOVING AVERAGE", values.toString()) //TODO delete
 
 
 
@@ -224,7 +224,7 @@ class SleepExtractor {
                 candidateRegions.add(app_activity[i] < dbound)
             }
 
-            Log.e("APP ACTIVITY", app_activity.toString())
+            Log.d("APP ACTIVITY", app_activity.toString())
 
 
             return candidateRegions
@@ -248,7 +248,7 @@ class SleepExtractor {
             var sectionEnd = -1
 
             for (i in x.indices) {
-                Log.e("X", x[i].toString())
+                Log.d("X", x[i].toString())
             }
 
             for (i in x.indices) {
@@ -289,10 +289,10 @@ class SleepExtractor {
                 }
             }
             try {
-                Log.e("BOUNDS", ranges[longestIdx].toString())
+                Log.d("BOUNDS", ranges[longestIdx].toString())
                 return ranges[longestIdx]
             } catch (e: Exception) {
-                Log.e("ranges[longestIdx] not found", e.toString())
+                Log.d("ranges[longestIdx] not found", e.toString())
                 return null
             }
 
@@ -320,7 +320,7 @@ class SleepExtractor {
             val regions = getCandidateRegions(app_activity, thresh=0.1F)
             val start_stop_idx = computeBounds(regions) ?: return Pair(0L, 0L)
 
-            Log.e("TIMECODES", Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second]).toString())
+            Log.d("TIMECODES", Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second]).toString())
             return Pair(time_codes[start_stop_idx.first], time_codes[start_stop_idx.second])
         }
 
