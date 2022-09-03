@@ -15,20 +15,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class HourlyWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
+class RouterRequestsWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
     private var context: Context = context.applicationContext
 
     override fun doWork(): Result {
-        // Update Notification
-        NotifUpdateUtil.updateNotif(context.applicationContext)
-
-        //Run daily collection sequence for yesterday
-        CollectionUtil.dailyCollectYesterday(context)
-//        val tokenExpiry = DataCollectorService.tokenExpiry
-//        if (tokenExpiry !== null && tokenExpiry < Date().time - 2*60*60*1000) {
-//            Auth0Manager.refreshCredentials(context)
-//            DataCollectorService.tokenExpiry = Date().time
-//        }
+        RestClient.popRequest(context.applicationContext, Dispatchers.Default)
         return Result.success()
     }
 }

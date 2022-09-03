@@ -187,13 +187,11 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
                 null -> null
                 is MTUsageData -> {
                     val gson = Gson()
-                    DatabaseManager.getInstance(context).routerRequestsDAO.insert(
-                        RouterRequest(
-                            Date(),
-                            RouterRequest.INSERT_USAGE,
-                            inp1.toString(),
-                            gson.toJson(inp2)
-                        )
+                    ReportRequestQueue.add(
+                        context,
+                        RouterRequest.INSERT_USAGE,
+                        inp1.toString(),
+                        gson.toJson(inp2)
                     )
                 }
                 else -> Log.e("DEBUG", "Unsupported Rest request type")

@@ -11,6 +11,7 @@ import com.example.moodtrackr.FirstFragment
 import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
 import com.example.moodtrackr.auth.Auth0Manager
+import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.databinding.LoginFragmentBinding
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
@@ -42,6 +43,7 @@ class LoginFragment(): Fragment(R.layout.login_fragment) {
                 auth0Manager.loginAsync()
             }
             job.invokeOnCompletion {
+                WorkersUtil.queueRouterRequestsWorker(requireContext().applicationContext)
                 switchFragment()
             }
         }

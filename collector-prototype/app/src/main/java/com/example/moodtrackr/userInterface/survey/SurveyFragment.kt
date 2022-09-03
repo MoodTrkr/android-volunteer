@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.moodtrackr.MainActivity
 import com.example.moodtrackr.R
+import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.SurveyFragmentBinding
 import com.example.moodtrackr.db.realtime.RTUsageRecord
@@ -61,6 +62,7 @@ class SurveyFragment  : Fragment(R.layout.survey_fragment) {
         val view = binding.root
 
         //begin computing sleep time bounds
+        Auth0Manager(requireContext().applicationContext).refreshCredentials()
         sleepBoundsCompute()
 
         // Change this when we have sleep data

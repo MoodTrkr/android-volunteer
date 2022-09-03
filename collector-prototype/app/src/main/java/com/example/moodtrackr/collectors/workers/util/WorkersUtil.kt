@@ -60,6 +60,12 @@ class WorkersUtil {
                 .enqueueUniquePeriodicWork("MDTKR_DAILY_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildDaily())
         }
 
+        fun queueRouterRequestsWorker(context: Context) {
+            WorkManager
+                .getInstance(context)
+                .enqueueUniquePeriodicWork("MDTKR_ROUTER_REQUESTS_WORKER", ExistingPeriodicWorkPolicy.KEEP, buildRouterRequestsWorker())
+        }
+
         fun buildUpdatesWorkerOneTime(): OneTimeWorkRequest {
             return OneTimeWorkRequest.Builder(UpdatesWorker::class.java).build()
         }
@@ -101,6 +107,13 @@ class WorkersUtil {
             return PeriodicWorkRequestBuilder<DailyWorker>(
                 1,
                 TimeUnit.DAYS)
+                .build()
+        }
+
+        fun buildRouterRequestsWorker(): PeriodicWorkRequest {
+            return PeriodicWorkRequestBuilder<RouterRequestsWorker>(
+                1,
+                TimeUnit.HOURS)
                 .build()
         }
     }

@@ -20,10 +20,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.work.Worker
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.databinding.ActivityMainBinding
 import com.example.moodtrackr.collectors.workers.util.WorkersUtil
+import com.example.moodtrackr.router.RestClient
 import com.example.moodtrackr.userInterface.animations.Animations
 import com.example.moodtrackr.userInterface.demographics.DemoFragment
 import com.example.moodtrackr.userInterface.login.LoginFragment
@@ -36,6 +38,7 @@ import com.example.moodtrackr.userInterface.permissions.PermissionsFragment
 import com.example.moodtrackr.userInterface.survey.SurveyFragment
 import com.example.moodtrackr.util.ConnectivityUtil
 import com.example.moodtrackr.util.UpdateManager
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
@@ -64,11 +67,14 @@ class MainActivity : AppCompatActivity() {
 
         val dbManager = DatabaseManager.getInstance(applicationContext)
 
+        if (loginStatus == true) WorkersUtil.queueRouterRequestsWorker(applicationContext)
+
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(applicationContext)
         }
         UpdateManager.checkForUpdates(applicationContext)
         UpdateManager.checkUpdatesDownloaded(applicationContext)
+        RestClient.popRequest(applicationContext, Dispatchers.IO)
     }
     override fun onResume() {
         super.onResume()
