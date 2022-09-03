@@ -360,7 +360,7 @@ class Auth0Manager(context: Context) {
             }
         }
 
-                fun updateUserMetadataAsync(context: Context, metadata: Map<String, String>): CompletableDeferred<Boolean> {
+        fun updateUserMetadataAsync(context: Context, metadata: Map<String, String>): CompletableDeferred<Boolean> {
             val deferredNever = CompletableDeferred<Boolean>()
             val accessToken: String? = SharedPreferencesStorage(context)
                 .retrieveString(context.resources.getString(R.string.token_identifier))
@@ -399,7 +399,7 @@ class Auth0Manager(context: Context) {
                 })
             return userMetadataDeferred
         }
-        
+
         fun updateUserMetadata(context: Context, userId: String, accessToken: String, usersClient: UsersAPIClient, metadata: Map<String, String>) {
             // Call updateMetadata with the id of the user to update, and the map of data
             usersClient.updateMetadata(userId, metadata)
