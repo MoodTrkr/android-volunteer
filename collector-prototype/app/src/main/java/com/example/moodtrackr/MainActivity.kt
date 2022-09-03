@@ -170,8 +170,8 @@ class MainActivity : AppCompatActivity() {
         val popup = PopupMenu(this, v)
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
             when(item.itemId) {
-                R.id.devButton ->
-                    switchFragment(FirstFragment())
+                // R.id.devButton ->
+                //    switchFragment(FirstFragment())
                 R.id.permissionsButton ->{
                     val permsFragment = PermissionsFragment()
                     val bundle = Bundle()
