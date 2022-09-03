@@ -30,14 +30,16 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        if(arguments != null){
+            isReviewing = requireArguments().getBoolean("isReviewing")
+        }
         _binding = SinglePermissionFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
         permsManager = PermissionsManager(this)
 
-        if(permsManager!!.isIgnoringBatteryOptimizations()){
+        if(isReviewing){
             binding.grant.text ="Next"
-            isReviewing = true
         }else{
             binding.grant.text ="Disable battery optimization"
         }
@@ -48,7 +50,13 @@ class BatteryPermissionsFragment  : Fragment(R.layout.single_permission_fragment
 
         binding.grant.setOnClickListener{
             if(isReviewing){
-                (activity as MainActivity).switchFragment(AppUsagePermissionsFragment());
+                val appUsagePermsFragment = AppUsagePermissionsFragment()
+                if(isReviewing){
+                    val bundle = Bundle()
+                    bundle.putBoolean("isReviewing", true)
+                    appUsagePermsFragment.arguments = bundle
+                }
+                (activity as MainActivity).switchFragment(appUsagePermsFragment)
             }
             var isBatteryOptDisabled = permsManager!!.isIgnoringBatteryOptimizations()
             if(!isBatteryOptDisabled) {
