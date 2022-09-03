@@ -31,14 +31,16 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        if(arguments != null){
+            isReviewing = requireArguments().getBoolean("isReviewing")
+        }
         _binding = SinglePermissionFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
         permsManager = PermissionsManager(this)
 
-        if(permsManager!!.isUsageAccessGranted()){
+        if(isReviewing){
             binding.grant.text ="Next"
-            isReviewing = true
         }else{
             binding.grant.text ="Permit usage access"
         }
@@ -49,7 +51,13 @@ class AppUsagePermissionsFragment  : Fragment(R.layout.single_permission_fragmen
                 "You will remain anonymous and your data will never be viewed directly."
         binding.grant.setOnClickListener{
             if(isReviewing){
-                (activity as MainActivity).switchFragment(AppInstallPermissionsFragment());
+                val appInstallPermsFragment = AppInstallPermissionsFragment()
+                if(isReviewing){
+                    val bundle = Bundle()
+                    bundle.putBoolean("isReviewing", true)
+                    appInstallPermsFragment.arguments = bundle
+                }
+                (activity as MainActivity).switchFragment(appInstallPermsFragment)
             }
 
             if(!permsManager!!.isUsageAccessGranted()) {

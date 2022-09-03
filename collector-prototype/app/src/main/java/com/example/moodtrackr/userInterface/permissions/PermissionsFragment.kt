@@ -31,6 +31,9 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        if(arguments != null){
+            isReviewing = requireArguments().getBoolean("isReviewing")
+        }
         _binding = PermissionsFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -47,16 +50,21 @@ class PermissionsFragment  : Fragment(R.layout.permissions_fragment) {
 //            To add multiple permissions, uncomment the following requestMultiplePermissions lines
 //            and add the permissions needed!
             if(permsManager!!.allBasicPermissionsGranted()){
-                (activity as MainActivity).switchFragment(BatteryPermissionsFragment());
+                val batteryPermsFragment = BatteryPermissionsFragment()
+                if(isReviewing){
+                    val bundle = Bundle()
+                    bundle.putBoolean("isReviewing", true)
+                    batteryPermsFragment.arguments = bundle
+                }
+                (activity as MainActivity).switchFragment(batteryPermsFragment)
             }else{
                 permsManager!!.checkAllBasicPermissions()
             }
 
         }
 
-        if(permsManager!!.allBasicPermissionsGranted()){
+        if(isReviewing){
             binding.getPermissions.text = "Next"
-            isReviewing = true
         }else{
             binding.getPermissions.text = "Grant Permissions"
         }
