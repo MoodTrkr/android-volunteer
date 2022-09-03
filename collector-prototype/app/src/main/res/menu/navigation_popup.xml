@@ -12,7 +12,7 @@
     <item android:id="@+id/demographicsButton"
         android:title="Edit my profile"
         />
-    <item android:id="@+id/devButton"
+    <!-- <item android:id="@+id/devButton"
         android:title="Dev (REMOVE)"
-        />
+        /> -->
 </menu>
