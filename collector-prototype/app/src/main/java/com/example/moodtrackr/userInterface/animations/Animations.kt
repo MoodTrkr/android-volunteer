@@ -8,6 +8,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import android.widget.LinearLayout
+import kotlinx.coroutines.CompletableDeferred
 import kotlin.math.floor
 
 
@@ -50,8 +51,37 @@ class Animations {
             Handler(Looper.getMainLooper()).postDelayed({
                 fadeInStaggered(time,offset,views,index+1)
             }, offset)
+        }
+        fun fadeInStaggeredAsync(time:Long, offset:Long, views: List<View>, index:Int = 0, deferred: CompletableDeferred<Boolean>? = null):CompletableDeferred<Boolean>{
+            var _deferred = deferred?: CompletableDeferred<Boolean>()
+            if(index == views.size){
+                return _deferred
+            }
+            views[index].apply {
+                // Set the content view to 0% opacity but visible, so that it is visible
+                // (but fully transparent) during the animation.
+                alpha = 0f
+                visibility = View.VISIBLE
 
+                // Animate the content view to 100% opacity, and clear any animation
+                // listener set on the view.
+                animate()
+                    .alpha(1f)
+                    .setDuration(time)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            if(index == views.size-1){
+                                _deferred.complete(true)
+                            }
+                        }
+                    })
+            }
 
+            Handler(Looper.getMainLooper()).postDelayed({
+                fadeInStaggeredAsync(time,offset,views,index+1,_deferred)
+            }, offset)
+
+            return _deferred
         }
 
         fun fadeToInvisible(time:Long, view: View){
