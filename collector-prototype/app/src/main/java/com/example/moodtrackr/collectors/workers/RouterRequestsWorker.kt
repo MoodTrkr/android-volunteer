@@ -1,6 +1,7 @@
 package com.example.moodtrackr.collectors.workers
 
 import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -15,11 +16,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class RouterRequestsWorker(context: Context, parameters: WorkerParameters) : Worker(context, parameters) {
+class RouterRequestsWorker(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     private var context: Context = context.applicationContext
 
-    override fun doWork(): Result {
-        RestClient.popRequest(context.applicationContext, Dispatchers.Default)
+    override suspend fun doWork(): Result {
+        RestClient.popRequest(context.applicationContext, Dispatchers.IO)
         return Result.success()
     }
 }

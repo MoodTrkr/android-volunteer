@@ -185,7 +185,7 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
         private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
             when (inp2) {
                 null -> null
-                is MTUsageData -> {
+                is MTUsageData, is MTUsageDataStamped -> {
                     val gson = Gson()
                     ReportRequestQueue.add(
                         context,

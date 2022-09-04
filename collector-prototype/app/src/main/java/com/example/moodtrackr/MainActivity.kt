@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.work.WorkManager
 import androidx.work.Worker
 import com.auth0.android.authentication.storage.SharedPreferencesStorage
 import com.example.moodtrackr.auth.Auth0Manager
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         }
         UpdateManager.checkForUpdates(applicationContext)
         UpdateManager.checkUpdatesDownloaded(applicationContext)
-        RestClient.popRequest(applicationContext, Dispatchers.IO)
+        WorkersUtil.queueRouterRequestsWorkerOneTime(applicationContext)
     }
     override fun onResume() {
         super.onResume()
