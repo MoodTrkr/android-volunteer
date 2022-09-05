@@ -45,8 +45,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var permsManager: PermissionsManager
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private var _savedInstanceState: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        _savedInstanceState = savedInstanceState
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState)
         permsManager = PermissionsManager(this)
@@ -58,10 +60,7 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val superPermsGranted = permsManager.isIgnoringBatteryOptimizations() && permsManager.isUsageAccessGranted()
 
-//        permsManager.checkAllPermissions()
         Log.d("DEBUG", "Setup Vars: $loginStatus, $setupStatus ${permsManager.allBasicPermissionsGranted()}")
-
-        redirect(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -69,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         val dbManager = DatabaseManager.getInstance(applicationContext)
 
         if (loginStatus == true) WorkersUtil.queueRouterRequestsWorker(applicationContext)
-
         if (loginStatus == true && setupStatus == true && superPermsGranted) {
             WorkersUtil.queueAll(applicationContext)
         }
@@ -79,41 +77,9 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
-        if(!permsManager.allBasicPermissionsGranted()){
-            switchFragment(PermissionsFragment())
-        }else if(!permsManager.isIgnoringBatteryOptimizations()){
-            switchFragment(BatteryPermissionsFragment())
-        }else if(!permsManager.isUsageAccessGranted()){
-            switchFragment(AppUsagePermissionsFragment())
-        }
+        guardedRedirect(_savedInstanceState)
     }
-    fun redirect(savedInstanceState: Bundle?){
-        val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
-            this.applicationContext.resources.getString(
-                R.string.login_status_identifier))
-        val setupStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
-            this.applicationContext.resources.getString(
-                R.string.setup_status_identifier))
-        val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
-        val usagePermsGranted = permsManager.isUsageAccessGranted()
-        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
 
-        val enableDebugging = true
-        supportFragmentManager.commit {
-            setReorderingAllowed(true)
-            //add<SurveyFragment>(R.id.fragment_container_view)
-            when {
-                loginStatus != true -> add<LoginFragment>(R.id.fragment_container_view)
-                setupStatus != true -> add<DemoFragment>(R.id.fragment_container_view)
-                !permsManager.allBasicPermissionsGranted() -> add<PermissionsFragment>(R.id.fragment_container_view)
-                !batteryPermsGranted -> add<BatteryPermissionsFragment>(R.id.fragment_container_view)
-                !usagePermsGranted -> add<AppUsagePermissionsFragment>(R.id.fragment_container_view)
-                !appInstallPermsGranted -> add<AppInstallPermissionsFragment>(R.id.fragment_container_view)
-                enableDebugging -> add<FirstFragment>(R.id.fragment_container_view)
-                savedInstanceState == null -> add<SurveyFragment>(R.id.fragment_container_view)
-            }
-        }
-    }
     fun guardedRedirect(savedInstanceState: Bundle?){
         val loginStatus = SharedPreferencesStorage(this.applicationContext).retrieveBoolean(
             this.applicationContext.resources.getString(
@@ -123,18 +89,19 @@ class MainActivity : AppCompatActivity() {
                 R.string.setup_status_identifier))
         val batteryPermsGranted = permsManager.isIgnoringBatteryOptimizations()
         val usagePermsGranted = permsManager.isUsageAccessGranted()
-        val appInstallPermsGranted = permsManager.isInstallAppsPermissionGranted()
+        val installAppsPermissionGranted = permsManager.isInstallAppsPermissionGranted()
 
-        val enableDebugging = true
+        val enableDebugging = false
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             when {
                 loginStatus != true -> switchFragment(LoginFragment())
-                setupStatus != true -> switchFragment(DemoFragment())
                 !permsManager.allBasicPermissionsGranted() -> switchFragment(PermissionsFragment())
                 !batteryPermsGranted -> switchFragment(BatteryPermissionsFragment())
                 !usagePermsGranted -> switchFragment(AppUsagePermissionsFragment())
-                !appInstallPermsGranted -> switchFragment(AppInstallPermissionsFragment())
+                !installAppsPermissionGranted -> switchFragment(AppInstallPermissionsFragment())
+                setupStatus != true -> switchFragment(DemoFragment())
+                enableDebugging -> switchFragment(FirstFragment())
                 savedInstanceState == null -> switchFragment(SurveyFragment())
             }
         }
@@ -166,6 +133,12 @@ class MainActivity : AppCompatActivity() {
         binding.fragmentContainerView.apply {
             alpha = 1f
             visibility = View.VISIBLE
+
+            val fragmentManager: FragmentManager = supportFragmentManager
+            val currentFragment = fragmentManager.findFragmentById(R.id.fragment_container_view)
+            if(currentFragment != null && currentFragment!!::class == fragment::class){
+                return
+            }
 
             animate()
                 .alpha(0f)
@@ -205,10 +178,15 @@ class MainActivity : AppCompatActivity() {
         val popup = PopupMenu(this, v)
         popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item ->
             when(item.itemId) {
-                R.id.devButton ->
-                    switchFragment(FirstFragment())
-                R.id.permissionsButton ->
-                    switchFragment(PermissionsFragment())
+                // R.id.devButton ->
+                //    switchFragment(FirstFragment())
+                R.id.permissionsButton ->{
+                    val permsFragment = PermissionsFragment()
+                    val bundle = Bundle()
+                    bundle.putBoolean("isReviewing", true)
+                    permsFragment.arguments = bundle
+                    switchFragment(permsFragment)
+                }
                 R.id.logoutButton ->{
                     Auth0Manager(this).logout()
                     switchFragment(LoginFragment())

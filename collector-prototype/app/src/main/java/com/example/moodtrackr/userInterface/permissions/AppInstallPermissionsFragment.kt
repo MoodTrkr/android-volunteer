@@ -31,14 +31,16 @@ class AppInstallPermissionsFragment  : Fragment(R.layout.single_permission_fragm
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        if(arguments != null){
+            isReviewing = requireArguments().getBoolean("isReviewing")
+        }
         _binding = SinglePermissionFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
         permsManager = PermissionsManager(this)
 
-        if(permsManager!!.isInstallAppsPermissionGranted()){
+        if(isReviewing){
             binding.grant.text ="Next"
-            isReviewing = true
         }else{
             binding.grant.text ="Permit App Installation Permissions"
         }
