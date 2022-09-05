@@ -23,7 +23,7 @@ class NotifUpdateUtil {
                 .setContentTitle(MainActivity.TITLE)
                 .setTicker(MainActivity.TITLE)
                 .setContentText("Unlocks: ${DataCollectorService.localUnlocks} | Steps: ${DataCollectorService.localSteps}")
-                .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setOngoing(true)
                 .setContentIntent(createNotifContext(context))
                 .setOnlyAlertOnce(true)

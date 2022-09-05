@@ -15,12 +15,10 @@ import java.util.*
 
 class ReportRequestQueue {
     companion object {
-        fun add(context: Context, type: String, params: String, payload: String) {
-            runBlocking {
-                DatabaseManager.getInstance(context).routerRequestsDAO.insert(
-                    RouterRequest(Date(), type, params, payload)
-                )
-            }
+        suspend fun add(context: Context, type: String, params: String, payload: String) {
+            DatabaseManager.getInstance(context).routerRequestsDAO.insert(
+                RouterRequest(Date(), type, params, payload)
+            )
         }
 
         fun peek(context: Context): RouterRequest? {
