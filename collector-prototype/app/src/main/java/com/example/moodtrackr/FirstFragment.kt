@@ -12,6 +12,7 @@ import com.example.moodtrackr.auth.Auth0Manager
 import com.example.moodtrackr.collectors.service.DataCollectorService
 import com.example.moodtrackr.collectors.service.util.NotifUpdateUtil
 import com.example.moodtrackr.collectors.util.CollectionUtil
+import com.example.moodtrackr.collectors.workers.util.WorkersUtil
 import com.example.moodtrackr.data.MTUsageData
 import com.example.moodtrackr.databinding.FragmentFirstBinding
 import com.example.moodtrackr.extractors.UnlockCollector
@@ -185,6 +186,10 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
                     R.string.auth0_user_metadata))
             Log.e("DEBUG", "$metadata")
 
+        }
+
+        binding.popReqBtn.setOnClickListener {
+            WorkersUtil.queueRouterRequestsWorkerOneTime(requireContext().applicationContext)
         }
 
         binding.surveyBtn.setOnClickListener {

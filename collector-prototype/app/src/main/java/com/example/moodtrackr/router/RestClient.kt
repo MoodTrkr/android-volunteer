@@ -185,15 +185,13 @@ interface RestClient : UsageDataRoutes, UpdateRoutes {
         private suspend fun <T, R> queueRequest(context: Context, inp1: T, inp2: R?) {
             when (inp2) {
                 null -> null
-                is MTUsageData -> {
+                is MTUsageData, is MTUsageDataStamped -> {
                     val gson = Gson()
-                    DatabaseManager.getInstance(context).routerRequestsDAO.insert(
-                        RouterRequest(
-                            Date(),
-                            RouterRequest.INSERT_USAGE,
-                            inp1.toString(),
-                            gson.toJson(inp2)
-                        )
+                    ReportRequestQueue.add(
+                        context,
+                        RouterRequest.INSERT_USAGE,
+                        inp1.toString(),
+                        gson.toJson(inp2)
                     )
                 }
                 else -> Log.e("DEBUG", "Unsupported Rest request type")
